@@ -35,3 +35,9 @@ function update()
 {
     
 }
+
+var socket = io.connect();
+socket.on('hi', function(msg) {
+    console.log(msg);
+});
+socket.emit('hello');

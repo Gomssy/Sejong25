@@ -1,0 +1,19 @@
+{
+  "name": "sejong25",
+  "version": "1.0.0",
+  "description": "",
+  "main": "run_server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.kucatdog.net/tear-of-sejong/sejong25.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.2.0"
+  }
+}
