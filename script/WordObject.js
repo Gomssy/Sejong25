@@ -12,7 +12,18 @@ class WordObject
             }
             return temp;
         })(this.wordText);
-        //alert(this.wordTyping);
+        this.wordGrade = 2 < this.wordTyping && this.wordTyping < 6 ? 3 :
+                         7 < this.wordTyping && this.wordTyping < 11 ? 2 : 
+                         12 < this.wordTyping && this.wordTyping < 16 ? 1 : 0;
+        this.wordWeight = (function(_wordGrade)
+        {
+            var temp = 0;
+            temp = _wordGrade == 3 ? 3 : 
+                _wordGrade == 2 ? 5 : 
+                _wordGrade == 1 ? 7 : 10;
+            return temp;
+        })(this.wordGrade);
+        //alert("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
     }
 
     generate(scene)
@@ -30,7 +41,22 @@ class WordObject
         this.physicsObj.setVelocity(dist * Math.cos(angle) * wordSpeed, dist * Math.sin(angle) * wordSpeed);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
     }
+
+    getWordWeight()
+    {
+        return this.wordWeight;
+    }
 }
+
+//***********ToDo*************
+WordObject.isEqual(inputWord)
+{
+    if(inputWord === this.wordText)
+    {
+        this.destroy();
+    }
+}
+//****************************
 
 function firstSound(charText)
 {
