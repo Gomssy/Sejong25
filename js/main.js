@@ -52,17 +52,14 @@ function create()
 
 function update()
 {
-    var socket = io.connect();
-    socket.on('hi', function(msg) {
-        console.log(msg);
-    });
-    socket.emit('hello');
-    
     for(i = 0; i < WordSpace.wordGroup.length; i++)
     {
         WordSpace.wordGroup[i].attract(0.3);
     }
 }
 
-
-
+var socket = io.connect();
+socket.on('hi', function(msg) {
+    console.log(msg);
+});
+socket.emit('hello');

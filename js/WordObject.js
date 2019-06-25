@@ -46,17 +46,17 @@ class WordObject
     {
         return this.wordWeight;
     }
-}
 
-//***********ToDo*************
-WordObject.isEqual(inputWord)
-{
-    if(inputWord === this.wordText)
+    //***********ToDo*************
+    isEqual(inputWord)
     {
-        this.destroy();
+        if(inputWord === this.wordText)
+        {
+            this.destroy();
+        }
     }
+    //****************************
 }
-//****************************
 
 function firstSound(charText)
 {
