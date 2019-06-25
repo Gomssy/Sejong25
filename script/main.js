@@ -38,7 +38,7 @@ function create()
             delay: 2000,
             callback: function()
             {
-                word = new Word("솽젠커");
+                word = new WordObject("솽젠커");
                 word.generate(this);
                 WordSpace.wordGroup.push(word);
                 this.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
@@ -54,6 +54,6 @@ function update()
 {
     for(i = 0; i < WordSpace.wordGroup.length; i++)
     {
-        WordSpace.wordGroup[i].attract(0.5);
+        WordSpace.wordGroup[i].attract(0.3);
     }
 }
