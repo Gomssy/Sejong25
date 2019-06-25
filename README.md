@@ -2,8 +2,13 @@
 
 ## 필수
 1. nodejs 설치
-2. npm 설치
-3. npm install
+    - https://nodejs.org/en/download/
+2. npm
+    - nodejs를 설치하면 함께 설치됨
+    - `$ npm install npm -g` 하면 최신 버전으로 업데이트
+3. Dependency 모듈 설치
+    - `$ npm install`
+    - sejong25 디렉토리에서 콘솔을 열고 명령어 실행
     - package.json과 package-lock.json을 참고하여 필요한 모듈들을 자동으로 설치해 줌
 
 ## 서버 및 네트워킹
