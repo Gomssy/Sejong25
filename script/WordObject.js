@@ -3,6 +3,16 @@ class WordObject
     constructor(text)
     {
         this.wordText = text;
+        this.wordTyping = (function(_wordText)
+        {
+            var temp = 0;
+            for(var i = 0; i < _wordText.length; i++)
+            {
+                temp += firstSound(_wordText.charAt(i)) + middleSound(_wordText.charAt(i)) + lastSound(_wordText.charAt(i));
+            }
+            return temp;
+        })(this.wordText);
+        //alert(this.wordTyping);
     }
 
     generate(scene)
@@ -20,4 +30,46 @@ class WordObject
         this.physicsObj.setVelocity(dist * Math.cos(angle) * wordSpeed, dist * Math.sin(angle) * wordSpeed);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
     }
+}
+
+function firstSound(charText)
+{
+    var r = parseInt(((charText.charCodeAt(0) - parseInt('0xac00',16)) /28) / 21);
+    switch(r)
+    {
+        case 1 || 4 || 8 || 19 || 13: return 1.3;
+        default: return 1;
+    }
+    /*var t = String.fromCharCode(r + parseInt('0x1100',16));
+    console.log("first sound : " + r + " " + t);
+	return r;*/
+}
+
+function middleSound(charText)
+{
+	var r = parseInt(((charText.charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21);
+    switch(r)
+    {
+        case 3 || 7: return 1.3;
+        case 9 || 10 || 11 || 14 || 15 || 16 || 19: return 2;
+        default: return 1;
+    }
+    /*var t = String.fromCharCode(r + parseInt('0x1161',16));
+    console.log("middle sound : " + r + " " + t);
+	return r;*/
+}
+
+function lastSound(charText)
+{
+	var r = parseInt((charText.charCodeAt(0) - parseInt('0xac00',16)) % 28);
+    switch(r)
+    {
+        case 2 || 20: return 1.3;
+        case 3 || 5 || 6 || 9 || 10 || 11 || 12 || 13 || 14 || 15 || 18: return 2;
+        case 0: return 0;
+        default: return 1;
+    }
+    /*var t = String.fromCharCode(r + parseInt('0x11A8') -1);
+    console.log("last sound : " + r + " " + t);
+	return r;*/
 }
