@@ -23,11 +23,13 @@ function preload()
 {
     BackGround.loadImage(this);
     WordSpace.loadImage(this);
+    Input.inputField.loadImage(this);
 }
 
 function create()
 {
     BackGround.drawBrain(this);
+    Input.inputField.generate(this);
     WordSpace.wordPhysicsGroup = this.physics.add.group();
     WordSpace.resetCycle(this, 2000);
 }

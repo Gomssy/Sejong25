@@ -15,10 +15,13 @@ Input.convert = function()
 
 Input.inputField = 
 {
-    background: null,
-    text: null,
-    init: function()
+    generate: function(scene)
     {
-
+        this.background = scene.add.sprite(400, 500, 'inputFieldBackground').setScale(0.2);
+        this.text = scene.add.text(400, 500, "안녕하세요", {font: '15pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000');
+    },
+    loadImage: function(scene)
+    {
+        scene.load.image('inputFieldBackground', 'assets/inputFieldBackground.png');
     }
 }
