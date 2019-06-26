@@ -32,22 +32,7 @@ function create()
     BackGround.drawBrain(this);
     WordSpace.wordGroup = [];
     WordSpace.wordPhysicsGroup = this.physics.add.group();
-
-    this.time.addEvent(
-        {
-            delay: 2000,
-            callback: function()
-            {
-                word = new WordObject("솽젠커");
-                word.generate(this);
-                WordSpace.wordGroup.push(word);
-                this.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
-                WordSpace.wordPhysicsGroup.add(word.physicsObj);
-            },
-            callbackScope: this,
-            repeat: 10
-        }
-    );
+    WordSpace.resetCycle(this, 2000);
 }
 
 function update()

@@ -28,8 +28,8 @@ class WordObject
 
     generate(scene)
     {
-        var randomX = Phaser.Math.Between(100, 500);
-        this.physicsObj = scene.physics.add.sprite(randomX, 100, 'wordBackground').setScale(0.5);
+        var randomX = Phaser.Math.Between(100, 700);
+        this.physicsObj = scene.physics.add.sprite(randomX, 100, 'wordBackground').setScale(0.3);
         this.wordObj = scene.add.text(randomX, 100, this.wordText, {fontFamily: '"궁서", 궁서체, serif'}).setColor('#000000');
         this.wordObj.setOrigin(0.5,0.5);
     }
