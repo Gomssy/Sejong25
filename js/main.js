@@ -30,17 +30,16 @@ function preload()
 function create()
 {
     BackGround.drawBrain(this);
-    WordSpace.wordGroup = [];
     WordSpace.wordPhysicsGroup = this.physics.add.group();
     WordSpace.resetCycle(this, 2000);
 }
 
 function update()
 {
-    for(i = 0; i < WordSpace.wordGroup.length; i++)
+    WordSpace.wordForcedGroup.forEach(function(element)
     {
-        WordSpace.wordGroup[i].attract(0.3);
-    }
+        element.attract(0.3);
+    });
 }
 
 var socket = io.connect();

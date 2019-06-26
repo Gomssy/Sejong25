@@ -2,7 +2,8 @@ var WordSpace = WordSpace || {};
 
 WordSpace.isImageLoaded = false;
 
-WordSpace.wordGroup = null;
+WordSpace.wordGroup = [];
+WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
 WordSpace.gravityPoint = {x: 400, y: 300};
@@ -10,42 +11,23 @@ WordSpace.gravityPoint = {x: 400, y: 300};
 WordSpace.wordCycle = null;
 WordSpace.resetCycle = function(scene, _delay)
 {
+    var option = 
+    {
+        delay: _delay,
+        callback: function()
+        {
+            WordSpace.generateWord(this)
+        },
+        callbackScope: scene,
+        loop: true
+    };
     if (this.wordCycle != null)
     {
-        this.wordCycle = this.wordCycle.reset(
-            {
-                delay: _delay,
-                callback: function()
-                {
-                    word = new WordObject("솽젠커");
-                    word.generate(this);
-                    WordSpace.wordGroup.push(word);
-                    this.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
-                    WordSpace.wordPhysicsGroup.add(word.physicsObj);
-                },
-                callbackScope: scene,
-                loop: true
-            }
-        );
+        this.wordCycle = this.wordCycle.reset(option);
     }
     else
     {
-        this.wordCycle = scene.time.addEvent(
-            {
-                delay: _delay,
-                callback: function()
-                {
-                    word = new WordObject("솽젠커");
-                    word.generate(this);
-                    WordSpace.wordGroup.push(word);
-                    this.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
-                    this.physics.add.collider(word.physicsObj, BackGround.brainGroup);
-                    WordSpace.wordPhysicsGroup.add(word.physicsObj);
-                },
-                callbackScope: scene,
-                loop: true
-            }
-        );
+        this.wordCycle = scene.time.addEvent(option);
     }
 }
 
@@ -55,4 +37,15 @@ WordSpace.loadImage = function(scene)
     {
         scene.load.image('wordBackground', 'assets/wordBackground.png');
     }
+}
+
+WordSpace.generateWord = function(scene)
+{
+    word = new WordObject("솽젠커");
+    word.instantiate(scene);
+    WordSpace.wordGroup.push(word);
+    WordSpace.wordForcedGroup.push(word);
+    scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
+    scene.physics.add.collider(word.physicsObj, BackGround.brainGroup);
+    WordSpace.wordPhysicsGroup.add(word.physicsObj);
 }
