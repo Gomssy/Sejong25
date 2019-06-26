@@ -38,8 +38,9 @@ function create()
             delay: 2000,
             callback: function()
             {
-                word = new WordObject("솽젠커");
+                var word = new WordObject("치또이쯔");
                 word.generate(this);
+                console.log(word.getWordWeight() + " " + word.wordTyping);
                 WordSpace.wordGroup.push(word);
                 this.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
                 WordSpace.wordPhysicsGroup.add(word.physicsObj);

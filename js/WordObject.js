@@ -8,7 +8,7 @@ class WordObject
             var temp = 0;
             for(var i = 0; i < _wordText.length; i++)
             {
-                temp += firstSound(_wordText.charAt(i)) + middleSound(_wordText.charAt(i)) + lastSound(_wordText.charAt(i));
+                temp += parseFloat(firstSound(_wordText.charAt(i))) + middleSound(_wordText.charAt(i)) + lastSound(_wordText.charAt(i));
             }
             return temp;
         })(this.wordText);
@@ -47,6 +47,16 @@ class WordObject
         return this.wordWeight;
     }
 
+    removeConVow(_wordText)
+    {
+        var temp = 0;
+        for(var i = 0; i < _wordText.length; i++)
+        {
+            
+        }
+        return temp;
+    }
+
     //***********ToDo*************
     isEqual(inputWord)
     {
@@ -61,41 +71,23 @@ class WordObject
 function firstSound(charText)
 {
     var r = parseInt(((charText.charCodeAt(0) - parseInt('0xac00',16)) /28) / 21);
-    switch(r)
-    {
-        case 1 || 4 || 8 || 19 || 13: return 1.3;
-        default: return 1;
-    }
-    /*var t = String.fromCharCode(r + parseInt('0x1100',16));
-    console.log("first sound : " + r + " " + t);
-	return r;*/
+    if(r === 1 || r === 4 || r === 8 || r === 10 || r === 13) return 1.3;
+    else return 1;
 }
 
 function middleSound(charText)
 {
-	var r = parseInt(((charText.charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21);
-    switch(r)
-    {
-        case 3 || 7: return 1.3;
-        case 9 || 10 || 11 || 14 || 15 || 16 || 19: return 2;
-        default: return 1;
-    }
-    /*var t = String.fromCharCode(r + parseInt('0x1161',16));
-    console.log("middle sound : " + r + " " + t);
-	return r;*/
+    var r = parseInt(((charText.charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21);
+    if(r === 3 || r === 7) return 1.3;
+    else if(r === 9 || r === 10 || r === 11 || r === 14 || r === 15 || r === 16 || r === 19) return 2;
+    else return 1;
 }
 
 function lastSound(charText)
 {
-	var r = parseInt((charText.charCodeAt(0) - parseInt('0xac00',16)) % 28);
-    switch(r)
-    {
-        case 2 || 20: return 1.3;
-        case 3 || 5 || 6 || 9 || 10 || 11 || 12 || 13 || 14 || 15 || 18: return 2;
-        case 0: return 0;
-        default: return 1;
-    }
-    /*var t = String.fromCharCode(r + parseInt('0x11A8') -1);
-    console.log("last sound : " + r + " " + t);
-	return r;*/
+    var r = parseInt((charText.charCodeAt(0) - parseInt('0xac00',16)) % 28);
+    if(r === 2 || r === 20) return 1.3;
+    else if(r === 0) return 0;
+    else if(r === 3 || r === 5 || r === 6 || r === 9 || r === 10 || r === 11 || r === 12 || r === 13 || r === 14 || r === 15 || r === 18) return 2;
+    else return 1;
 }
