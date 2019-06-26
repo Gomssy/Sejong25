@@ -2,6 +2,8 @@ class WordObject
 {
     constructor(text)
     {
+        this.generationCode = WordSpace.nextWordCode++;
+
         this.wordText = text;
         this.wordTyping = (function(_wordText)
         {
@@ -33,6 +35,17 @@ class WordObject
         this.wordObj = scene.add.text(randomX, 100, this.wordText, {fontFamily: '"궁서", 궁서체, serif'}).setColor('#000000');
         this.wordObj.setOrigin(0.5,0.5);
     }
+
+    destroy()
+    {
+        this.wordObj.destroy();
+        const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
+        if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
+        const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
+        if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
+        WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
+    }
+
     
     attract(wordSpeed)
     {
@@ -45,6 +58,11 @@ class WordObject
     getWordWeight()
     {
         return this.wordWeight;
+    }
+
+    isEqualObject(_generationCode)
+    {
+        return _generationCode === this._generationCode;
     }
 
     //***********ToDo*************

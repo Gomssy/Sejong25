@@ -2,6 +2,8 @@ var WordSpace = WordSpace || {};
 
 WordSpace.isImageLoaded = false;
 
+WordSpace.nextWordCode = 0;
+
 WordSpace.wordGroup = [];
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
