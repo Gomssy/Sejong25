@@ -18,8 +18,6 @@ var config = {
 
 var game = new Phaser.Game(config);
 
-var tec;
-
 // load assets
 function preload()
 {
