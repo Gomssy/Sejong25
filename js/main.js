@@ -18,45 +18,28 @@ var config = {
 
 var game = new Phaser.Game(config);
 
-var tec;
-
 // load assets
 function preload()
 {
     BackGround.loadImage(this);
     WordSpace.loadImage(this);
+    Input.inputField.loadImage(this);
 }
 
 function create()
 {
     BackGround.drawBrain(this);
-    WordSpace.wordGroup = [];
+    Input.inputField.generate(this);
     WordSpace.wordPhysicsGroup = this.physics.add.group();
-
-    this.time.addEvent(
-        {
-            delay: 2000,
-            callback: function()
-            {
-                var word = new WordObject("치또이쯔");
-                word.generate(this);
-                console.log(word.getWordWeight() + " " + word.wordTyping);
-                WordSpace.wordGroup.push(word);
-                this.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
-                WordSpace.wordPhysicsGroup.add(word.physicsObj);
-            },
-            callbackScope: this,
-            repeat: 10
-        }
-    );
+    WordSpace.resetCycle(this, 2000);
 }
 
 function update()
 {
-    for(i = 0; i < WordSpace.wordGroup.length; i++)
+    WordSpace.wordForcedGroup.forEach(function(element)
     {
-        WordSpace.wordGroup[i].attract(0.3);
-    }
+        element.attract(0.3);
+    });
 }
 
 var socket = io.connect();
