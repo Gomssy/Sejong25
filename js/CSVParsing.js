@@ -1,26 +1,7 @@
-function Dictionary() {
-    this.add = add;
-    this.datastore = new Array();
-    this.find = find;
-    this.remove = remove;
-}
-
-function add(key, value) {
-    this.datastore[key] = value;
-}
-
-function find(key, value) {
-    return this.datastore[key];
-}
-
-function remove(key) {
-    delete this.datastore[key];
-}
-
-var wordDic3 = new Dictionary();
-var wordDic2 = new Dictionary();
-var wordDic1 = new Dictionary();
-var wordDic0 = new Dictionary();
+var grade3Array = new Array();
+var grade2Array = new Array();
+var grade1Array = new Array();
+var grade0Array = new Array();
 
 function CSVParse($data) {
     var allRows = $data.split('\n')
@@ -32,13 +13,13 @@ function CSVParse($data) {
         grade = WordReader.getWordGrade(typing);
 
         if(grade==3) {
-            wordDic3.add(allRows[singleRow], grade);
+            grade3Array.push(allRows[singleRow]);
         } else if(grade==2) {
-            wordDic2.add(allRows[singleRow], grade);
+            grade2Array.push(allRows[singleRow]);
         } else if(grade==1) {
-            wordDic1.add(allRows[singleRow], grade);
+            grade1Array.push(allRows[singleRow]);
         } else {
-            wordDic0.add(allRows[singleRow], grade);
+            grade0Array.push(allRows[singleRow]);
         }
     }
-}  
+}
