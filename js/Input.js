@@ -339,7 +339,7 @@ Input.pushInput = function(inputKey)
         }
         else output = inputKey.charCodeAt(0);
         Input.input.push(output);
-        console.log(Input.input);
+        console.log(Input.input );
         Input.convert();
         Input.inputField.text.setText(Input.convInput);
         this.pressCount++;
