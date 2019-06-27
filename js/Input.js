@@ -40,16 +40,16 @@ Input.convert = function()
         // 모음쌍 체크
         else if (this.input[i] >= 'ㅏ'.charCodeAt(0) && this.input[i + 1] >= 'ㅏ'.charCodeAt(0)) 
         {
-            switch (String.fromCharCode(this.input[i]) | String.fromCharCode(this.input[i + 1]))
+            switch (String.fromCharCode(this.input[i]) + String.fromCharCode(this.input[i + 1]))
             {
-                case 'ㅗ' | 'ㅏ': krInput += 'ㅘ'; vowels.push(krInput.length - 1); i++; break;
-                case 'ㅗ' | 'ㅐ': krInput += 'ㅙ'; vowels.push(krInput.length - 1); i++; break;
-                case 'ㅗ' | 'ㅣ': krInput += 'ㅚ'; vowels.push(krInput.length - 1); i++; break;
-                case 'ㅜ' | 'ㅓ': krInput += 'ㅝ'; vowels.push(krInput.length - 1); i++; break;
-                case 'ㅜ' | 'ㅔ': krInput += 'ㅞ'; vowels.push(krInput.length - 1); i++; break;
-                case 'ㅜ' | 'ㅣ': krInput += 'ㅟ'; vowels.push(krInput.length - 1); i++; break;
-                case 'ㅡ' | 'ㅣ': krInput += 'ㅢ'; vowels.push(krInput.length - 1); i++; break;
-                default: break; // 모음쌍을 만들지 못함.
+                case 'ㅗㅏ': krInput += 'ㅘ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅗㅐ': krInput += 'ㅙ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅗㅣ': krInput += 'ㅚ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅜㅓ': krInput += 'ㅝ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅜㅔ': krInput += 'ㅞ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅜㅣ': krInput += 'ㅟ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅡㅣ': krInput += 'ㅢ'; vowels.push(krInput.length - 1); i++; break;
+                default: krInput += String.fromCharCode(this.input[i]); vowels.push(krInput.length - 1); break; // 모음쌍을 만들지 못함.
             }
         }
         // 나머지 자음 및 남는 모음들
@@ -60,6 +60,7 @@ Input.convert = function()
         }
     }
     this.convInput = krInput;
+    console.log(vowels);
 }
 
 Input.inputField = 
