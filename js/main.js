@@ -39,7 +39,7 @@ function update()
 {
     WordSpace.wordForcedGroup.forEach(function(element)
     {
-        element.attract(0.3);
+        element.attract();
     });
 }
 
