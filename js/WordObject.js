@@ -6,7 +6,7 @@ class WordObject
         this.wordText = text;
         //this.wordText = Input.removeConVow(text);
         this.wordTyping = WordReader.getWordTyping(this.wordText);
-        this.wordGrade = WordReader.getwordWeight(this.wordTyping);
+        this.wordGrade = WordReader.getWordGrade(this.wordTyping);
         this.wordWeight = (function(_wordGrade)
         {
             var temp = 0;
@@ -15,6 +15,9 @@ class WordObject
                 _wordGrade == 1 ? 7 : 10;
             return temp;
         })(this.wordGrade);
+        WordSpace.totalWeight += this.wordWeight;
+        WordSpace.setGameOverTimer();
+        console.log("Total weight : " + WordSpace.totalWeight);
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
     }
 
