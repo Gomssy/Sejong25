@@ -8,13 +8,58 @@ Input.isShifted = false;
 Input.reset = function()
 {
     Input.input = [];
+    Input.convInput = [];
     Input.inputField.text.setText(Input.convInput);
-    console.log(Input.input)
+    console.log(Input.input);
 }
 
+// convert input to convInput
 Input.convert = function()
 {
-    // convert input to convInput
+    // input -> krInput with vowels
+    let krInput = "";
+    let vowels = [];
+    for (let i = 0; i < this.input.length; i++)
+    {
+        // 쌍자음, Shift쓰는 모음 체크
+        if (this.input[i] < 0)
+        {
+            console.log(-1 * this.input[i]);
+            switch(String.fromCharCode(-1 * this.input[i]))
+            {
+                case 'ㅂ': krInput += 'ㅃ'; break;
+                case 'ㅈ': krInput += 'ㅉ'; break;
+                case 'ㄷ': krInput += 'ㄸ'; break;
+                case 'ㄱ': krInput += 'ㄲ'; break;
+                case 'ㅅ': krInput += 'ㅆ'; break;
+                case 'ㅐ': krInput += 'ㅒ'; vowels.push(krInput.length - 1); break;
+                case 'ㅔ': krInput += 'ㅖ'; vowels.push(krInput.length - 1); break;
+                default: console.log("[ERR] 이상한 단어가 쌍자음으로 들어옴."); break;
+            }
+        }
+        // 모음쌍 체크
+        else if (this.input[i] >= 'ㅏ'.charCodeAt(0) && this.input[i + 1] >= 'ㅏ'.charCodeAt(0)) 
+        {
+            switch (String.fromCharCode(this.input[i]) | String.fromCharCode(this.input[i + 1]))
+            {
+                case 'ㅗ' | 'ㅏ': krInput += 'ㅘ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅗ' | 'ㅐ': krInput += 'ㅙ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅗ' | 'ㅣ': krInput += 'ㅚ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅜ' | 'ㅓ': krInput += 'ㅝ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅜ' | 'ㅔ': krInput += 'ㅞ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅜ' | 'ㅣ': krInput += 'ㅟ'; vowels.push(krInput.length - 1); i++; break;
+                case 'ㅡ' | 'ㅣ': krInput += 'ㅢ'; vowels.push(krInput.length - 1); i++; break;
+                default: break; // 모음쌍을 만들지 못함.
+            }
+        }
+        // 나머지 자음 및 남는 모음들
+        else
+        {
+            krInput += String.fromCharCode(this.input[i]);
+            if (this.input[i] >= 'ㅏ'.charCodeAt(0)) vowels.push(krInput.length - 1); // 모음일 경우
+        }
+    }
+    this.convInput = krInput;
 }
 
 Input.inputField = 
@@ -31,7 +76,8 @@ Input.inputField =
         {
             if (Input.input.length > 0)
             {
-                Input.input.pop(); 
+                Input.input.pop();
+                Input.convert();
                 Input.inputField.text.setText(Input.convInput);
                 console.log(Input.input);
             }
@@ -42,34 +88,34 @@ Input.inputField =
             // do something
         });
         // upside 10 keys
-        scene.input.keyboard.on('keydown-Q', function() {Input.pushInput('Q')});
-        scene.input.keyboard.on('keydown-W', function() {Input.pushInput('W')});
-        scene.input.keyboard.on('keydown-E', function() {Input.pushInput('E')});
-        scene.input.keyboard.on('keydown-R', function() {Input.pushInput('R')});
-        scene.input.keyboard.on('keydown-T', function() {Input.pushInput('T')});
-        scene.input.keyboard.on('keydown-Y', function() {Input.pushInput('Y')});
-        scene.input.keyboard.on('keydown-U', function() {Input.pushInput('U')});
-        scene.input.keyboard.on('keydown-I', function() {Input.pushInput('I')});
-        scene.input.keyboard.on('keydown-O', function() {Input.pushInput('O')});
-        scene.input.keyboard.on('keydown-P', function() {Input.pushInput('P')});
+        scene.input.keyboard.on('keydown-Q', function() {Input.pushInput('ㅂ')});
+        scene.input.keyboard.on('keydown-W', function() {Input.pushInput('ㅈ')});
+        scene.input.keyboard.on('keydown-E', function() {Input.pushInput('ㄷ')});
+        scene.input.keyboard.on('keydown-R', function() {Input.pushInput('ㄱ')});
+        scene.input.keyboard.on('keydown-T', function() {Input.pushInput('ㅅ')});
+        scene.input.keyboard.on('keydown-Y', function() {Input.pushInput('ㅛ')});
+        scene.input.keyboard.on('keydown-U', function() {Input.pushInput('ㅕ')});
+        scene.input.keyboard.on('keydown-I', function() {Input.pushInput('ㅑ')});
+        scene.input.keyboard.on('keydown-O', function() {Input.pushInput('ㅐ')});
+        scene.input.keyboard.on('keydown-P', function() {Input.pushInput('ㅔ')});
         // middleside 9 keys
-        scene.input.keyboard.on('keydown-A', function() {Input.pushInput('A')});
-        scene.input.keyboard.on('keydown-S', function() {Input.pushInput('S')});
-        scene.input.keyboard.on('keydown-D', function() {Input.pushInput('D')});
-        scene.input.keyboard.on('keydown-F', function() {Input.pushInput('F')});
-        scene.input.keyboard.on('keydown-G', function() {Input.pushInput('G')});
-        scene.input.keyboard.on('keydown-H', function() {Input.pushInput('H')});
-        scene.input.keyboard.on('keydown-J', function() {Input.pushInput('J')});
-        scene.input.keyboard.on('keydown-K', function() {Input.pushInput('K')});
-        scene.input.keyboard.on('keydown-L', function() {Input.pushInput('L')});
+        scene.input.keyboard.on('keydown-A', function() {Input.pushInput('ㅁ')});
+        scene.input.keyboard.on('keydown-S', function() {Input.pushInput('ㄴ')});
+        scene.input.keyboard.on('keydown-D', function() {Input.pushInput('ㅇ')});
+        scene.input.keyboard.on('keydown-F', function() {Input.pushInput('ㄹ')});
+        scene.input.keyboard.on('keydown-G', function() {Input.pushInput('ㅎ')});
+        scene.input.keyboard.on('keydown-H', function() {Input.pushInput('ㅗ')});
+        scene.input.keyboard.on('keydown-J', function() {Input.pushInput('ㅓ')});
+        scene.input.keyboard.on('keydown-K', function() {Input.pushInput('ㅏ')});
+        scene.input.keyboard.on('keydown-L', function() {Input.pushInput('ㅣ')});
         // downside 7 keys
-        scene.input.keyboard.on('keydown-Z', function() {Input.pushInput('Z')});
-        scene.input.keyboard.on('keydown-X', function() {Input.pushInput('X')});
-        scene.input.keyboard.on('keydown-C', function() {Input.pushInput('C')});
-        scene.input.keyboard.on('keydown-V', function() {Input.pushInput('V')});
-        scene.input.keyboard.on('keydown-B', function() {Input.pushInput('B')});
-        scene.input.keyboard.on('keydown-N', function() {Input.pushInput('N')});
-        scene.input.keyboard.on('keydown-M', function() {Input.pushInput('M')});
+        scene.input.keyboard.on('keydown-Z', function() {Input.pushInput('ㅋ')});
+        scene.input.keyboard.on('keydown-X', function() {Input.pushInput('ㅌ')});
+        scene.input.keyboard.on('keydown-C', function() {Input.pushInput('ㅊ')});
+        scene.input.keyboard.on('keydown-V', function() {Input.pushInput('ㅍ')});
+        scene.input.keyboard.on('keydown-B', function() {Input.pushInput('ㅠ')});
+        scene.input.keyboard.on('keydown-N', function() {Input.pushInput('ㅜ')});
+        scene.input.keyboard.on('keydown-M', function() {Input.pushInput('ㅡ')});
     },
     loadImage: function(scene)
     {
@@ -84,18 +130,19 @@ Input.pushInput = function(inputKey)
     {
         switch(inputKey)
         {
-            case 'Q': output = -1 * 'Q'.charCodeAt(0); break;
-            case 'W': output = -1 * 'W'.charCodeAt(0); break;
-            case 'E': output = -1 * 'E'.charCodeAt(0); break;
-            case 'R': output = -1 * 'R'.charCodeAt(0); break;
-            case 'T': output = -1 * 'T'.charCodeAt(0); break;
-            case 'O': output = -1 * 'O'.charCodeAt(0); break;
-            case 'P': output = -1 * 'P'.charCodeAt(0); break;
+            case 'ㅂ': output = -1 * 'ㅂ'.charCodeAt(0); break;
+            case 'ㅈ': output = -1 * 'ㅈ'.charCodeAt(0); break;
+            case 'ㄷ': output = -1 * 'ㄷ'.charCodeAt(0); break;
+            case 'ㄱ': output = -1 * 'ㄱ'.charCodeAt(0); break;
+            case 'ㅅ': output = -1 * 'ㅅ'.charCodeAt(0); break;
+            case 'ㅐ': output = -1 * 'ㅐ'.charCodeAt(0); break;
+            case 'ㅔ': output = -1 * 'ㅔ'.charCodeAt(0); break;
             default: output = inputKey.charCodeAt(0); break;
         }
     }
     else output = inputKey.charCodeAt(0);
     Input.input.push(output);
     console.log(Input.input);
+    Input.convert();
     Input.inputField.text.setText(Input.convInput);
 }
