@@ -6,7 +6,7 @@ class WordObject
         this.wordText = text;
         //this.wordText = Input.removeConVow(text);
         this.wordTyping = WordReader.getWordTyping(this.wordText);
-        this.wordGrade = WordReader.getwordWeight(this.wordText);
+        this.wordGrade = WordReader.getwordWeight(this.wordTyping);
         this.wordWeight = (function(_wordGrade)
         {
             var temp = 0;
