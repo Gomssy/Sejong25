@@ -86,7 +86,11 @@ WordSpace.generateWord = function(scene)
     word.instantiate(scene);
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
-    scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup);
+    word.physicsObj.topObj = word;
+    scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
+    {
+        if (object1.topObj.isForced) object1.topObj.isForced = false;
+    });
     scene.physics.add.collider(word.physicsObj, BackGround.brainGroup);
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
 }
