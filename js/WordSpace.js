@@ -51,3 +51,15 @@ WordSpace.generateWord = function(scene)
     scene.physics.add.collider(word.physicsObj, BackGround.brainGroup);
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
 }
+
+WordSpace.findWord = function(word)
+{
+    var found = WordSpace.wordGroup.find(function(element)
+    {
+        return element.isEqual(word);
+    });
+    if (found != undefined)
+    {
+        found.destroy();
+    }
+}

@@ -1,17 +1,17 @@
 var Input = Input || {};
 
 Input.input = [];
-Input.convInput = ""; // converted input
+Input.convInput = ''; // converted input
 
 Input.isShifted = false;
 Input.pressCount = 0;
+Input.justPressed = '';
 
 Input.reset = function()
 {
     Input.input = [];
     Input.convInput = [];
     Input.inputField.text.setText(Input.convInput);
-    console.log(Input.input);
 }
 
 // convert input to convInput
@@ -25,7 +25,7 @@ Input.convert = function()
         // 쌍자음, Shift쓰는 모음 체크
         if (this.input[i] < 0)
         {
-            console.log(-1 * this.input[i]);
+            //console.log(-1 * this.input[i]);
             switch(String.fromCharCode(-1 * this.input[i]))
             {
                 case 'ㅂ': krInput += 'ㅃ'; break;
@@ -60,7 +60,7 @@ Input.convert = function()
             if (this.input[i] >= 'ㅏ'.charCodeAt(0)) vowels.push(krInput.length - 1); // 모음일 경우
         }
     }
-    console.log(vowels);
+    //console.log(vowels);
 
     this.convInput = "";
     let vowelIdx = 0;
@@ -150,7 +150,7 @@ Input.convert = function()
             }
         }
     }
-    console.log('__________');
+    console.log('_____end_convert_____');
 }
 
 Input.convertToLast = function(word)
@@ -181,11 +181,8 @@ Input.convertToLast = function(word)
 
 Input.convertToCharCode = function(first, middle, last)
 {
-    // 'last' must be code of last words
-    console.log(first + ' ' + (middle.charCodeAt(0) - 'ㅏ'.charCodeAt(0)) + ' ' + last );
-    var returnCode = 0xac00 + 28 * 21 * first + 28 * (middle.charCodeAt(0) - 'ㅏ'.charCodeAt(0)) + last;
-    console.log(returnCode);
-    return returnCode;
+    // 'last' and 'first' must be code of last words
+    return 0xac00 + 28 * 21 * first + 28 * (middle.charCodeAt(0) - 'ㅏ'.charCodeAt(0)) + last;
 }
 
 Input.combineLast = function(left, right)
@@ -250,7 +247,7 @@ Input.inputField =
         this.background = scene.add.sprite(400, 500, 'inputFieldBackground').setScale(0.2);
         this.text = scene.add.text(400, 500, "안녕하세요", {font: '15pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000');
 
-        scene.input.keyboard.on('keyup', function() {Input.pressCount--})
+        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});
         scene.input.keyboard.on('keydown-DELETE', function() {Input.reset()});
@@ -261,13 +258,12 @@ Input.inputField =
                 Input.input.pop();
                 Input.convert();
                 Input.inputField.text.setText(Input.convInput);
-                console.log(Input.input);
             }
         });
         scene.input.keyboard.on('keydown-ENTER', function()
         {
+            WordSpace.findWord(Input.convInput);
             Input.reset();
-            // do something
         });
         // upside 10 keys
         scene.input.keyboard.on('keydown-Q', function() {Input.pushInput('ㅂ')});
@@ -307,8 +303,9 @@ Input.inputField =
 
 Input.pushInput = function(inputKey)
 {
-    if (this.pressCount < 3)
+    if (this.justPressed != inputKey)
     {
+        this.justPressed = inputKey;
         let output;
         if (Input.isShifted)
         {

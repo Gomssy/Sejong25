@@ -38,6 +38,7 @@ class WordObject
 
     destroy()
     {
+        console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
         this.wordObj.destroy();
         const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
@@ -62,16 +63,13 @@ class WordObject
 
     isEqualObject(_generationCode)
     {
-        return _generationCode === this._generationCode;
+        return _generationCode === this.generationCode;
     }
 
     //***********ToDo*************
     isEqual(inputWord)
     {
-        if(inputWord === this.wordText)
-        {
-            this.destroy();
-        }
+        return this.wordText === inputWord;
     }
     //****************************
 }
