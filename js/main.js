@@ -31,7 +31,8 @@ function create()
     BackGround.drawBrain(this);
     Input.inputField.generate(this);
     WordSpace.wordPhysicsGroup = this.physics.add.group();
-    WordSpace.resetCycle(this, 2000);
+    WordSpace.wordCycle.resetCycle(this, 2000);
+    WordSpace.attackGauge.resetCycle(this);
 }
 
 function update()
