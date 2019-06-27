@@ -89,7 +89,7 @@ WordSpace.generateWord = function(scene)
     word.physicsObj.topObj = word;
     scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
     {
-        if (object1.topObj.isForced) object1.topObj.isForced = false;
+        if (object1.topObj.wordSpeed > 0.5) object1.topObj.wordSpeed = 0.05;
     });
     scene.physics.add.collider(word.physicsObj, BackGround.brainGroup);
     WordSpace.wordPhysicsGroup.add(word.physicsObj);

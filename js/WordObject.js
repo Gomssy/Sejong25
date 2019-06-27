@@ -25,7 +25,7 @@ class WordObject
                 _wordGrade == 1 ? 7 : 10;
             return temp;
         })(this.wordGrade);
-        this.isForced = true;
+        this.wordSpeed = 1;
         //alert("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
     }
 
@@ -49,14 +49,11 @@ class WordObject
         WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
     }
 
-    attract(wordSpeed)
+    attract()
     {
-        if (this.isForced)
-        {
-            var dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
-            var angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
-            this.physicsObj.setVelocity(dist * Math.cos(angle) * wordSpeed, dist * Math.sin(angle) * wordSpeed);
-        }
+        var dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
+        var angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
+        this.physicsObj.setVelocity(dist * Math.cos(angle) * this.wordSpeed, dist * Math.sin(angle) * this.wordSpeed);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
     }
 
