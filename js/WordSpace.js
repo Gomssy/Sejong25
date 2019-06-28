@@ -64,9 +64,11 @@ WordSpace.attackGauge =
 
 WordSpace.wordCycle =
 {
+    delay: 0,
     currentCycle: null,
     resetCycle: function(scene, _delay)
     {
+        this.delay = _delay;
         var option = 
         {
             delay: _delay,
@@ -74,6 +76,7 @@ WordSpace.wordCycle =
             {
                 let wordIdx = Math.floor(Math.random() * WordSpace.wordCycle.wordList.length);
                 WordSpace.generateWord(this, WordSpace.wordCycle.wordList[wordIdx]);
+                WordSpace.wordCycle.resetCycle(this, WordSpace.wordCycle.delay - 50);
             },
             callbackScope: scene,
             loop: true
@@ -89,7 +92,10 @@ WordSpace.wordCycle =
     },
     wordList: // 미개한 버전, 심심해서 만들어봄
     [
-        '솽젠커', '통관', '맥주땡겨', '자료구조', '팡광우럮다'
+        '맥주', '게임', '넥슨', '광팡', '팡광', '샌즈', '군머', '작혼', '육회', '공격',
+        '블루홀', '동묘얖', '치또이', '컴퓨터', '네빔띤', '소고기', '비넴띤', '비빔면',
+        '네오위즈', '기기괴피', '스테이크', '상장폐지', '상장폐거',
+        '탑블레이드', '엔씨소프트', '가스레인지', '괄도네빔띤'
     ]
 }
 
