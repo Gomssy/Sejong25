@@ -260,8 +260,8 @@ Input.inputField =
 {
     generate: function(scene)
     {
-        this.background = scene.add.sprite(400, 500, 'inputFieldBackground').setScale(0.2);
-        this.text = scene.add.text(400, 500, "안녕하세요", {font: '15pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000');
+        this.background = scene.add.sprite(400, 500, 'inputFieldBackground').setScale(0.2).setDepth(10);
+        this.text = scene.add.text(400, 500, "안녕하세요", {font: '15pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
 
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});

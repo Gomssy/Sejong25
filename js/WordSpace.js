@@ -56,7 +56,7 @@ WordSpace.attackGauge =
         };
         this.currentCycle = scene.time.addEvent(option);
 
-        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setColor('#ffffff');
+        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setColor('#ffffff').setDepth(10);
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;}
     // showValue: 아래쪽에 바의 길이로 게이지 표시, 색으로 게이지의 강도 표현
