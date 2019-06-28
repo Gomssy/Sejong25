@@ -1,7 +1,9 @@
-var grade3Array = grade3Array || {};
-var grade2Array = grade2Array || {};
-var grade1Array = grade1Array || {};
-var grade0Array = grade0Array || {};
+var gradeArray = {
+    grade3: [], //3급
+    grade2: [], //2급
+    grade1: [], //1급
+    grade0: []  //특급
+}
 
 function CSVParse($data) {
     var allRows = $data.split('\n')
@@ -13,13 +15,13 @@ function CSVParse($data) {
         grade = WordReader.getWordGrade(typing);
 
         if(grade==3) {
-            grade3Array.push(allRows[singleRow]);
+            gradeArray.grade3.push(allRows[singleRow]);
         } else if(grade==2) {
-            grade2Array.push(allRows[singleRow]);
+            gradeArray.grade2.push(allRows[singleRow]);
         } else if(grade==1) {
-            grade1Array.push(allRows[singleRow]);
+            gradeArray.grade1.push(allRows[singleRow]);
         } else {
-            grade0Array.push(allRows[singleRow]);
+            gradeArray.grade0.push(allRows[singleRow]);
         }
     }
 }
