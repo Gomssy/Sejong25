@@ -7,6 +7,8 @@ Input.isShifted = false;
 Input.pressCount = 0;
 Input.justPressed = '';
 
+Input.attackMode = false;
+
 Input.reset = function()
 {
     Input.input = [];
@@ -61,6 +63,7 @@ Input.convert = function()
         }
     }
     //console.log(vowels);
+    //console.log(krInput);
 
     this.convInput = "";
     let vowelIdx = 0;
@@ -70,10 +73,20 @@ Input.convert = function()
         for (let i = 0; i <= vowels[vowelIdx] - 2; i++) this.convInput += krInput[i];
         while (vowelIdx < vowels.length)
         {
-            if (krInput[vowels[vowelIdx] - 1] >= 'ㅏ'.charCodeAt(0)) // 모음 앞에 모음이 있을때
+            if (vowels[vowelIdx] - 1 < 0 || krInput[vowels[vowelIdx] - 1].charCodeAt(0) >= 'ㅏ'.charCodeAt(0)) // 모음 앞이 비거나 모음이 있을때
             {
-                this.convInput += krInput[vowels[vowelIdx]];
-                vowelIdx++;
+                if (vowelIdx + 1 < vowels.length) // 다음 모음이 있을때
+                {
+                    this.convInput += krInput[vowels[vowelIdx]];
+                    for (let i = vowels[vowelIdx] + 1; i <= vowels[vowelIdx + 1] - 2; ++i) this.convInput += krInput[i];
+                    ++vowelIdx;
+                }
+                else // 다음 모음이 없을때
+                {
+                    this.convInput += krInput[vowels[vowelIdx]];
+                    for (let i = vowels[vowelIdx] + 1; i < krInput.length; i++) this.convInput += krInput[i];
+                    ++vowelIdx;
+                }
             }
             else // 모음 앞에 자음이 있을때
             {
@@ -92,27 +105,27 @@ Input.convert = function()
                                 last = combLast;
                                 this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                                 for (var i = vowels[vowelIdx] + 3; i < krInput.length; i++) this.convInput += krInput[i];
-                                vowelIdx++;
+                                ++vowelIdx;
                             }
                             else // 뒤의 두 자음을 합칠수 없을때
                             {
                                 last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                                 this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                                 for (var i = vowels[vowelIdx] + 2; i < krInput.length; i++) this.convInput += krInput[i];
-                                vowelIdx++;
+                                ++vowelIdx;
                             }
                         }
                         else // 다다음 자음이 없을때
                         {
                             last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                             this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                            vowelIdx++;
+                            ++vowelIdx;
                         }
                     }
                     else // 다음 글자가 없을때
                     {
                         this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                        vowelIdx++;
+                        ++vowelIdx;
                     }
                 }
                 else // 다음 모음이 있을때
@@ -120,13 +133,13 @@ Input.convert = function()
                     if (vowels[vowelIdx + 1] - vowels[vowelIdx] <= 2) // 다음 모음 사이에 자음이 0개거나 1개
                     {
                         this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                        vowelIdx++;
+                        ++vowelIdx;
                     }
                     else if (vowels[vowelIdx + 1] - vowels[vowelIdx] === 3) // 다음 모음 사이에 자음이 2개
                     {
                         last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                         this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                        vowelIdx++;
+                        ++vowelIdx;
                     }
                     else // 다음 모음 사이에 자음이 3개 이상
                     {
@@ -136,21 +149,21 @@ Input.convert = function()
                             last = combLast;
                             this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                             for (var i = vowels[vowelIdx] + 3; i < vowels[vowelIdx + 1] - 1; i++) this.convInput += krInput[i];
-                            vowelIdx++;
+                            ++vowelIdx;
                         }
                         else // 뒤의 두 자음을 합칠수 없을때
                         {
                             last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                             this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                             for (var i = vowels[vowelIdx] + 2; i < vowels[vowelIdx + 1] - 1; i++) this.convInput += krInput[i];
-                            vowelIdx++;
+                            ++vowelIdx;
                         }   
                     }
                 }
             }
         }
     }
-    console.log('_____end_convert_____');
+    //console.log('_____end_convert_____');
 }
 
 Input.convertToLast = function(word)
@@ -260,8 +273,8 @@ Input.inputField =
 {
     generate: function(scene)
     {
-        this.background = scene.add.sprite(400, 500, 'inputFieldBackground').setScale(0.2);
-        this.text = scene.add.text(400, 500, "안녕하세요", {font: '15pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000');
+        this.background = scene.add.sprite(640, 550, 'inputfield').setDepth(10);
+        this.text = scene.add.text(640, 550, "안녕하세요", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
 
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
@@ -278,7 +291,8 @@ Input.inputField =
         });
         scene.input.keyboard.on('keydown-ENTER', function()
         {
-            WordSpace.findWord(Input.convInput);
+            if (Input.attackMode) WordSpace.attack(Input.convInput);
+            else WordSpace.findWord(Input.convInput);
             Input.reset();
         });
         // upside 10 keys
@@ -313,7 +327,7 @@ Input.inputField =
     },
     loadImage: function(scene)
     {
-        scene.load.image('inputFieldBackground', 'assets/inputFieldBackground.png');
+        scene.load.image('inputfield', 'assets/placeholder/inputfield.png');
     }
 }
 
@@ -339,7 +353,7 @@ Input.pushInput = function(inputKey)
         }
         else output = inputKey.charCodeAt(0);
         Input.input.push(output);
-        console.log(Input.input );
+        //console.log(Input.input);
         Input.convert();
         Input.inputField.text.setText(Input.convInput);
         this.pressCount++;

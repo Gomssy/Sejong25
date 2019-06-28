@@ -1,10 +1,12 @@
 var WordSpace = WordSpace || {};
 
+WordSpace.gameSceneForTest = null; // for test
+
 WordSpace.isImageLoaded = false;
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
-WordSpace.brainCapacity = 20; //수용 가능한 단어 무게 최대치
+WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.defeatTime = 3000;
 WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
 WordSpace.isTimerOn = false;
@@ -13,7 +15,16 @@ WordSpace.wordGroup = [];
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
-WordSpace.gravityPoint = {x: 400, y: 300};
+WordSpace.gravityPoint = {x: 640, y: 300};
+WordSpace.getSpawnPoint = function()
+{
+    let xLen = 600;
+    let yLen = 300;
+    const angle = Math.random() * Math.PI * 2;
+    let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
+    let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
+    return {x:_x, y:_y};
+}
 
 WordSpace.attackGauge = 
 {
@@ -45,9 +56,9 @@ WordSpace.attackGauge =
         };
         this.currentCycle = scene.time.addEvent(option);
 
-        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setColor('#ffffff');
+        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setDepth(10).setColor('#000000');
     },
-    pauseCycle: function(bool) {this.currentCycle.paused = bool;}
+    pauseCycle: function(bool) {this.currentCycle.paused = bool;},
     // showValue: 아래쪽에 바의 길이로 게이지 표시, 색으로 게이지의 강도 표현
 }
 
@@ -61,7 +72,8 @@ WordSpace.wordCycle =
             delay: _delay,
             callback: function()
             {
-                WordSpace.generateWord(this)
+                let wordIdx = Math.floor(Math.random() * WordSpace.wordCycle.wordList.length);
+                WordSpace.generateWord(this, WordSpace.wordCycle.wordList[wordIdx]);
             },
             callbackScope: scene,
             loop: true
@@ -74,29 +86,40 @@ WordSpace.wordCycle =
         {
             this.currentCycle = scene.time.addEvent(option);
         }
-    }
+    },
+    wordList: // 미개한 버전, 심심해서 만들어봄
+    [
+        '솽젠커', '통관', '맥주땡겨', '자료구조', '팡광우럮다'
+    ]
 }
 
 WordSpace.loadImage = function(scene)
 {
     if (!this.isImageLoaded)
     {
-        scene.load.image('wordBackground', 'assets/wordBackground.png');
+        for (let i = 0; i < 4; i++)
+        {
+            for (let j = 2; j < 7; j++)
+            {
+                scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
+            }
+        }
     }
+    WordSpace.gameSceneForTest = scene; // for test
 }
 
-WordSpace.generateWord = function(scene)
+WordSpace.generateWord = function(scene, wordText)
 {
-    word = new WordObject("솽젠커");
+    word = new WordObject(wordText);
     word.instantiate(scene);
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
     word.physicsObj.topObj = word;
     scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
     {
-        if (object1.topObj.wordSpeed > 0.5) object1.topObj.wordSpeed = 0.05;
+        object1.topObj.wordSpeed = 0.1;
+        object1.topObj.attract();
     });
-    scene.physics.add.collider(word.physicsObj, BackGround.brainGroup);
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
 }
 
@@ -118,15 +141,20 @@ WordSpace.setGameOverTimer = function()
     }
 }
 
-WordSpace.findWord = function(word)
+WordSpace.findWord = function(wordText)
 {
-    var found = WordSpace.wordGroup.find(function(element)
+    var found = WordSpace.wordGroup.filter(function(element)
     {
-        return Input.isEqual(word, element.wordText);
+        return Input.isEqual(wordText, element.wordText);
     });
-    if (found != undefined)
+    if (found.length != 0)
     {
-        switch(found.wordGrade) // 이부분 나중에 더 효율적으로 바꿀수있지 않을까
+        let weightest = found[0];
+        found.forEach(function(element) 
+        {
+            if (weightest.wordWeight < element.wordWeight) weightest = element;
+        });
+        switch(weightest.wordGrade) // 이부분 나중에 더 효율적으로 바꿀수있지 않을까
         {
             case 0: WordSpace.attackGauge.add(2.5); break;
             case 1: WordSpace.attackGauge.add(1.5); break;
@@ -134,6 +162,35 @@ WordSpace.findWord = function(word)
             case 3: WordSpace.attackGauge.add(0.5); break;
             default: console.log('[ERR] wrong grade of word'); break;
         }
-        found.destroy();
+        weightest.destroy();
     }
+    else if (wordText === '공격' && WordSpace.attackGauge.value > 3) // 공격모드 진입.
+    {
+        console.log('attack mode');
+        // 이부분에서 최대 단어수 결정
+        Input.attackMode = true;
+        WordSpace.attackGauge.pauseCycle(true);
+    }
+    else
+    {
+        // 오타 체크
+    }
+}
+
+WordSpace.attack = function(wordText)
+{
+    if (wordText != '')
+    {
+        console.log('attack ' + wordText);
+        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText); // for test
+        // 이부분에서 게이지에 따라 급수 결정
+        // 이부분은 서버 잘써야함
+        WordSpace.attackGauge.resetValue();
+    }
+    else
+    {
+        WordSpace.attackGauge.cutValue(0.3);
+    }
+    Input.attackMode = false;
+    WordSpace.attackGauge.pauseCycle(false);
 }
