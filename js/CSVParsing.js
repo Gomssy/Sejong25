@@ -1,7 +1,7 @@
-var grade3Array = new Array();
-var grade2Array = new Array();
-var grade1Array = new Array();
-var grade0Array = new Array();
+var grade3Array = grade3Array || {};
+var grade2Array = grade2Array || {};
+var grade1Array = grade1Array || {};
+var grade0Array = grade0Array || {};
 
 function CSVParse($data) {
     var allRows = $data.split('\n')
