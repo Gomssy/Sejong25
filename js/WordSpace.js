@@ -94,7 +94,8 @@ WordSpace.generateWord = function(scene)
     word.physicsObj.topObj = word;
     scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
     {
-        if (object1.topObj.wordSpeed > 0.5) object1.topObj.wordSpeed = 0.05;
+        object1.topObj.wordSpeed = 0.1;
+        object1.topObj.attract();
     });
     scene.physics.add.collider(word.physicsObj, BackGround.brainGroup);
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
@@ -120,13 +121,18 @@ WordSpace.setGameOverTimer = function()
 
 WordSpace.findWord = function(word)
 {
-    var found = WordSpace.wordGroup.find(function(element)
+    var found = WordSpace.wordGroup.filter(function(element)
     {
         return Input.isEqual(word, element.wordText);
     });
-    if (found != undefined)
+    if (found.length != 0)
     {
-        switch(found.wordGrade) // 이부분 나중에 더 효율적으로 바꿀수있지 않을까
+        let weightest = found[0];
+        found.forEach(function(element) 
+        {
+            if (weightest.wordWeight < element.wordWeight) weightest = element;
+        });
+        switch(weightest.wordGrade) // 이부분 나중에 더 효율적으로 바꿀수있지 않을까
         {
             case 0: WordSpace.attackGauge.add(2.5); break;
             case 1: WordSpace.attackGauge.add(1.5); break;
@@ -134,6 +140,10 @@ WordSpace.findWord = function(word)
             case 3: WordSpace.attackGauge.add(0.5); break;
             default: console.log('[ERR] wrong grade of word'); break;
         }
-        found.destroy();
+        weightest.destroy();
+    }
+    else if (word === '공격') // 공격모드 진입.
+    {
+        console.log('attack mode');
     }
 }
