@@ -22,10 +22,10 @@ class WordObject
 
     instantiate(scene)
     {
-        var random = WordSpace.spawnPoint[Math.floor(Math.random() * (WordSpace.spawnPoint.length))];
-        this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBackground').setScale(0.3);
+        var random = WordSpace.getSpawnPoint();
+        this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6));
         this.physicsObj.body.bounce.set(0.5);
-        this.wordObj = scene.add.text(random.x, random.y, this.wordText, {fontFamily: '"궁서", 궁서체, serif'}).setColor('#000000').setOrigin(0.5,0.5);
+        this.wordObj = scene.add.text(random.x, random.y, this.wordText, {fontSize: '18pt', fontFamily: '"궁서", 궁서체, serif'}).setColor('#000000').setOrigin(0.5,0.5);
         WordSpace.totalWeight += this.wordWeight;
         WordSpace.setGameOverTimer();
         console.log("Total weight : " + WordSpace.totalWeight);

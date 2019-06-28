@@ -15,18 +15,16 @@ WordSpace.wordGroup = [];
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
-WordSpace.gravityPoint = {x: 400, y: 300};
-WordSpace.spawnPoint = 
-[
-    {x: 100, y: 100},
-    {x: 100, y: 300},
-    {x: 100, y: 500},
-    {x: 400, y: 100},
-    {x: 400, y: 500},
-    {x: 700, y: 100},
-    {x: 700, y: 300},
-    {x: 700, y: 500},
-]
+WordSpace.gravityPoint = {x: 640, y: 300};
+WordSpace.getSpawnPoint = function()
+{
+    let xLen = 600;
+    let yLen = 300;
+    const angle = Math.random() * Math.PI * 2;
+    let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
+    let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
+    return {x:_x, y:_y};
+}
 
 WordSpace.attackGauge = 
 {
@@ -94,7 +92,13 @@ WordSpace.loadImage = function(scene)
 {
     if (!this.isImageLoaded)
     {
-        scene.load.image('wordBackground', 'assets/wordBackground.png');
+        for (let i = 0; i < 4; i++)
+        {
+            for (let j = 2; j < 7; j++)
+            {
+                scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
+            }
+        }
     }
     WordSpace.gameSceneForTest = scene; // for test
 }
@@ -111,7 +115,6 @@ WordSpace.generateWord = function(scene, wordText)
         object1.topObj.wordSpeed = 0.1;
         object1.topObj.attract();
     });
-    scene.physics.add.collider(word.physicsObj, BackGround.brainGroup);
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
 }
 
