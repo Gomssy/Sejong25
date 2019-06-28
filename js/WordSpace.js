@@ -1,5 +1,7 @@
 var WordSpace = WordSpace || {};
 
+WordSpace.gameSceneForTest = null; // for test
+
 WordSpace.isImageLoaded = false;
 
 WordSpace.nextWordCode = 0;
@@ -58,7 +60,7 @@ WordSpace.attackGauge =
 
         this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setColor('#ffffff').setDepth(10);
     },
-    pauseCycle: function(bool) {this.currentCycle.paused = bool;}
+    pauseCycle: function(bool) {this.currentCycle.paused = bool;},
     // showValue: 아래쪽에 바의 길이로 게이지 표시, 색으로 게이지의 강도 표현
 }
 
@@ -72,7 +74,7 @@ WordSpace.wordCycle =
             delay: _delay,
             callback: function()
             {
-                WordSpace.generateWord(this)
+                WordSpace.generateWord(this, '통관');
             },
             callbackScope: scene,
             loop: true
@@ -94,11 +96,12 @@ WordSpace.loadImage = function(scene)
     {
         scene.load.image('wordBackground', 'assets/wordBackground.png');
     }
+    WordSpace.gameSceneForTest = scene; // for test
 }
 
-WordSpace.generateWord = function(scene)
+WordSpace.generateWord = function(scene, wordText)
 {
-    word = new WordObject("솽젠커");
+    word = new WordObject(wordText);
     word.instantiate(scene);
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
@@ -130,11 +133,11 @@ WordSpace.setGameOverTimer = function()
     }
 }
 
-WordSpace.findWord = function(word)
+WordSpace.findWord = function(wordText)
 {
     var found = WordSpace.wordGroup.filter(function(element)
     {
-        return Input.isEqual(word, element.wordText);
+        return Input.isEqual(wordText, element.wordText);
     });
     if (found.length != 0)
     {
@@ -153,8 +156,33 @@ WordSpace.findWord = function(word)
         }
         weightest.destroy();
     }
-    else if (word === '공격') // 공격모드 진입.
+    else if (wordText === '공격' && WordSpace.attackGauge.value > 3) // 공격모드 진입.
     {
         console.log('attack mode');
+        // 이부분에서 최대 단어수 결정
+        Input.attackMode = true;
+        WordSpace.attackGauge.pauseCycle(true);
     }
+    else
+    {
+        // 오타 체크
+    }
+}
+
+WordSpace.attack = function(wordText)
+{
+    if (wordText != '')
+    {
+        console.log('attack ' + wordText);
+        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText); // for test
+        // 이부분에서 게이지에 따라 급수 결정
+        // 이부분은 서버 잘써야함
+        WordSpace.attackGauge.resetValue();
+    }
+    else
+    {
+        WordSpace.attackGauge.cutValue(0.3);
+    }
+    Input.attackMode = false;
+    WordSpace.attackGauge.pauseCycle(false);
 }

@@ -15,9 +15,6 @@ class WordObject
                 _wordGrade == 1 ? 7 : 10;
             return temp;
         })(this.wordGrade);
-        WordSpace.totalWeight += this.wordWeight;
-        WordSpace.setGameOverTimer();
-        console.log("Total weight : " + WordSpace.totalWeight);
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
         this.wordSpeed = 1;
         //alert("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
@@ -29,6 +26,9 @@ class WordObject
         this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBackground').setScale(0.3);
         this.physicsObj.body.bounce.set(0.5);
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, {fontFamily: '"궁서", 궁서체, serif'}).setColor('#000000').setOrigin(0.5,0.5);
+        WordSpace.totalWeight += this.wordWeight;
+        WordSpace.setGameOverTimer();
+        console.log("Total weight : " + WordSpace.totalWeight);
     }
 
     destroy()

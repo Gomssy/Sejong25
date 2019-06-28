@@ -7,6 +7,8 @@ Input.isShifted = false;
 Input.pressCount = 0;
 Input.justPressed = '';
 
+Input.attackMode = false;
+
 Input.reset = function()
 {
     Input.input = [];
@@ -150,7 +152,7 @@ Input.convert = function()
             }
         }
     }
-    console.log('_____end_convert_____');
+    //console.log('_____end_convert_____');
 }
 
 Input.convertToLast = function(word)
@@ -278,7 +280,8 @@ Input.inputField =
         });
         scene.input.keyboard.on('keydown-ENTER', function()
         {
-            WordSpace.findWord(Input.convInput);
+            if (Input.attackMode) WordSpace.attack(Input.convInput);
+            else WordSpace.findWord(Input.convInput);
             Input.reset();
         });
         // upside 10 keys
@@ -339,7 +342,7 @@ Input.pushInput = function(inputKey)
         }
         else output = inputKey.charCodeAt(0);
         Input.input.push(output);
-        console.log(Input.input );
+        //console.log(Input.input);
         Input.convert();
         Input.inputField.text.setText(Input.convInput);
         this.pressCount++;
