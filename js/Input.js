@@ -63,6 +63,7 @@ Input.convert = function()
         }
     }
     //console.log(vowels);
+    //console.log(krInput);
 
     this.convInput = "";
     let vowelIdx = 0;
@@ -72,10 +73,20 @@ Input.convert = function()
         for (let i = 0; i <= vowels[vowelIdx] - 2; i++) this.convInput += krInput[i];
         while (vowelIdx < vowels.length)
         {
-            if (krInput[vowels[vowelIdx] - 1] >= 'ㅏ'.charCodeAt(0)) // 모음 앞에 모음이 있을때
+            if (vowels[vowelIdx] - 1 < 0 || krInput[vowels[vowelIdx] - 1].charCodeAt(0) >= 'ㅏ'.charCodeAt(0)) // 모음 앞이 비거나 모음이 있을때
             {
-                this.convInput += krInput[vowels[vowelIdx]];
-                vowelIdx++;
+                if (vowelIdx + 1 < vowels.length) // 다음 모음이 있을때
+                {
+                    this.convInput += krInput[vowels[vowelIdx]];
+                    for (let i = vowels[vowelIdx] + 1; i <= vowels[vowelIdx + 1] - 2; ++i) this.convInput += krInput[i];
+                    ++vowelIdx;
+                }
+                else // 다음 모음이 없을때
+                {
+                    this.convInput += krInput[vowels[vowelIdx]];
+                    for (let i = vowels[vowelIdx] + 1; i < krInput.length; i++) this.convInput += krInput[i];
+                    ++vowelIdx;
+                }
             }
             else // 모음 앞에 자음이 있을때
             {
@@ -94,27 +105,27 @@ Input.convert = function()
                                 last = combLast;
                                 this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                                 for (var i = vowels[vowelIdx] + 3; i < krInput.length; i++) this.convInput += krInput[i];
-                                vowelIdx++;
+                                ++vowelIdx;
                             }
                             else // 뒤의 두 자음을 합칠수 없을때
                             {
                                 last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                                 this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                                 for (var i = vowels[vowelIdx] + 2; i < krInput.length; i++) this.convInput += krInput[i];
-                                vowelIdx++;
+                                ++vowelIdx;
                             }
                         }
                         else // 다다음 자음이 없을때
                         {
                             last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                             this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                            vowelIdx++;
+                            ++vowelIdx;
                         }
                     }
                     else // 다음 글자가 없을때
                     {
                         this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                        vowelIdx++;
+                        ++vowelIdx;
                     }
                 }
                 else // 다음 모음이 있을때
@@ -122,13 +133,13 @@ Input.convert = function()
                     if (vowels[vowelIdx + 1] - vowels[vowelIdx] <= 2) // 다음 모음 사이에 자음이 0개거나 1개
                     {
                         this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                        vowelIdx++;
+                        ++vowelIdx;
                     }
                     else if (vowels[vowelIdx + 1] - vowels[vowelIdx] === 3) // 다음 모음 사이에 자음이 2개
                     {
                         last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                         this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
-                        vowelIdx++;
+                        ++vowelIdx;
                     }
                     else // 다음 모음 사이에 자음이 3개 이상
                     {
@@ -138,14 +149,14 @@ Input.convert = function()
                             last = combLast;
                             this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                             for (var i = vowels[vowelIdx] + 3; i < vowels[vowelIdx + 1] - 1; i++) this.convInput += krInput[i];
-                            vowelIdx++;
+                            ++vowelIdx;
                         }
                         else // 뒤의 두 자음을 합칠수 없을때
                         {
                             last = this.convertToLast(krInput[vowels[vowelIdx] + 1]);
                             this.convInput += String.fromCharCode(this.convertToCharCode(first, middle, last));
                             for (var i = vowels[vowelIdx] + 2; i < vowels[vowelIdx + 1] - 1; i++) this.convInput += krInput[i];
-                            vowelIdx++;
+                            ++vowelIdx;
                         }   
                     }
                 }
