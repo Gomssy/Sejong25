@@ -72,7 +72,8 @@ WordSpace.wordCycle =
             delay: _delay,
             callback: function()
             {
-                WordSpace.generateWord(this, '통관');
+                let wordIdx = Math.floor(Math.random() * WordSpace.wordCycle.wordList.length);
+                WordSpace.generateWord(this, WordSpace.wordCycle.wordList[wordIdx]);
             },
             callbackScope: scene,
             loop: true
@@ -85,7 +86,11 @@ WordSpace.wordCycle =
         {
             this.currentCycle = scene.time.addEvent(option);
         }
-    }
+    },
+    wordList: // 미개한 버전, 심심해서 만들어봄
+    [
+        '솽젠커', '통관', '맥주땡겨', '자료구조', '팡광우럮다'
+    ]
 }
 
 WordSpace.loadImage = function(scene)
