@@ -25,16 +25,16 @@ class WordObject
 
     instantiate(scene)
     {
-        var randomX = Phaser.Math.Between(100, 700);
-        this.physicsObj = scene.physics.add.sprite(randomX, 100, 'wordBackground').setScale(0.3);
+        var random = WordSpace.spawnPoint[Math.floor(Math.random() * (WordSpace.spawnPoint.length))];
+        this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBackground').setScale(0.3);
         this.physicsObj.body.bounce.set(0.5);
-        this.wordObj = scene.add.text(randomX, 100, this.wordText, {fontFamily: '"궁서", 궁서체, serif'}).setColor('#000000');
-        this.wordObj.setOrigin(0.5,0.5);
+        this.wordObj = scene.add.text(random.x, random.y, this.wordText, {fontFamily: '"궁서", 궁서체, serif'}).setColor('#000000').setOrigin(0.5,0.5);
     }
 
     destroy()
     {
         console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
+        WordSpace.totalWeight -= this.wordWeight;
         this.wordObj.destroy();
         const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);

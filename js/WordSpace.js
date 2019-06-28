@@ -4,7 +4,7 @@ WordSpace.isImageLoaded = false;
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
-WordSpace.brainCapacity = 20; //수용 가능한 단어 무게 최대치
+WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.defeatTime = 3000;
 WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
 WordSpace.isTimerOn = false;
@@ -14,6 +14,17 @@ WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
 WordSpace.gravityPoint = {x: 400, y: 300};
+WordSpace.spawnPoint = 
+[
+    {x: 100, y: 100},
+    {x: 100, y: 300},
+    {x: 100, y: 500},
+    {x: 400, y: 100},
+    {x: 400, y: 500},
+    {x: 700, y: 100},
+    {x: 700, y: 300},
+    {x: 700, y: 500},
+]
 
 WordSpace.attackGauge = 
 {
