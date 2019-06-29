@@ -60,6 +60,14 @@ WordSpace.attackGauge =
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;},
     // showValue: 아래쪽에 바의 길이로 게이지 표시, 색으로 게이지의 강도 표현
+    getAttackOption: function()
+    {
+        if (this.value < 3) return {wordCount: 0, wordGrade: -1};
+        else if (this.value < 5) return {wordCount: 2, wordGrade: 3};
+        else if (this.value < 7) return {wordCount: 3, wordGrade: 2};
+        else if (this.value < 10) return {wordCount: 4, wordGrade: 1};
+        else return {wordCount: 5, wordGrade: 0};
+    }
 }
 
 WordSpace.wordCycle =
@@ -108,9 +116,14 @@ WordSpace.loadImage = function(scene)
     WordSpace.gameSceneForTest = scene; // for test
 }
 
-WordSpace.generateWord = function(scene, wordText)
+WordSpace.generateWord = function(scene, wordText, grade)
 {
     word = new WordObject(wordText);
+    if (typeof grade != 'undefined')
+    {
+        word.wordGrade = grade;
+        word.wordWeight = WordReader.getWordWeight(grade);
+    }
     word.instantiate(scene);
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
@@ -183,7 +196,8 @@ WordSpace.findWord = function(wordText)
     else if (wordText === '공격' && WordSpace.attackGauge.value > 3) // 공격모드 진입.
     {
         console.log('attack mode');
-        // 이부분에서 최대 단어수 결정
+        Input.attackOption = this.attackGauge.getAttackOption();
+        Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
     }
@@ -193,12 +207,12 @@ WordSpace.findWord = function(wordText)
     }
 }
 
-WordSpace.attack = function(wordText)
+WordSpace.attack = function(wordText, grade)
 {
     if (wordText != '')
     {
-        console.log('attack ' + wordText);
-        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText); // for test
+        console.log('attack ' + wordText + ', grade: ' + grade);
+        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade); // for test
         // 이부분에서 게이지에 따라 급수 결정
         // 이부분은 서버 잘써야함
         WordSpace.attackGauge.resetValue();
@@ -207,6 +221,7 @@ WordSpace.attack = function(wordText)
     {
         WordSpace.attackGauge.cutValue(0.3);
     }
+    Input.maxInput = 5;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
 }
