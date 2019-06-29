@@ -24,6 +24,7 @@ function preload()
     BackGround.loadImage(this);
     WordSpace.loadImage(this);
     Input.inputField.loadImage(this);
+    CSVParsing.loadText(this);
 }
 
 function create()
@@ -33,6 +34,7 @@ function create()
     WordSpace.wordPhysicsGroup = this.physics.add.group();
     WordSpace.wordCycle.resetCycle(this, 2000);
     WordSpace.attackGauge.resetCycle(this);
+    CSVParsing.CSVParse(this);
 }
 
 function update()
