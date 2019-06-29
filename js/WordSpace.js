@@ -6,8 +6,8 @@ WordSpace.isImageLoaded = false;
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
-WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
-WordSpace.defeatTime = 3000;
+WordSpace.brainCapacity = 20; //수용 가능한 단어 무게 최대치
+WordSpace.defeatTime = 5000;
 WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
 WordSpace.isTimerOn = false;
 
@@ -125,7 +125,7 @@ WordSpace.generateWord = function(scene, wordText)
 
 function gameOver()
 {
-    this.wordCycle.currentCycle.paused = true;
+    WordSpace.wordCycle.currentCycle.remove();
     //To Do
     console.log('defeat');
 }
@@ -136,8 +136,30 @@ WordSpace.setGameOverTimer = function()
     //만약 현재 단어 무게 총합이 뇌 용량보다 크다면 타이머를 시작함
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
-        this.gameOverTimer = setTimeout(gameOver.bind(this), this.defeatTime);
-        isTimerOn = true;
+        var timer = 
+        {
+            delay: this.defeatTime,
+            callback: function()
+            {
+                isTimerOn = true;
+                gameOver();
+            },
+            callbackScope: WordSpace.gameSceneForTest,
+            loop: false
+        }
+        this.gameOverTimer = WordSpace.gameSceneForTest.time.addEvent(timer);
+
+        //this.gameOverTimer = setTimeout(gameOver.bind(this), this.defeatTime);
+        //isTimerOn = true;
+    }
+}
+
+WordSpace.resetGameOverTimer = function()
+{
+    if(this.brainCapacity >= this.totalWeight && this.isTimerOn)
+    {
+        console.log('d');
+        this.gameOverTimer.remove();
     }
 }
 
