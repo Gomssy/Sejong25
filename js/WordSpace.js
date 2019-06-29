@@ -141,26 +141,20 @@ WordSpace.setGameOverTimer = function()
             delay: this.defeatTime,
             callback: function()
             {
-                isTimerOn = true;
                 gameOver();
             },
             callbackScope: WordSpace.gameSceneForTest,
             loop: false
         }
+        this.isTimerOn = true;
         this.gameOverTimer = WordSpace.gameSceneForTest.time.addEvent(timer);
-
-        //this.gameOverTimer = setTimeout(gameOver.bind(this), this.defeatTime);
-        //isTimerOn = true;
     }
 }
 
 WordSpace.resetGameOverTimer = function()
 {
     if(this.brainCapacity >= this.totalWeight && this.isTimerOn)
-    {
-        console.log('d');
         this.gameOverTimer.remove();
-    }
 }
 
 WordSpace.findWord = function(wordText)
