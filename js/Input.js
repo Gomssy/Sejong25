@@ -6,8 +6,10 @@ Input.convInput = ''; // converted input
 Input.isShifted = false;
 Input.pressCount = 0;
 Input.justPressed = '';
+Input.maxInput = 5;
 
 Input.attackMode = false;
+Input.attackOption = null;
 
 Input.reset = function()
 {
@@ -62,6 +64,7 @@ Input.convert = function()
             if (this.input[i] >= 'ㅏ'.charCodeAt(0)) vowels.push(krInput.length - 1); // 모음일 경우
         }
     }
+    if (vowels.length > 5) return false;
     //console.log(vowels);
     //console.log(krInput);
 
@@ -163,7 +166,8 @@ Input.convert = function()
             }
         }
     }
-    //console.log('_____end_convert_____');
+    return true;
+    //console.log('_____end_convert_____');    
 }
 
 Input.convertToLast = function(word)
@@ -291,7 +295,7 @@ Input.inputField =
         });
         scene.input.keyboard.on('keydown-ENTER', function()
         {
-            if (Input.attackMode) WordSpace.attack(Input.convInput);
+            if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
             else WordSpace.findWord(Input.convInput);
             Input.reset();
         });
@@ -352,10 +356,13 @@ Input.pushInput = function(inputKey)
             }
         }
         else output = inputKey.charCodeAt(0);
-        Input.input.push(output);
+        this.input.push(output);
         //console.log(Input.input);
-        Input.convert();
-        Input.inputField.text.setText(Input.convInput);
-        this.pressCount++;
+        if (!this.convert() || this.convInput.length > this.maxInput) 
+        {
+            this.input.pop();
+            this.convert();
+        }
+        this.inputField.text.setText(Input.convInput);
     }
 }
