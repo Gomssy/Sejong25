@@ -80,8 +80,8 @@ WordSpace.wordCycle =
             delay: _delay,
             callback: function()
             {
-                let wordIdx = Math.floor(Math.random() * WordSpace.wordCycle.wordList.length);
-                WordSpace.generateWord(this, WordSpace.wordCycle.wordList[wordIdx]);
+                let wordIdx = Math.floor(Math.random() * 4);
+                WordSpace.generateWord(this, SelectWord.selectWord(wordIdx));
             },
             callbackScope: scene,
             loop: true
