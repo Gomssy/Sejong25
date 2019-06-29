@@ -51,3 +51,10 @@ WordReader.getWordGrade = function(_wordTyping)
     7 <= _wordTyping && _wordTyping < 12 ? 2 : 
     12 <= _wordTyping && _wordTyping < 17 ? 1 : 0;
 }
+
+WordReader.getWordWeight = function(_wordGrade)
+{
+    return _wordGrade == 3 ? 3 : 
+        _wordGrade == 2 ? 5 : 
+        _wordGrade == 1 ? 7 : 10;
+}

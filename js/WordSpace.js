@@ -1,13 +1,15 @@
 var WordSpace = WordSpace || {};
 
-WordSpace.gameSceneForTest = null; // for test
+// for test
+WordSpace.gameSceneForTest = null;
+WordSpace.weightTextObjForTest = null;
 
 WordSpace.isImageLoaded = false;
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
-WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
-WordSpace.defeatTime = 3000;
+WordSpace.brainCapacity = 100; //수용 가능한 단어 무게 최대치
+WordSpace.defeatTime = 5000;
 WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
 WordSpace.isTimerOn = false;
 
@@ -60,6 +62,14 @@ WordSpace.attackGauge =
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;},
     // showValue: 아래쪽에 바의 길이로 게이지 표시, 색으로 게이지의 강도 표현
+    getAttackOption: function()
+    {
+        if (this.value < 3) return {wordCount: 0, wordGrade: -1};
+        else if (this.value < 5) return {wordCount: 2, wordGrade: 3};
+        else if (this.value < 7) return {wordCount: 3, wordGrade: 2};
+        else if (this.value < 10) return {wordCount: 4, wordGrade: 1};
+        else return {wordCount: 5, wordGrade: 0};
+    }
 }
 
 WordSpace.wordCycle =
@@ -74,9 +84,8 @@ WordSpace.wordCycle =
             delay: _delay,
             callback: function()
             {
-                let wordIdx = Math.floor(Math.random() * WordSpace.wordCycle.wordList.length);
-                WordSpace.generateWord(this, WordSpace.wordCycle.wordList[wordIdx]);
-                WordSpace.wordCycle.resetCycle(this, WordSpace.wordCycle.delay - 50);
+                let wordIdx = Math.floor(Math.random() * 4);
+                WordSpace.generateWord(this, SelectWord.selectWord(wordIdx));
             },
             callbackScope: scene,
             loop: true
@@ -90,13 +99,6 @@ WordSpace.wordCycle =
             this.currentCycle = scene.time.addEvent(option);
         }
     },
-    wordList: // 미개한 버전, 심심해서 만들어봄
-    [
-        '맥주', '게임', '넥슨', '광팡', '팡광', '샌즈', '군머', '작혼', '육회', '공격',
-        '블루홀', '동묘얖', '치또이', '컴퓨터', '네빔띤', '소고기', '비넴띤', '비빔면',
-        '네오위즈', '기기괴피', '스테이크', '상장폐지', '상장폐거',
-        '탑블레이드', '엔씨소프트', '가스레인지', '괄도네빔띤'
-    ]
 }
 
 WordSpace.loadImage = function(scene)
@@ -112,11 +114,17 @@ WordSpace.loadImage = function(scene)
         }
     }
     WordSpace.gameSceneForTest = scene; // for test
+    WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
 }
 
-WordSpace.generateWord = function(scene, wordText)
+WordSpace.generateWord = function(scene, wordText, grade)
 {
     word = new WordObject(wordText);
+    if (typeof grade != 'undefined')
+    {
+        word.wordGrade = grade;
+        word.wordWeight = WordReader.getWordWeight(grade);
+    }
     word.instantiate(scene);
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
@@ -127,11 +135,13 @@ WordSpace.generateWord = function(scene, wordText)
         object1.topObj.attract();
     });
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
+
+    WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / 100 (전체)');
 }
 
 function gameOver()
 {
-    this.wordCycle.currentCycle.paused = true;
+    WordSpace.wordCycle.currentCycle.remove();
     //To Do
     console.log('defeat');
 }
@@ -142,9 +152,25 @@ WordSpace.setGameOverTimer = function()
     //만약 현재 단어 무게 총합이 뇌 용량보다 크다면 타이머를 시작함
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
-        this.gameOverTimer = setTimeout(gameOver.bind(this), this.defeatTime);
-        isTimerOn = true;
+        var timer = 
+        {
+            delay: this.defeatTime,
+            callback: function()
+            {
+                gameOver();
+            },
+            callbackScope: WordSpace.gameSceneForTest,
+            loop: false
+        }
+        this.isTimerOn = true;
+        this.gameOverTimer = WordSpace.gameSceneForTest.time.addEvent(timer);
     }
+}
+
+WordSpace.resetGameOverTimer = function()
+{
+    if(this.brainCapacity >= this.totalWeight && this.isTimerOn)
+        this.gameOverTimer.remove();
 }
 
 WordSpace.findWord = function(wordText)
@@ -173,7 +199,8 @@ WordSpace.findWord = function(wordText)
     else if (wordText === '공격' && WordSpace.attackGauge.value > 3) // 공격모드 진입.
     {
         console.log('attack mode');
-        // 이부분에서 최대 단어수 결정
+        Input.attackOption = this.attackGauge.getAttackOption();
+        Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
     }
@@ -183,12 +210,12 @@ WordSpace.findWord = function(wordText)
     }
 }
 
-WordSpace.attack = function(wordText)
+WordSpace.attack = function(wordText, grade)
 {
     if (wordText != '')
     {
-        console.log('attack ' + wordText);
-        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText); // for test
+        console.log('attack ' + wordText + ', grade: ' + grade);
+        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade); // for test
         // 이부분에서 게이지에 따라 급수 결정
         // 이부분은 서버 잘써야함
         WordSpace.attackGauge.resetValue();
@@ -197,6 +224,7 @@ WordSpace.attack = function(wordText)
     {
         WordSpace.attackGauge.cutValue(0.3);
     }
+    Input.maxInput = 5;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
 }
