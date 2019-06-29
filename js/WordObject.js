@@ -10,7 +10,6 @@ class WordObject
         this.wordWeight = WordReader.getWordWeight(this.wordGrade);
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
         this.wordSpeed = 1;
-        //alert("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
     }
 
     instantiate(scene)

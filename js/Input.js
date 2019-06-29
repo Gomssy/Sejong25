@@ -293,6 +293,7 @@ Input.inputField =
         {
             if (Input.attackMode) WordSpace.attack(Input.convInput);
             else WordSpace.findWord(Input.convInput);
+            WordSpace.resetGameOverTimer();
             Input.reset();
         });
         // upside 10 keys
