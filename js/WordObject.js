@@ -14,11 +14,17 @@ class WordObject
 
     instantiate(scene)
     {
+        let p = [{x : 3, y : 0.7}, {x : 20, y : 1.8}];
+        let scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
+        let fontscale = 25;
         var random = WordSpace.getSpawnPoint();
-        this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6)).setMass(this.wordWeight);
+        this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
+        .setMass(this.wordWeight)
+        .setScale(scale);
+        
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
-                fontSize: (this.wordWeight + 10) +'pt',
+                fontSize: (scale * fontscale) +'pt',
                 fontFamily: '"궁서", 궁서체, serif',
                 fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             }).setColor('#000000').setOrigin(0.5,0.5);

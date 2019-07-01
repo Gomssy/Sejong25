@@ -13,7 +13,6 @@ CSVParsing.loadText = function(scene) {
 
 CSVParsing.CSVParse = function(scene) {
     var data = scene.cache.text.get('parseword');
-    console.log('xx' + data);
     var allRows = data.split('\n')
     for(var singleRow = 0; singleRow < allRows.length; singleRow++)
     {
