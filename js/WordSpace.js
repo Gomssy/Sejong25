@@ -8,6 +8,7 @@ WordSpace.isImageLoaded = false;
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
+WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 100; //수용 가능한 단어 무게 최대치
 WordSpace.defeatTime = 5000;
 WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
@@ -37,6 +38,15 @@ WordSpace.getSpawnPoint = function()
     let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
     let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
     return {x:_x, y:_y};
+}
+
+WordSpace.spaceInitiate = function(scene)
+{
+    let arr = [3, 3, 3, 3, 3, 2, 2, 2, 2, 1]
+    arr.forEach(function(element)
+    {
+        WordSpace.generateWord(scene, SelectWord.selectWord(element));
+    });
 }
 
 WordSpace.AdjustVarByPhase = function(typingRate, phase)
@@ -192,6 +202,15 @@ WordSpace.nameCycle =
     }
 }
 
+WordSpace.genWordByProb = function(scene)
+{
+    let wordRnd = Math.random();
+    let wordIdx = wordRnd < WordSpace.GradeProb[0] ? 3 :
+                  wordRnd < WordSpace.GradeProb[1] ? 2 :
+                  wordRnd < WordSpace.GradeProb[2] ? 1 : 0;
+    WordSpace.generateWord(scene, SelectWord.selectWord(wordIdx));
+}
+
 WordSpace.wordCycle =
 {
     delay: 0,
@@ -205,11 +224,7 @@ WordSpace.wordCycle =
             delay: _delay,
             callback: function()
             {
-                let wordRnd = Math.random();
-                let wordIdx = wordRnd < WordSpace.GradeProb[0] ? 3 :
-                              wordRnd < WordSpace.GradeProb[1] ? 2 :
-                              wordRnd < WordSpace.GradeProb[2] ? 1 : 0;
-                WordSpace.generateWord(this, SelectWord.selectWord(wordIdx));
+                WordSpace.genWordByProb(scene);
             },
             callbackScope: scene,
             loop: true
@@ -320,6 +335,12 @@ WordSpace.findWord = function(wordText)
         }
         weightest.destroy();
         WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
+        
+        while(WordSpace.totalWordNum < 5)
+        {
+            WordSpace.genWordByProb(WordSpace.gameSceneForTest);
+            WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, 0);
+        }
     }
     else if (wordText === '공격' && WordSpace.attackGauge.value >= 3) // 공격모드 진입.
     {

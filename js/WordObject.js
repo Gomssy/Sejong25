@@ -29,6 +29,7 @@ class WordObject
                 fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             }).setColor('#000000').setOrigin(0.5,0.5);
         WordSpace.totalWeight += this.wordWeight;
+        WordSpace.totalWordNum += 1;
         WordSpace.setGameOverTimer();
         //console.log("Total weight : " + WordSpace.totalWeight);
     }
@@ -37,6 +38,7 @@ class WordObject
     {
         console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
         WordSpace.totalWeight -= this.wordWeight;
+        WordSpace.totalWordNum -= 1;
         this.wordObj.destroy();
         const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);

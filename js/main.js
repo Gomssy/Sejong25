@@ -37,6 +37,7 @@ function create()
     WordSpace.varAdjustCycle.resetCycle(this, 100, 0);
     WordSpace.attackGauge.resetCycle(this);
     CSVParsing.CSVParse(this);
+    WordSpace.spaceInitiate(this);
 }
 
 function update()
