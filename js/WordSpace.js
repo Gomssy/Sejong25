@@ -17,6 +17,17 @@ WordSpace.wordGroup = [];
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
+WordSpace.GradeProb = [0.35, 0.6, 0.8];
+WordSpace.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
+WordSpace.CurrentPhase = WordSpace.Phase.READY;
+WordSpace.PlayerTyping = 0;
+WordSpace.PlayerTypingRate = 0;
+
+WordSpace.WordSpawnDelay = 3000;
+WordSpace.NameSpawnDelay = 3000;
+WordSpace.NameSpawnReduce = 1000;
+
+
 WordSpace.gravityPoint = {x: 640, y: 300};
 WordSpace.getSpawnPoint = function()
 {
@@ -26,6 +37,57 @@ WordSpace.getSpawnPoint = function()
     let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
     let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
     return {x:_x, y:_y};
+}
+
+WordSpace.AdjustVarByPhase = function(typingRate, phase)
+{
+    if(phase == WordSpace.Phase.READY)
+    {
+
+    }
+    else if(phase == WordSpace.Phase.START)
+    {
+        WordSpace.WordSpawnDelay = 3000;
+        WordSpace.NameSpawnDelay = 6000;
+        WordSpace.NameSpawnReduce = 1000;
+        WordSpace.GradeProb[0] = 0.35;
+        WordSpace.GradeProb[1] = 1 - 0.4 * typingRate;
+        WordSpace.GradeProb[2] = 1;
+    }
+    else if(phase == WordSpace.Phase.MAIN)
+    {
+        WordSpace.WordSpawnDelay = 3000 - typingRate * 1000;
+        WordSpace.NameSpawnDelay = 6000;
+        WordSpace.NameSpawnReduce = 1000;
+        WordSpace.GradeProb[0] = 0.4 - 0.4 * typingRate;
+        WordSpace.GradeProb[1] = 0.8 - 0.4 * typingRate;
+        WordSpace.GradeProb[2] = 1 - 0.2 * typingRate;
+    }
+    else if(phase == WordSpace.Phase.MUSIC)
+    {
+        WordSpace.WordSpawnDelay = 1500;
+        WordSpace.NameSpawnDelay = 4000;
+        WordSpace.NameSpawnReduce = 500;
+        WordSpace.GradeProb[0] = 0.2 - 0.2 * typingRate;
+        WordSpace.GradeProb[1] = 0.8 - 0.5 * typingRate;
+        WordSpace.GradeProb[2] = 0.9 - 0.2 * typingRate;
+    }
+    WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, WordSpace.wordCycle.currentCycle.getElapsed());
+    WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed());
+}
+
+WordSpace.GetPhase = function()
+{
+    //서버통신하셈~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //임시
+    WordSpace.CurrentPhase = WordSpace.Phase.START;
+}
+
+WordSpace.GetPlayerTypingRate = function()
+{
+    //서버통신하셈~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //임시
+    WordSpace.PlayerTypingRate = 0.5;
 }
 
 WordSpace.attackGauge = 
@@ -72,11 +134,10 @@ WordSpace.attackGauge =
     }
 }
 
-WordSpace.wordCycle =
+WordSpace.varAdjustCycle = 
 {
-    delay: 0,
     currentCycle: null,
-    resetCycle: function(scene, _delay)
+    resetCycle : function(scene, _delay)
     {
         this.delay = _delay;
         var option = 
@@ -84,7 +145,70 @@ WordSpace.wordCycle =
             delay: _delay,
             callback: function()
             {
-                let wordIdx = Math.floor(Math.random() * 4);
+                //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
+                WordSpace.GetPhase();
+                WordSpace.GetPlayerTypingRate();
+                WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
+            },
+            callbackScope: scene,
+            loop: true
+        };
+        if (this.currentCycle != null)
+        {
+            this.currentCycle = this.currentCycle.reset(option);
+        }
+        else
+        {
+            this.currentCycle = scene.time.addEvent(option);
+        }
+    }
+}
+
+WordSpace.nameCycle = 
+{
+    currentCycle: null,
+    resetCycle: function(scene, _delay, _startAt)
+    {
+        this.delay = _delay;
+        var option = 
+        {
+            startAt: _startAt,
+            delay: _delay,
+            callback: function()
+            {
+                console.log("호패 on");
+            },
+            callbackScope: scene,
+            loop: true
+        };
+        if (this.currentCycle != null)
+        {
+            this.currentCycle = this.currentCycle.reset(option);
+        }
+        else
+        {
+            this.currentCycle = scene.time.addEvent(option);
+        }
+    }
+}
+
+WordSpace.wordCycle =
+{
+    delay: 0,
+    currentCycle: null,
+    resetCycle: function(scene, _delay, _startAt)
+    {
+        this.delay = _delay;
+        var option = 
+        {
+            startAt: _startAt,
+            delay: _delay,
+            callback: function()
+            {
+                let wordRnd = Math.random();
+                let wordIdx = wordRnd < WordSpace.GradeProb[0] ? 3 :
+                              wordRnd < WordSpace.GradeProb[1] ? 2 :
+                              wordRnd < WordSpace.GradeProb[2] ? 1 : 0;
                 WordSpace.generateWord(this, SelectWord.selectWord(wordIdx));
             },
             callbackScope: scene,
@@ -195,8 +319,9 @@ WordSpace.findWord = function(wordText)
             default: console.log('[ERR] wrong grade of word'); break;
         }
         weightest.destroy();
+        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
     }
-    else if (wordText === '공격' && WordSpace.attackGauge.value > 3) // 공격모드 진입.
+    else if (wordText === '공격' && WordSpace.attackGauge.value >= 3) // 공격모드 진입.
     {
         console.log('attack mode');
         Input.attackOption = this.attackGauge.getAttackOption();
