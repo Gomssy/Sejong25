@@ -102,22 +102,31 @@ WordSpace.GetPlayerTypingRate = function()
 WordSpace.attackGauge = 
 {
     value: 0,
-    gradeColor: ['#000000','#000000','#000000','#000000','#000000'],
+    gradeColor: ['#111124','#EBB435','#A42FFF','#1D22EB','#83947F'],
+    setRect: function()
+    {
+        this.rectUI.setSize(20 * this.value, 11);
+        this.rectUI.setPosition(640 - 10 * this.value, 597);
+        let tmp = this.getAttackOption();
+        this.rectUI.setFillStyle(Phaser.Display.Color.HexStringToColor(this.gradeColor[tmp.wordGrade + 1]).color);
+    },
     generate: function(scene)
     {
         console.log("created");
-        this.rectUI = scene.add.rectangle(640,580,0,20,this.gradeColor[0]);
+        this.rectUI = scene.add.rectangle(640,600,0,11).setDepth(11);
     },
     add: function(plus)
     {
         if (this.value + plus > 11) this.value = 11;
         else this.value += plus;
+        this.setRect();
         this.text.setText('게이지: ' + this.value.toFixed(1));
     },
     sub: function(minus)
     {
         if (this.value - minus < 0) this.value = 0;
         else this.value -= minus;
+        this.setRect();
         this.text.setText('게이지: ' + this.value.toFixed(1));
     },
     resetValue: function() {this.value = 0;},
@@ -137,7 +146,6 @@ WordSpace.attackGauge =
 
         this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setDepth(10).setColor('#000000');
         //this.rectUI.setColor(this.gradeColor[0]);
-        this.rectUI.setSize(this.rectUI.width, this.value * 20);
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;},
     // showValue: 아래쪽에 바의 길이로 게이지 표시, 색으로 게이지의 강도 표현
