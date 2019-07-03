@@ -28,7 +28,6 @@ WordSpace.WordSpawnDelay = 3000;
 WordSpace.NameSpawnDelay = 3000;
 WordSpace.NameSpawnReduce = 1000;
 
-
 WordSpace.gravityPoint = {x: 640, y: 300};
 WordSpace.getSpawnPoint = function()
 {
@@ -103,6 +102,12 @@ WordSpace.GetPlayerTypingRate = function()
 WordSpace.attackGauge = 
 {
     value: 0,
+    gradeColor: ['#000000','#000000','#000000','#000000','#000000'],
+    generate: function(scene)
+    {
+        console.log("created");
+        this.rectUI = scene.add.rectangle(640,580,0,20,this.gradeColor[0]);
+    },
     add: function(plus)
     {
         if (this.value + plus > 11) this.value = 11;
@@ -131,6 +136,8 @@ WordSpace.attackGauge =
         this.currentCycle = scene.time.addEvent(option);
 
         this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setDepth(10).setColor('#000000');
+        //this.rectUI.setColor(this.gradeColor[0]);
+        this.rectUI.setSize(this.rectUI.width, this.value * 20);
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;},
     // showValue: 아래쪽에 바의 길이로 게이지 표시, 색으로 게이지의 강도 표현
@@ -275,7 +282,7 @@ WordSpace.generateWord = function(scene, wordText, grade)
     });
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
 
-    WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / 100 (전체)');
+    WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ this.brainCapacity+' (전체)');
 }
 
 function gameOver()
