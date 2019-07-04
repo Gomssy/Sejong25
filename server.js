@@ -47,4 +47,17 @@ io.on('connection', function(socket)
         });
     });
 
+    socket.on('disconnect', function(reason)
+    {
+        var idxToDel = GameServer.waitingRoom.findIndex( function(element)
+            {
+                return element.socketId == socket;
+            }
+        );
+        if (idxToDel != -1) 
+        {
+            console.log('client disconnected, id: ' + GameServer.waitingRoom[idxToDel].id + ', reason: ' + reason);
+            GameServer.waitingRoom.splice(idxToDel, 1);
+        }
+    });
 });
