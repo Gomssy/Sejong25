@@ -39,6 +39,7 @@ WordReader.getWordTyping = function(stringText)
     var temp = 0;
     for(var i = 0; i < stringText.length; i++)
     {
+        if(stringText.charCodeAt(i) < parseInt('0xac00',16) || stringText.charCodeAt(i) > parseInt('0xd7af',16)) return -1;
         temp += parseFloat(firstSound(stringText.charAt(i))) + middleSound(stringText.charAt(i)) + lastSound(stringText.charAt(i));
     }
     return temp;
