@@ -46,13 +46,22 @@ var gameScene = new Phaser.Class(
 
     create: function()
     {
-        BackGround.drawBrain(this);
-        Input.inputField.generate(this);
-        WordSpace.wordPhysicsGroup = this.physics.add.group();
-        WordSpace.wordCycle.resetCycle(this, 3000);
-        WordSpace.attackGauge.resetCycle(this);
-        WordSpace.playerTyping.initiate(this);
         CSVParsing.CSVParse(this);
+        BackGround.drawBrain(this);
+
+        WordSpace.wordPhysicsGroup = this.physics.add.group();
+
+        Input.inputField.generate(this);
+        WordSpace.attackGauge.generate(this);
+        WordSpace.spaceInitiate(this);
+
+        // cycle
+        WordSpace.attackGauge.resetCycle(this);
+        WordSpace.wordCycle.resetCycle(this, 3000, 0);
+        WordSpace.nameCycle.resetCycle(this, 3000, 0);
+        WordSpace.varAdjustCycle.resetCycle(this, 100);
+        
+        WordSpace.playerTyping.initiate(this);
     },
 
     update: function()
@@ -61,5 +70,6 @@ var gameScene = new Phaser.Class(
         {
             element.attract();
         });
+        WordSpace.playerTyping.add('');
     }
 });

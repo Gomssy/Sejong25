@@ -117,7 +117,7 @@ WordSpace.attackGauge =
     },
     generate: function(scene)
     {
-        console.log("created");
+        //console.log("created");
         this.rectUI = scene.add.rectangle(640,600,0,11).setDepth(11);
     },
     add: function(plus)
@@ -206,7 +206,7 @@ WordSpace.nameCycle =
             delay: _delay,
             callback: function()
             {
-                console.log("호패 on");
+                //console.log("호패 on");
             },
             callbackScope: scene,
             loop: true
@@ -354,7 +354,7 @@ WordSpace.findWord = function(wordText)
             default: console.log('[ERR] wrong grade of word'); break;
         }
         weightest.destroy();
-        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
+        //WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
         
         while(WordSpace.totalWordNum < 5)
         {
@@ -398,6 +398,7 @@ WordSpace.playerTyping =
 
 WordSpace.attack = function(wordText, grade)
 {
+    console.log("d");
     wordText = Input.removeConVow(wordText);
     if (wordText != '')
     {

@@ -39,7 +39,7 @@ window.addEventListener("message", function(event)
             if(window.timeouts[i].ran){
                 window.timeouts.splice(i,1);
             }
-        }﻿﻿
+        }
         var i = window.timeouts.length;
         while (i--) {
             if(new Date().getTime() - window.timeouts[i].started >= window.timeouts[i].delay && window.timeouts[i]){
@@ -52,7 +52,7 @@ window.addEventListener("message", function(event)
             if(currTime - window.intervals[i].last >= window.intervals[i].delay && window.intervals[i]){
                 window.intervals[i].last = currTime;
                 window.intervals[i].func();
-            }﻿
+            }
         }
         window.postMessage('tick', '*');
     }
@@ -120,5 +120,5 @@ window.addEventListener("message", function(event)
             context.clearInterval = old.clearInterval
             alert("Your browser does not support postMessage. Sorry but you will be forced to default to the standard setInterval and setTimeout functions. This means you may experience pauses in your game when you navigate away from the tab it is playing in.");
         }
-    });﻿
+    });
 })(this);
