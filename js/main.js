@@ -9,7 +9,7 @@ var config = {
         }
     },
     backgroundColor: Phaser.Display.Color.GetColor(0,0,0),
-    scene: [ gameScene ]
+    scene: [ gameScene, menuScene ]
 };
 
 var game = new Phaser.Game(config)

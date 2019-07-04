@@ -1,12 +1,39 @@
+var menuScene = new Phaser.Class(
+{
+    Extends: Phaser.Scene,
+
+    initialize: 
+
+    function menuScene ()
+    {
+        Phaser.Scene.call(this, {key: 'menuScene'});
+    },
+
+    preload: function()
+    {
+        //Input.inputField.loadImage(this);
+    },
+
+    create: function()
+    {
+        //Input.inputField.generate(this);
+    },
+
+    update: function()
+    {
+        
+    }
+});
+
 var gameScene = new Phaser.Class(
 {
     Extends: Phaser.Scene,
 
     initialize:
 
-    function gameScene (config)
+    function gameScene ()
     {
-        Phaser.Scene.call(this, config);
+        Phaser.Scene.call(this, {key: 'gameScene'});
     },
 
     preload: function()
