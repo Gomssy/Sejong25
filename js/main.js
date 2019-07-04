@@ -48,9 +48,9 @@ function update()
 
 // client side
 var socket = io.connect();
+socket.emit('idRequest');
 socket.on('idSet', function(msg) // {str, num}
 {
     console.log(msg.str);
     this.playerNum = msg.num;
 });
-socket.emit('idRequest');

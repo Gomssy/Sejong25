@@ -18,28 +18,65 @@ server.listen(80, function() {
 
 var GameServer = GameServer || {};
 
-GameServer.waitingRoom = [];
+GameServer.currentPlayer = [];
+GameServer.playingRoom = [];
 
 GameServer.getPlayerNumber = function()
 {
     do
     {
         var num = Math.floor(Math.random() * 1000 + 1);
-        if (!this.waitingRoom.includes(num)) return num;
+        if (!this.currentPlayer.includes(num)) return num;
     } while (true)
 }
 GameServer.findPlayer = function(playerId)
 {
-    var idx = this.waitingRoom.findIndex(function(element)
+    var idx = this.currentPlayer.findIndex(function(element)
     {
         return element.id === socket;
     });
-    if (idx != -1) return this.waitingRoom[idx];
+    if (idx != -1) return this.currentPlayer[idx];
     else
     {
         console.log('[ERR] wrong playerId to find');
         return null;
     }
+}
+GameServer.nextRoomNumber = 0;
+GameServer.makeRoom = function()
+{
+    var roomOption = 
+    {
+        roomNum: GameServer.nextRoomNumber++,
+        maxPlayer: 25,
+        currentPlayer: []
+    }
+    this.playingRoom.push(roomOption);
+    console.log('new room made, roomCount: ' + this.playingRoom.length);
+    return this.playingRoom.length - 1;
+}
+GameServer.enterRoom = function(roomIdx, playerData)
+{
+    this.playingRoom[roomIdx].currentPlayer.push(playerData);
+    console.log(playerData.id + ' entered to room# ' + this.playingRoom[roomIdx].roomNum);
+    return this.playingRoom[roomIdx];
+}
+GameServer.enterEmptyRoom = function(playerData)
+{
+    var toEnter = -1;
+    for (let i = 0; i < this.playingRoom.length; i++)
+    {
+        if (this.playingRoom[i].currentPlayer.length < this.playingRoom[i].maxPlayer)
+        {
+            toEnter = i;
+            break;
+        }
+    }
+    if (toEnter === -1)
+    {
+        toEnter = this.makeRoom();
+    }
+    return this.enterRoom(toEnter, playerData);
 }
 
 // 클라이언트 요청에 대한 콜백 정의
@@ -49,28 +86,30 @@ io.on('connection', function(socket)
         var playerSocket = 
         {
             id: GameServer.getPlayerNumber(),
+            nickname: '게스트',
             socketId: socket
         }
-        GameServer.waitingRoom.push(playerSocket);
+        GameServer.currentPlayer.push(playerSocket);
         console.log('client request, id: ' + playerSocket.id);
         socket.emit('idSet', 
         {
-            str: 'your number is ' + playerSocket.id,
+            str: 'your number is ' + playerSocket.id + ', your nickname is ' + playerSocket.nickname,
             num: playerSocket.id
         });
+        GameServer.enterEmptyRoom(playerSocket);
     });
 
     socket.on('disconnect', function(reason)
     {
-        var idxToDel = GameServer.waitingRoom.findIndex( function(element)
+        var idxToDel = GameServer.currentPlayer.findIndex(function(element)
             {
                 return element.socketId === socket;
             }
         );
         if (idxToDel != -1) 
         {
-            console.log('client disconnected, id: ' + GameServer.waitingRoom[idxToDel].id + ', reason: ' + reason);
-            GameServer.waitingRoom.splice(idxToDel, 1);
+            console.log('client disconnected, id: ' + GameServer.currentPlayer[idxToDel].id + ', reason: ' + reason);
+            GameServer.currentPlayer.splice(idxToDel, 1);
         }
     });
 });
