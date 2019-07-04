@@ -27,7 +27,7 @@ CSVParsing.CSVParse = function(scene) {
             CSVParsing.gradeArray.grade2.push(allRows[singleRow].trim());
         } else if(grade==1) {
             CSVParsing.gradeArray.grade1.push(allRows[singleRow].trim());
-        } else {
+        } else if(grade==0) {
             CSVParsing.gradeArray.grade0.push(allRows[singleRow].trim());
         }
     }
