@@ -34,6 +34,7 @@ function create()
     WordSpace.wordPhysicsGroup = this.physics.add.group();
     WordSpace.wordCycle.resetCycle(this, 3000);
     WordSpace.attackGauge.resetCycle(this);
+    WordSpace.playerTyping.initiate(this);
     CSVParsing.CSVParse(this);
 }
 
@@ -43,6 +44,7 @@ function update()
     {
         element.attract();
     });
+    WordSpace.playerTyping.add('');
 }
 
 var socket = io.connect();

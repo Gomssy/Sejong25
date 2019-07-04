@@ -195,6 +195,7 @@ WordSpace.findWord = function(wordText)
             default: console.log('[ERR] wrong grade of word'); break;
         }
         weightest.destroy();
+        WordSpace.playerTyping.add(wordText);
     }
     else if (wordText === '공격' && WordSpace.attackGauge.value > 3) // 공격모드 진입.
     {
@@ -203,10 +204,29 @@ WordSpace.findWord = function(wordText)
         Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
+        WordSpace.playerTyping.add(wordText);
     }
     else
     {
         // 오타 체크
+    }
+}
+
+WordSpace.playerTyping = 
+{
+    totalTyping: 0,
+    playerTyping: 0,
+    add: function(wordText)
+    {
+        this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
+        this.playerTyping = this.totalTyping / this.gameTimer.now * 1000;
+        this.text.setText('현재 타수 : ' + this.playerTyping.toFixed(1));
+    },
+    initiate: function(scene)
+    {
+        this.gameTimer = new Phaser.Time.Clock(scene);
+        this.gameTimer.start();
+        this.text = scene.add.text(100,200,'현재 타수 : ' + this.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
     }
 }
 
@@ -220,6 +240,7 @@ WordSpace.attack = function(wordText, grade)
         // 이부분에서 게이지에 따라 급수 결정
         // 이부분은 서버 잘써야함
         WordSpace.attackGauge.resetValue();
+        WordSpace.playerTyping.add(wordText);
     }
     else
     {
