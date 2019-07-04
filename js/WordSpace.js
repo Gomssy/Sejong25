@@ -290,7 +290,7 @@ WordSpace.generateWord = function(scene, wordText, grade, lenRate)
     word.physicsObj.topObj = word;
     scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
     {
-        object1.topObj.wordSpeed = 0.1;
+        //object1.topObj.wordSpeed = 0.1;
         object1.topObj.attract();
     });
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
