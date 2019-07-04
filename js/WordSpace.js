@@ -29,10 +29,12 @@ WordSpace.NameSpawnDelay = 3000;
 WordSpace.NameSpawnReduce = 1000;
 
 WordSpace.gravityPoint = {x: 640, y: 300};
-WordSpace.getSpawnPoint = function()
+WordSpace.getSpawnPoint = function(_lenRate)
 {
-    let xLen = 600;
-    let yLen = 300;
+    let lenRate = 1;
+    if(typeof _lenRate == 'number') lenRate  = _lenRate;
+    let xLen = 600 * lenRate;
+    let yLen = 300 * lenRate;
     const angle = Math.random() * Math.PI * 2;
     let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
     let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
@@ -41,10 +43,13 @@ WordSpace.getSpawnPoint = function()
 
 WordSpace.spaceInitiate = function(scene)
 {
-    let arr = [3, 3, 3, 3, 3, 2, 2, 2, 2, 1]
+    let arr = [2, 1, 3, 3, 2, 2, 3, 3, 2, 3]
+
+    let lenRate = 1;
     arr.forEach(function(element)
     {
-        WordSpace.generateWord(scene, SelectWord.selectWord(element));
+        WordSpace.generateWord(scene, SelectWord.selectWord(element),'',lenRate);
+        lenRate += 0.2;
     });
 }
 
@@ -271,15 +276,15 @@ WordSpace.loadImage = function(scene)
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
 }
 
-WordSpace.generateWord = function(scene, wordText, grade)
+WordSpace.generateWord = function(scene, wordText, grade, lenRate)
 {
     word = new WordObject(wordText);
-    if (typeof grade != 'undefined')
+    if (typeof grade == 'number')
     {
         word.wordGrade = grade;
         word.wordWeight = WordReader.getWordWeight(grade);
     }
-    word.instantiate(scene);
+    word.instantiate(scene, lenRate);
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
     word.physicsObj.topObj = word;
