@@ -212,6 +212,7 @@ WordSpace.findWord = function(wordText)
 
 WordSpace.attack = function(wordText, grade)
 {
+    wordText = Input.removeConVow(wordText);
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
