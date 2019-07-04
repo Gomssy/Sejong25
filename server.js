@@ -28,6 +28,19 @@ GameServer.getPlayerNumber = function()
         if (!this.waitingRoom.includes(num)) return num;
     } while (true)
 }
+GameServer.findPlayer = function(playerId)
+{
+    var idx = this.waitingRoom.findIndex(function(element)
+    {
+        return element.id === socket;
+    });
+    if (idx != -1) return this.waitingRoom[idx];
+    else
+    {
+        console.log('[ERR] wrong playerId to find');
+        return null;
+    }
+}
 
 // 클라이언트 요청에 대한 콜백 정의
 io.on('connection', function(socket) 
@@ -51,7 +64,7 @@ io.on('connection', function(socket)
     {
         var idxToDel = GameServer.waitingRoom.findIndex( function(element)
             {
-                return element.socketId == socket;
+                return element.socketId === socket;
             }
         );
         if (idxToDel != -1) 
