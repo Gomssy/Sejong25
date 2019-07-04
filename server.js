@@ -16,10 +16,35 @@ server.listen(80, function() {
     console.log('Listening on port ' + server.address().port);
 });
 
+var GameServer = GameServer || {};
+
+GameServer.waitingRoom = [];
+
+GameServer.getPlayerNumber = function()
+{
+    do
+    {
+        var num = Math.floor(Math.random() * 1000 + 1);
+        if (!this.waitingRoom.includes(num)) return num;
+    } while (true)
+}
+
 // 클라이언트 요청에 대한 콜백 정의
-io.on('connection', function(socket) {
-    socket.on('hello', function() {
-        console.log('client request');
-        socket.emit('hi', 'Hello, Client!');
+io.on('connection', function(socket) 
+{
+    socket.on('idRequest', function() {
+        var playerSocket = 
+        {
+            id: GameServer.getPlayerNumber(),
+            socketId: socket
+        }
+        GameServer.waitingRoom.push(playerSocket);
+        console.log('client request, id: ' + playerSocket.id);
+        socket.emit('idSet', 
+        {
+            str: 'your number is ' + playerSocket.id,
+            num: playerSocket.id
+        });
     });
+
 });

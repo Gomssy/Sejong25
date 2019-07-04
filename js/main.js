@@ -17,6 +17,7 @@ var config = {
 };
 
 var game = new Phaser.Game(config)
+var playerNum = -1;
 
 // load assets
 function preload()
@@ -45,8 +46,11 @@ function update()
     });
 }
 
+// client side
 var socket = io.connect();
-socket.on('hi', function(msg) {
-    console.log(msg);
+socket.on('idSet', function(msg) // {str, num}
+{
+    console.log(msg.str);
+    this.playerNum = msg.num;
 });
-socket.emit('hello');
+socket.emit('idRequest');
