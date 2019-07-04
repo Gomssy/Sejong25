@@ -295,6 +295,7 @@ Input.inputField =
         });
         scene.input.keyboard.on('keydown-ENTER', function()
         {
+            Input.convInput = Input.removeConVow(Input.convInput);
             if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
             else WordSpace.findWord(Input.convInput);
             WordSpace.resetGameOverTimer();

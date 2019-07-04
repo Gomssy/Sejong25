@@ -51,6 +51,7 @@ var gameScene = new Phaser.Class(
         WordSpace.wordPhysicsGroup = this.physics.add.group();
         WordSpace.wordCycle.resetCycle(this, 3000);
         WordSpace.attackGauge.resetCycle(this);
+        WordSpace.playerTyping.initiate(this);
         CSVParsing.CSVParse(this);
     },
 
