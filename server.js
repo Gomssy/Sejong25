@@ -26,7 +26,7 @@ io.on('connection', function(socket)
             id: GameServer.getPlayerNumber(),
             nickname: '게스트',
             socketId: socket,
-            currnetRoom: null,
+            currentRoom: null,
             
             playerTyping: 0
         }
@@ -56,17 +56,31 @@ io.on('connection', function(socket)
 
     socket.on('disconnect', function(reason)
     {
-        var idxToDel = GameServer.currentPlayer.findIndex(function(element)
-            {
-                return element.id === socket.playerData.id;
-            }
-        );
+        let idxToDel = GameServer.currentPlayer.findIndex(function(element)
+        {
+            return element.id === socket.playerData.id;
+        });
         if (idxToDel != -1) 
         {
             console.log('['+ socket.playerData.id +'] client disconnected, reason: ' + reason);
             GameServer.currentPlayer.splice(idxToDel, 1);
             // 룸에서도 제거
-            // 모두에게 삭제했다고 보내기
+            if (socket.playerData.currentRoom != null)
+            {
+                GameServer.anounceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', 
+                {
+                    id: socket.playerData.id,
+                    nickname: socket.playerData.nickname
+                });
+                let _idxToDel = socket.playerData.currentRoom.currentPlayer.findIndex(function(element)
+                {
+                    return element.id === socket.playerData.id;
+                });
+                if (idxToDel != -1)
+                {
+                    socket.playerData.currentRoom.currentPlayer.splice(_idxToDel, 1);
+                }
+            }
         }
     });
 });

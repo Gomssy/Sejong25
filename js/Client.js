@@ -19,3 +19,7 @@ socket.on('startGame', function()
 { 
     game.scene.start('gameScene');
 });
+socket.on('userDisconnect', function(msg) // {num id, str nickname}
+{
+    console.log(msg.id + ' / ' + msg.nickname + ' disconnected');
+});

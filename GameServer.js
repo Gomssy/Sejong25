@@ -1,7 +1,7 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 1;
+GameServer.startCount = 2;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
@@ -42,15 +42,22 @@ GameServer.makeRoom = function()
         minPlayerTyping: 0
     }
     this.playingRoom.push(roomOption);
-    console.log('[SERVER] new room made, roomCount: ' + this.playingRoom.length);
+    console.log('[SERVER] new room #'+roomOption.roomNum+' made, roomCount: ' + this.playingRoom.length);
     return this.playingRoom.length - 1;
+}
+GameServer.findRoomIndex = function(roomNum)
+{
+    return GameServer.playingRoom.findIndex(function(element)
+    {
+        return element.roomNum === roomNum;
+    });
 }
 GameServer.enterRoom = function(roomIdx, playerData)
 {
     this.playingRoom[roomIdx].currentPlayer.push(playerData);
     playerData.currentRoom = this.playingRoom[roomIdx];
     console.log('[' + playerData.id + '] entered to room #' + this.playingRoom[roomIdx].roomNum);
-    if (this.playingRoom[roomIdx].currentPlayer.length > this.startCount) GameServer.startRoom(roomIdx);
+    if (this.playingRoom[roomIdx].currentPlayer.length >= this.startCount && this.playingRoom[roomIdx].Phase != GameServer.Phase.START) GameServer.startRoom(roomIdx);
     return this.playingRoom[roomIdx];
 }
 GameServer.enterEmptyRoom = function(playerData)
@@ -73,11 +80,19 @@ GameServer.enterEmptyRoom = function(playerData)
 GameServer.startRoom = function(roomIdx)
 {
     this.playingRoom[roomIdx].Phase = this.Phase.START;
-    this.playingRoom[roomIdx].currentPlayer.forEach(element => {
-        element.socketId.emit('phaseChange', this.Phase.START);
-        element.socketId.emit('startGame');
-        // 데이터 동기화
+    console.log('[ROOM#'+this.playingRoom[roomIdx].roomNum+'] Game Start');
+    this.anounceToRoom(roomIdx, 'phaseChange', this.Phase.START);
+    this.anounceToRoom(roomIdx, 'startGame');
+    // 데이터 동기화도
+}
+GameServer.anounceToRoom = function(roomIdx, message, data = null)
+{
+    this.playingRoom[roomIdx].currentPlayer.forEach(element => 
+    {
+        element.socketId.emit(message, data);
     });
 }
+// 데이터 동기화 함수 만들기
+// 동기화할것: 유저리스트(id - nickname 쌍)
 
 module.exports = GameServer;
