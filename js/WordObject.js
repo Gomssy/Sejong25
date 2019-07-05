@@ -4,7 +4,6 @@ class WordObject
     {
         this.generationCode = WordSpace.nextWordCode++;
         this.wordText = text;
-        //this.wordText = Input.removeConVow(text);
         this.wordTyping = WordReader.getWordTyping(this.wordText);
         this.wordGrade = WordReader.getWordGrade(this.wordTyping);
         this.wordWeight = WordReader.getWordWeight(this.wordGrade);

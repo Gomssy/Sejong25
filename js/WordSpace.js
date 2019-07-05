@@ -9,7 +9,7 @@ WordSpace.isImageLoaded = false;
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
 WordSpace.totalWordNum = 0;
-WordSpace.brainCapacity = 100; //수용 가능한 단어 무게 최대치
+WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.defeatTime = 5000;
 WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
 WordSpace.isTimerOn = false;
@@ -86,8 +86,8 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
         WordSpace.GradeProb[1] = 0.8 - 0.5 * typingRate;
         WordSpace.GradeProb[2] = 0.9 - 0.2 * typingRate;
     }
-    WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, WordSpace.wordCycle.currentCycle.getElapsed());
-    WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed());
+    WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, WordSpace.wordCycle.currentCycle.getElapsed(), true);
+    WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed(), true);
 }
 
 WordSpace.GetPhase = function()
@@ -164,64 +164,6 @@ WordSpace.attackGauge =
     }
 }
 
-WordSpace.varAdjustCycle = 
-{
-    currentCycle: null,
-    resetCycle : function(scene, _delay)
-    {
-        this.delay = _delay;
-        var option = 
-        {
-            delay: _delay,
-            callback: function()
-            {
-                //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
-                WordSpace.GetPhase();
-                WordSpace.GetPlayerTypingRate();
-                WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
-            },
-            callbackScope: scene,
-            loop: true
-        };
-        if (this.currentCycle != null)
-        {
-            this.currentCycle = this.currentCycle.reset(option);
-        }
-        else
-        {
-            this.currentCycle = scene.time.addEvent(option);
-        }
-    }
-}
-
-WordSpace.nameCycle = 
-{
-    currentCycle: null,
-    resetCycle: function(scene, _delay, _startAt)
-    {
-        this.delay = _delay;
-        var option = 
-        {
-            startAt: _startAt,
-            delay: _delay,
-            callback: function()
-            {
-                //console.log("호패 on");
-            },
-            callbackScope: scene,
-            loop: true
-        };
-        if (this.currentCycle != null)
-        {
-            this.currentCycle = this.currentCycle.reset(option);
-        }
-        else
-        {
-            this.currentCycle = scene.time.addEvent(option);
-        }
-    }
-}
-
 WordSpace.genWordByProb = function(scene)
 {
     let wordRnd = Math.random();
@@ -229,35 +171,6 @@ WordSpace.genWordByProb = function(scene)
                   wordRnd < WordSpace.GradeProb[1] ? 2 :
                   wordRnd < WordSpace.GradeProb[2] ? 1 : 0;
     WordSpace.generateWord(scene, SelectWord.selectWord(wordIdx));
-}
-
-WordSpace.wordCycle =
-{
-    delay: 0,
-    currentCycle: null,
-    resetCycle: function(scene, _delay, _startAt)
-    {
-        this.delay = _delay;
-        var option = 
-        {
-            startAt: _startAt,
-            delay: _delay,
-            callback: function()
-            {
-                WordSpace.genWordByProb(scene);
-            },
-            callbackScope: scene,
-            loop: true
-        };
-        if (this.currentCycle != null)
-        {
-            this.currentCycle = this.currentCycle.reset(option);
-        }
-        else
-        {
-            this.currentCycle = scene.time.addEvent(option);
-        }
-    },
 }
 
 WordSpace.loadImage = function(scene)
@@ -311,25 +224,18 @@ WordSpace.setGameOverTimer = function()
     //만약 현재 단어 무게 총합이 뇌 용량보다 크다면 타이머를 시작함
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
-        var timer = 
-        {
-            delay: this.defeatTime,
-            callback: function()
-            {
-                gameOver();
-            },
-            callbackScope: WordSpace.gameSceneForTest,
-            loop: false
-        }
+        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.defeatTime, false);
         this.isTimerOn = true;
-        this.gameOverTimer = WordSpace.gameSceneForTest.time.addEvent(timer);
     }
 }
 
 WordSpace.resetGameOverTimer = function()
 {
     if(this.brainCapacity >= this.totalWeight && this.isTimerOn)
+    {
         this.gameOverTimer.remove();
+        this.isTimerOn = false;
+    }
 }
 
 WordSpace.findWord = function(wordText)
@@ -354,7 +260,7 @@ WordSpace.findWord = function(wordText)
             default: console.log('[ERR] wrong grade of word'); break;
         }
         weightest.destroy();
-        //WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
+        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
         
         while(WordSpace.totalWordNum < 5)
         {
@@ -398,7 +304,6 @@ WordSpace.playerTyping =
 
 WordSpace.attack = function(wordText, grade)
 {
-    console.log("d");
     wordText = Input.removeConVow(wordText);
     if (wordText != '')
     {
@@ -417,3 +322,44 @@ WordSpace.attack = function(wordText, grade)
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
 }
+
+class cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
+{
+    constructor(_callback)
+    {
+        this.delay = 0;
+        this.currentCycle = null;
+        this.callbackFunction = _callback;
+    }
+    resetCycle(scene, _delay, _startAt, _loop)
+    {
+        this.delay = _delay;
+        var option = 
+        {
+            startAt: _startAt,
+            delay: _delay,
+            callback: this.callbackFunction,
+            callbackScope: scene,
+            loop: _loop
+        };
+        if (this.currentCycle != null) this.currentCycle = this.currentCycle.reset(option);
+        else this.currentCycle = scene.time.addEvent(option);
+    }
+}
+
+WordSpace.wordCycle = new cycle(function()
+{
+    WordSpace.genWordByProb(this);
+});
+WordSpace.gameOverCycle = new cycle(gameOver);
+WordSpace.nameCycle = new cycle(function()
+{
+    console.log("호패 on");
+});
+WordSpace.varAdjustCycle = new cycle(function()
+{
+    //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
+    WordSpace.GetPhase();
+    WordSpace.GetPlayerTypingRate();
+    WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
+});

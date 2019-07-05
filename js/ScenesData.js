@@ -54,12 +54,13 @@ var gameScene = new Phaser.Class(
         Input.inputField.generate(this);
         WordSpace.attackGauge.generate(this);
         WordSpace.spaceInitiate(this);
-
-        // cycle
         WordSpace.attackGauge.resetCycle(this);
-        WordSpace.wordCycle.resetCycle(this, 3000, 0);
-        WordSpace.nameCycle.resetCycle(this, 3000, 0);
+
+        WordSpace.wordCycle.resetCycle(this, 3000, 0, true);
+
+        WordSpace.nameCycle.resetCycle(this, 3000, 0, true);
         WordSpace.varAdjustCycle.resetCycle(this, 100);
+        WordSpace.varAdjustCycle.resetCycle(this, 100, 0, true);
         
         WordSpace.playerTyping.initiate(this);
     },
