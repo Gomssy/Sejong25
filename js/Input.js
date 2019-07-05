@@ -11,6 +11,23 @@ Input.maxInput = 5;
 Input.attackMode = false;
 Input.attackOption = null;
 
+Input.gameSceneEnterReaction = function()
+{
+    Input.convInput = Input.removeConVow(Input.convInput);
+    if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
+    else WordSpace.findWord(Input.convInput);
+    WordSpace.resetGameOverTimer();
+    Input.reset();
+}
+Input.menuSceneEnterReaction = function()
+{
+    Input.convInput = Input.removeConVow(Input.convInput);
+    console.log('닉네임은 ' + Input.convInput);
+    Input.reset();
+    game.scene.start('gameScene');
+    game.scene.remove('menuScene');
+}
+
 Input.reset = function()
 {
     Input.input = [];
@@ -275,7 +292,7 @@ Input.removeConVow = function(_wordText)
 
 Input.inputField = 
 {
-    generate: function(scene)
+    generate: function(scene, enterCallback)
     {
         this.background = scene.add.sprite(640, 550, 'inputfield').setDepth(10);
         this.text = scene.add.text(640, 550, "안녕하세요", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
@@ -293,14 +310,7 @@ Input.inputField =
                 Input.inputField.text.setText(Input.convInput);
             }
         });
-        scene.input.keyboard.on('keydown-ENTER', function()
-        {
-            Input.convInput = Input.removeConVow(Input.convInput);
-            if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
-            else WordSpace.findWord(Input.convInput);
-            WordSpace.resetGameOverTimer();
-            Input.reset();
-        });
+        scene.input.keyboard.on('keydown-ENTER', enterCallback);
         // upside 10 keys
         scene.input.keyboard.on('keydown-Q', function() {Input.pushInput('ㅂ')});
         scene.input.keyboard.on('keydown-W', function() {Input.pushInput('ㅈ')});

@@ -48,7 +48,7 @@ GameServer.makeRoom = function()
     var roomOption = 
     {
         roomNum: GameServer.nextRoomNumber++,
-        maxPlayer: 25,
+        maxPlayer: 3,
         currentPlayer: []
     }
     this.playingRoom.push(roomOption);
@@ -110,6 +110,8 @@ io.on('connection', function(socket)
         {
             console.log('client disconnected, id: ' + GameServer.currentPlayer[idxToDel].id + ', reason: ' + reason);
             GameServer.currentPlayer.splice(idxToDel, 1);
+            // 룸에서도 제거
+            // 모두에게 삭제했다고 보내기
         }
     });
 });
