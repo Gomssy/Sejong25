@@ -15,15 +15,6 @@ var config = {
 var game = new Phaser.Game(config)
 var playerNum = -1;
 
-// client side
-var socket = io.connect();
-socket.emit('idRequest');
-socket.on('idSet', function(msg) // {str, num}
-{
-    console.log(msg.str);
-    this.playerNum = msg.num;
-});
-
 //test
 /*
 window.addEventListener("message", function (event) {

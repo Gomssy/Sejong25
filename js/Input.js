@@ -26,7 +26,6 @@ Input.menuSceneEnterReaction = function()
     {
         socket.emit('setNickname', Input.convInput);
         Input.reset();
-        game.scene.start('gameScene');
         game.scene.remove('menuScene');
     }
     else 

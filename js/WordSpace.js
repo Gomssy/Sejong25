@@ -57,7 +57,12 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
 {
     if(phase == WordSpace.Phase.READY)
     {
-
+        WordSpace.WordSpawnDelay = 10000;
+        WordSpace.NameSpawnDelay = 10000;
+        WordSpace.NameSpawnReduce = 0;
+        WordSpace.GradeProb[0] = 1;
+        WordSpace.GradeProb[1] = 1;
+        WordSpace.GradeProb[2] = 1;
     }
     else if(phase == WordSpace.Phase.START)
     {
@@ -88,13 +93,6 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     }
     WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, WordSpace.wordCycle.currentCycle.getElapsed());
     WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed());
-}
-
-WordSpace.GetPhase = function()
-{
-    //서버통신하셈~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //임시
-    WordSpace.CurrentPhase = WordSpace.Phase.START;
 }
 
 WordSpace.GetPlayerTypingRate = function()
@@ -176,7 +174,7 @@ WordSpace.varAdjustCycle =
             callback: function()
             {
                 //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
-                WordSpace.GetPhase();
+                //WordSpace.GetPhase();
                 WordSpace.GetPlayerTypingRate();
                 WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
             },
@@ -386,6 +384,7 @@ WordSpace.playerTyping =
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
         this.playerTyping = this.totalTyping / this.gameTimer.now * 1000;
+        socket.emit('setPlayerTyping', this.playerTyping);
         this.text.setText('현재 타수 : ' + this.playerTyping.toFixed(1));
     },
     initiate: function(scene)
