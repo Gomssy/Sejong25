@@ -19,11 +19,6 @@ var menuScene = new Phaser.Class(
     {
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         BackGround.drawMenu(this);
-    },
-
-    update: function()
-    {
-        
     }
 });
 

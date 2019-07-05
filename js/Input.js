@@ -22,10 +22,18 @@ Input.gameSceneEnterReaction = function()
 Input.menuSceneEnterReaction = function()
 {
     Input.convInput = Input.removeConVow(Input.convInput);
-    console.log('닉네임은 ' + Input.convInput);
-    Input.reset();
-    game.scene.start('gameScene');
-    game.scene.remove('menuScene');
+    if (Input.convInput.length > 0)
+    {
+        socket.emit('setNickname', Input.convInput);
+        Input.reset();
+        game.scene.start('gameScene');
+        game.scene.remove('menuScene');
+    }
+    else 
+    {
+        alert('정확한 가명을 입력해주세요.');
+        Input.reset();
+    }
 }
 
 Input.reset = function()

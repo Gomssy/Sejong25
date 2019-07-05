@@ -13,7 +13,7 @@ app.get('/', function(req, res) {
 
 // http 기본 포트(80)에 서버 열기
 server.listen(80, function() {
-    console.log('Listening on port ' + server.address().port);
+    console.log('[SERVER] Listening on port ' + server.address().port);
 });
 
 var GameServer = GameServer || {};
@@ -52,13 +52,13 @@ GameServer.makeRoom = function()
         currentPlayer: []
     }
     this.playingRoom.push(roomOption);
-    console.log('new room made, roomCount: ' + this.playingRoom.length);
+    console.log('[SERVER] new room made, roomCount: ' + this.playingRoom.length);
     return this.playingRoom.length - 1;
 }
 GameServer.enterRoom = function(roomIdx, playerData)
 {
     this.playingRoom[roomIdx].currentPlayer.push(playerData);
-    console.log(playerData.id + ' entered to room# ' + this.playingRoom[roomIdx].roomNum);
+    console.log('[' + playerData.id + '] entered to room #' + this.playingRoom[roomIdx].roomNum);
     return this.playingRoom[roomIdx];
 }
 GameServer.enterEmptyRoom = function(playerData)
@@ -89,26 +89,33 @@ io.on('connection', function(socket)
             nickname: '게스트',
             socketId: socket
         }
+        socket.playerData = playerSocket;
         GameServer.currentPlayer.push(playerSocket);
-        console.log('client request, id: ' + playerSocket.id);
+        console.log('['+playerSocket.id+'] client request');
         socket.emit('idSet', 
         {
-            str: 'your number is ' + playerSocket.id + ', your nickname is ' + playerSocket.nickname,
+            str: 'your number is ' + playerSocket.id,
             num: playerSocket.id
         });
         GameServer.enterEmptyRoom(playerSocket);
+    });
+
+    socket.on('setNickname', function(msg) // string new_nickname
+    {
+        socket.playerData.nickname = msg;
+        console.log('['+socket.playerData.id+'] nickname set to ' + msg);
     });
 
     socket.on('disconnect', function(reason)
     {
         var idxToDel = GameServer.currentPlayer.findIndex(function(element)
             {
-                return element.socketId === socket;
+                return element.id === socket.playerData.id;
             }
         );
         if (idxToDel != -1) 
         {
-            console.log('client disconnected, id: ' + GameServer.currentPlayer[idxToDel].id + ', reason: ' + reason);
+            console.log('['+ socket.playerData.id +'] client disconnected, reason: ' + reason);
             GameServer.currentPlayer.splice(idxToDel, 1);
             // 룸에서도 제거
             // 모두에게 삭제했다고 보내기
