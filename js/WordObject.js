@@ -64,3 +64,14 @@ class WordObject
 
     isEqualObject(_generationCode) { return _generationCode === this.generationCode; }
 }
+
+class AttackWord extends WordObject
+{
+    constructor(text, _attacker)
+    {
+        super(text);
+        this.attacker = _attacker;
+        this.attackedTime = WordSpace.gameTimer.now;
+        console.log('Attack text : ' + text + ', Attacker : ' + _attacker);
+    }
+}

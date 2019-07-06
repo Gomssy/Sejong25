@@ -12,6 +12,7 @@ WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.defeatTime = 5000;
 WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
+WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
 
 WordSpace.wordGroup = [];
@@ -29,6 +30,52 @@ WordSpace.NameSpawnDelay = 3000;
 WordSpace.NameSpawnReduce = 1000;
 
 WordSpace.gravityPoint = {x: 640, y: 300};
+
+class cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
+{
+    constructor(_callback)
+    {
+        this.delay = 0;
+        this.currentCycle = null;
+        this.callbackFunction = _callback;
+    }
+    resetCycle(scene, _delay, _startAt, _loop)
+    {
+        this.delay = _delay;
+        var option = 
+        {
+            startAt: _startAt,
+            delay: _delay,
+            callback: this.callbackFunction,
+            callbackScope: scene,
+            loop: _loop
+        };
+        if (this.currentCycle != null) this.currentCycle = this.currentCycle.reset(option);
+        else this.currentCycle = scene.time.addEvent(option);
+    }
+}
+
+//단어 생성 사이클
+WordSpace.wordCycle = new cycle(function()
+{
+    WordSpace.genWordByProb(this);
+});
+//게임 오버 사이클
+WordSpace.gameOverCycle = new cycle(gameOver);
+//호패 생성 사이클
+WordSpace.nameCycle = new cycle(function()
+{
+    console.log("호패 on");
+});
+//이건 뭐지
+WordSpace.varAdjustCycle = new cycle(function()
+{
+    //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
+    WordSpace.GetPhase();
+    WordSpace.GetPlayerTypingRate();
+    WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
+});
+
 WordSpace.getSpawnPoint = function(_lenRate)
 {
     let lenRate = 1;
@@ -189,9 +236,15 @@ WordSpace.loadImage = function(scene)
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
 }
 
-WordSpace.generateWord = function(scene, wordText, grade, lenRate)
+WordSpace.generateWord = function(scene, wordText, grade, lenRate, attacker = null)
 {
-    word = new WordObject(wordText);
+    if(attacker != null)
+    {
+        console.log('d');
+        word = new AttackWord(wordText, attacker);
+    }
+
+    else word = new WordObject(wordText);
     if (typeof grade == 'number')
     {
         word.wordGrade = grade;
@@ -291,13 +344,13 @@ WordSpace.playerTyping =
     add: function(wordText)
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
-        this.playerTyping = this.totalTyping / this.gameTimer.now * 1000;
+        this.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 1000;
         this.text.setText('현재 타수 : ' + this.playerTyping.toFixed(1));
     },
     initiate: function(scene)
     {
-        this.gameTimer = new Phaser.Time.Clock(scene);
-        this.gameTimer.start();
+        WordSpace.gameTimer = new Phaser.Time.Clock(scene);
+        WordSpace.gameTimer.start();
         this.text = scene.add.text(100,200,'현재 타수 : ' + this.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
     }
 }
@@ -308,8 +361,9 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
-        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade); // for test
+        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, playerNum); // for test
         // 이부분에서 게이지에 따라 급수 결정
+        // 이걸 서버로 공격을 보내야 함
         // 이부분은 서버 잘써야함
         WordSpace.attackGauge.resetValue();
         WordSpace.playerTyping.add(wordText);
@@ -322,44 +376,3 @@ WordSpace.attack = function(wordText, grade)
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
 }
-
-class cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
-{
-    constructor(_callback)
-    {
-        this.delay = 0;
-        this.currentCycle = null;
-        this.callbackFunction = _callback;
-    }
-    resetCycle(scene, _delay, _startAt, _loop)
-    {
-        this.delay = _delay;
-        var option = 
-        {
-            startAt: _startAt,
-            delay: _delay,
-            callback: this.callbackFunction,
-            callbackScope: scene,
-            loop: _loop
-        };
-        if (this.currentCycle != null) this.currentCycle = this.currentCycle.reset(option);
-        else this.currentCycle = scene.time.addEvent(option);
-    }
-}
-
-WordSpace.wordCycle = new cycle(function()
-{
-    WordSpace.genWordByProb(this);
-});
-WordSpace.gameOverCycle = new cycle(gameOver);
-WordSpace.nameCycle = new cycle(function()
-{
-    console.log("호패 on");
-});
-WordSpace.varAdjustCycle = new cycle(function()
-{
-    //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
-    WordSpace.GetPhase();
-    WordSpace.GetPlayerTypingRate();
-    WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
-});
