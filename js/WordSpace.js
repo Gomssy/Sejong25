@@ -236,14 +236,9 @@ WordSpace.loadImage = function(scene)
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
 }
 
-WordSpace.generateWord = function(scene, wordText, grade, lenRate, attacker = null)
+WordSpace.generateWord = function(scene, wordText, grade, lenRate, isStrong)
 {
-    if(attacker != null)
-    {
-        console.log('d');
-        word = new AttackWord(wordText, attacker);
-    }
-
+    if(isStrong != undefined) word = new AttackWord(wordText, grade, isStrong);
     else word = new WordObject(wordText);
     if (typeof grade == 'number')
     {
@@ -361,7 +356,7 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
-        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, playerNum); // for test
+        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, undefined, true); // for test
         // 이부분에서 게이지에 따라 급수 결정
         // 이걸 서버로 공격을 보내야 함
         // 이부분은 서버 잘써야함
