@@ -59,19 +59,16 @@ class WordObject
 
     attract()
     {
-        /*
         let gravityScale = 0.5, velocityLimit;
         let accel = {x: this.physicsObj.body.velocity.x, y: this.physicsObj.body.velocity.y};
         let dist, angle;
         let vel;
 
-        console.log('#' + this.physicsObj.body.velocity.x);
-
         dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         velocityLimit = dist + 10;
-        //accel.x += gravityScale * Math.cos(angle);
-        //accel.y += gravityScale * Math.sin(angle);
+        accel.x += gravityScale * Math.cos(angle);
+        accel.y += gravityScale * Math.sin(angle);
 
         vel = Phaser.Math.Distance.Between(accel.x,accel.y,0,0);
         if(vel > velocityLimit)
@@ -82,7 +79,6 @@ class WordObject
 
         this.physicsObj.setVelocity(accel.x, accel.y);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
-        */
 
     }
 
