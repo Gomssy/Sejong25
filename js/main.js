@@ -13,7 +13,12 @@ var config = {
 };
 
 var game = new Phaser.Game(config)
-var playerNum = -1;
+
+//플레이어 정보, 서버 통신시 필요할 듯
+//테스트용이므로 차후 수정 요망
+var playerNum = -1; //플레이어 아이디, 고유 번호
+var playerName = '임시아이디' //플레이어 닉네임
+
 
 // client side
 var socket = io.connect();

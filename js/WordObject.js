@@ -67,11 +67,25 @@ class WordObject
 
 class AttackWord extends WordObject
 {
-    constructor(text, _attacker)
+    constructor(text, isStrong)
     {
         super(text);
-        this.attacker = _attacker;
+        if(WordReader.getWordTyping(playerName) <= 9)
+            this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(playerName) - 9);
+        this.wordWeight *= isStrong ? 3 : 2;
+        this.attacker = playerNum;
         this.attackedTime = WordSpace.gameTimer.now;
+        console.log('Attack text : ' + text + ', Attacker : ' + _attacker);
+    }
+}
+
+class NameWord extends WordObject
+{
+    constructor(text, _isStrong = false)
+    {
+        super(text);
+        this.wordWeight = 2;
+        this.isStrong = _isStrong;
         console.log('Attack text : ' + text + ', Attacker : ' + _attacker);
     }
 }
