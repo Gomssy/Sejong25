@@ -184,6 +184,10 @@ WordSpace.loadImage = function(scene)
                 scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
             }
         }
+        for (let i = 0; i < 4; i++)
+        {
+            scene.load.image('attackAlert' + i, 'assets/placeholder/attackalert' + (i+1) + '.png');
+        }
     }
     WordSpace.gameSceneForTest = scene; // for test
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');

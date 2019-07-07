@@ -27,11 +27,10 @@ class WordObject
 
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
-        this.physicsObj.setVelocity(100 * Math.cos(angle), 100 * Math.sin(angle));
 
         //임시땜빵
         this.moveStarted = false;
-        this.initSpeed = {x: 200 * Math.cos(angle), y: 200 * Math.sin(angle)};
+        this.initSpeed = {x: Math.max(0, 200-WordSpace.totalWeight) * Math.cos(angle), y: Math.max(0, 200-WordSpace.totalWeight) * Math.sin(angle)};
         
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
