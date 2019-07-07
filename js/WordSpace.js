@@ -9,9 +9,8 @@ WordSpace.isImageLoaded = false;
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
 WordSpace.totalWordNum = 0;
-WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
+WordSpace.brainCapacity = 50; //수용 가능한 단어 무게 최대치
 WordSpace.defeatTime = 5000;
-WordSpace.gameOverTimer = null; //게임 오버 판정 타이머
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
 
@@ -242,7 +241,7 @@ WordSpace.generateWord =
 {
     Normal: function(scene, grade, lenRate)
     {
-        word = new WordObject(SelectWord.selectWord(grade));
+        word = new NormalWord(SelectWord.selectWord(grade));
         WordSpace.pushWord(scene, word, lenRate);
     },
     Attack: function(scene, wordText, grade, attacker, isStrong, lenRate)
@@ -270,13 +269,12 @@ WordSpace.pushWord = function(scene, word, lenRate)
         object1.topObj.attract();
     });
     WordSpace.wordPhysicsGroup.add(word.physicsObj);
-
-    WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ this.brainCapacity+' (전체)');
 }
 
 function gameOver()
 {
     WordSpace.wordCycle.currentCycle.remove();
+    WordSpace.nameCycle.currentCycle.remove();
     //To Do
     console.log('defeat');
 }
@@ -287,8 +285,9 @@ WordSpace.setGameOverTimer = function()
     //만약 현재 단어 무게 총합이 뇌 용량보다 크다면 타이머를 시작함
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
-        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.defeatTime, false);
         this.isTimerOn = true;
+        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.defeatTime, 0, false);
+        console.log('Game over timer On');
     }
 }
 
@@ -296,8 +295,9 @@ WordSpace.resetGameOverTimer = function()
 {
     if(this.brainCapacity >= this.totalWeight && this.isTimerOn)
     {
-        this.gameOverTimer.remove();
         this.isTimerOn = false;
+        WordSpace.gameOverCycle.currentCycle.paused = true;
+        console.log('Game over timer Off');
     }
 }
 
@@ -314,18 +314,8 @@ WordSpace.findWord = function(wordText)
         {
             if (weightest.wordWeight < element.wordWeight) weightest = element;
         });
-        switch(weightest.wordGrade) // 이부분 나중에 더 효율적으로 바꿀수있지 않을까
-        {
-            case 0: WordSpace.attackGauge.add(2.5); break;
-            case 1: WordSpace.attackGauge.add(1.5); break;
-            case 2: WordSpace.attackGauge.add(0.9); break;
-            case 3: WordSpace.attackGauge.add(0.5); break;
-            default: console.log('[ERR] wrong grade of word'); break;
-        }
-        //if(typeof(weightest) == 'AttackWord')
-            console.log(weightest instanceof AttackWord);
         weightest.destroy();
-        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
+        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce, true);
         
         while(WordSpace.totalWordNum < 5)
         {

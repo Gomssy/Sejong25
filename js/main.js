@@ -30,7 +30,7 @@ socket.on('idSet', function(msg) // {str, num}
 });
 
 //test
-window.addEventListener("message", function(event)
+/*window.addEventListener("message", function(event)
 {
     var sub = 0;
     if(event.data == "tick"){
@@ -126,4 +126,4 @@ window.addEventListener("message", function(event)
             alert("Your browser does not support postMessage. Sorry but you will be forced to default to the standard setInterval and setTimeout functions. This means you may experience pauses in your game when you navigate away from the tab it is playing in.");
         }
     });
-})(this);
+})(this);*/

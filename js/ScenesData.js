@@ -57,9 +57,7 @@ var gameScene = new Phaser.Class(
         WordSpace.attackGauge.resetCycle(this);
 
         WordSpace.wordCycle.resetCycle(this, 3000, 0, true);
-
         WordSpace.nameCycle.resetCycle(this, 3000, 0, true);
-        WordSpace.varAdjustCycle.resetCycle(this, 100);
         WordSpace.varAdjustCycle.resetCycle(this, 100, 0, true);
         
         WordSpace.setPlayerTyping.initiate(this);
@@ -71,6 +69,7 @@ var gameScene = new Phaser.Class(
         {
             element.attract();
         });
+        WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
         WordSpace.setPlayerTyping.add('');
     }
 });

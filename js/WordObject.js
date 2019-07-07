@@ -39,6 +39,7 @@ class WordObject
         console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
         WordSpace.totalWeight -= this.wordWeight;
         WordSpace.totalWordNum -= 1;
+        WordSpace.resetGameOverTimer();
         this.wordObj.destroy();
         const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
@@ -65,6 +66,26 @@ class WordObject
     isEqualObject(_generationCode) { return _generationCode === this.generationCode; }
 }
 
+class NormalWord extends WordObject
+{
+    constructor(text)
+    {
+        super(text);
+    }
+    destroy()
+    {
+        switch(this.wordGrade)
+        {
+            case 0: WordSpace.attackGauge.add(2.5); break;
+            case 1: WordSpace.attackGauge.add(1.5); break;
+            case 2: WordSpace.attackGauge.add(0.9); break;
+            case 3: WordSpace.attackGauge.add(0.5); break;
+            default: console.log('[ERR] wrong grade of word'); break;
+        }
+        super.destroy();
+    }
+}
+
 class AttackWord extends WordObject
 {
     constructor(text, _wordGrade, _attacker, isStrong)
@@ -77,16 +98,21 @@ class AttackWord extends WordObject
         this.wordWeight *= isStrong ? 3 : 2;
         this.attacker = _attacker;
         //서버 사용하게 되면 PlayerTyping을 피격자의 것으로 바꿔야 함
-        /*this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping * (WordSpace.playerTyping / 60) * 2 :
-                            ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 3) * (WordSpace.playerTyping / 60) * 2);*/
-        this.counterTime = WordSpace.gameTimer.now + 10000;
+        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping * (WordSpace.playerTyping / 60) * 2 :
+                            ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 3) * (WordSpace.playerTyping / 60) * 2);
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
-        console.log(WordSpace.playerTyping);
     }
-    
     destroy()
     {
+        switch(this.wordGrade)
+        {
+            case 0: WordSpace.attackGauge.add(2.5); break;
+            case 1: WordSpace.attackGauge.add(1.5); break;
+            case 2: WordSpace.attackGauge.add(0.9); break;
+            case 3: WordSpace.attackGauge.add(0.5); break;
+            default: console.log('[ERR] wrong grade of word'); break;
+        }
         if(WordSpace.gameTimer.now < this.counterTime) WordSpace.generateWord.Name(WordSpace.gameSceneForTest, true);
         super.destroy();
     }
@@ -100,5 +126,10 @@ class NameWord extends WordObject
         this.wordWeight = 2;
         this.isStrong = _isStrong;
         console.log('Name : ' + text + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
-     }
+    }
+    destroy()
+    {
+        WordSpace.attackGauge.add(this.wordTyping * 0.1);
+        super.destroy();
+    }
 }
