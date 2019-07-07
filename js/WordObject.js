@@ -21,13 +21,17 @@ class WordObject
         this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
         .setMass(this.wordWeight * 10)
         .setScale(scale)
-        .setFrictionX(0.5)
-        .setFrictionY(0.5);
+        .setFrictionX(0)
+        .setFrictionY(0)
+        .setBounce(0.5);
 
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         this.physicsObj.setVelocity(100 * Math.cos(angle), 100 * Math.sin(angle));
-        
+
+        //임시땜빵
+        this.moveStarted = false;
+        this.initSpeed = {x: 200 * Math.cos(angle), y: 200 * Math.sin(angle)};
         
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
@@ -39,8 +43,6 @@ class WordObject
         WordSpace.totalWordNum += 1;
         WordSpace.setGameOverTimer();
         //console.log("Total weight : " + WordSpace.totalWeight);
-
-        console.log(this.physicsObj.body.velocity.x);
     }
 
     destroy()
@@ -59,14 +61,19 @@ class WordObject
 
     attract()
     {
-        let gravityScale = 0.5, velocityLimit;
+        if(!this.moveStarted)
+        {
+            this.moveStarted = true;
+            this.physicsObj.setVelocity(this.initSpeed.x, this.initSpeed.y);
+        }
+        let gravityScale = 0.8, velocityLimit;
         let accel = {x: this.physicsObj.body.velocity.x, y: this.physicsObj.body.velocity.y};
         let dist, angle;
         let vel;
 
         dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
-        velocityLimit = dist + 10;
+        velocityLimit = dist * 0.9;
         accel.x += gravityScale * Math.cos(angle);
         accel.y += gravityScale * Math.sin(angle);
 
