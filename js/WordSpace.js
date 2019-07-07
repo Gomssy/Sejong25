@@ -65,7 +65,7 @@ WordSpace.gameOverCycle = new cycle(gameOver);
 //호패 생성 사이클
 WordSpace.nameCycle = new cycle(function()
 {
-    console.log("호패 on");
+    WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
 });
 //이건 뭐지
 WordSpace.varAdjustCycle = new cycle(function()
