@@ -62,7 +62,7 @@ var gameScene = new Phaser.Class(
         WordSpace.varAdjustCycle.resetCycle(this, 100);
         WordSpace.varAdjustCycle.resetCycle(this, 100, 0, true);
         
-        WordSpace.playerTyping.initiate(this);
+        WordSpace.setPlayerTyping.initiate(this);
     },
 
     update: function()
@@ -71,6 +71,6 @@ var gameScene = new Phaser.Class(
         {
             element.attract();
         });
-        WordSpace.playerTyping.add('');
+        WordSpace.setPlayerTyping.add('');
     }
 });

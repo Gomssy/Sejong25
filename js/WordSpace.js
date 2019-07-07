@@ -22,7 +22,7 @@ WordSpace.wordPhysicsGroup = null;
 WordSpace.GradeProb = [0.35, 0.6, 0.8];
 WordSpace.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
 WordSpace.CurrentPhase = WordSpace.Phase.READY;
-WordSpace.PlayerTyping = 0;
+WordSpace.playerTyping = 0;
 WordSpace.PlayerTypingRate = 0;
 
 WordSpace.WordSpawnDelay = 3000;
@@ -95,7 +95,8 @@ WordSpace.spaceInitiate = function(scene)
     let lenRate = 1;
     arr.forEach(function(element)
     {
-        WordSpace.generateWord(scene, SelectWord.selectWord(element),'',lenRate);
+        WordSpace.generateWord.Normal(scene, element, lenRate);
+        //WordSpace.generateWord(scene, SelectWord.selectWord(element),'',lenRate);
         lenRate += 0.2;
     });
 }
@@ -217,7 +218,8 @@ WordSpace.genWordByProb = function(scene)
     let wordIdx = wordRnd < WordSpace.GradeProb[0] ? 3 :
                   wordRnd < WordSpace.GradeProb[1] ? 2 :
                   wordRnd < WordSpace.GradeProb[2] ? 1 : 0;
-    WordSpace.generateWord(scene, SelectWord.selectWord(wordIdx));
+    WordSpace.generateWord.Normal(scene, wordIdx);
+    //WordSpace.generateWord(scene, SelectWord.selectWord(wordIdx));
 }
 
 WordSpace.loadImage = function(scene)
@@ -236,15 +238,28 @@ WordSpace.loadImage = function(scene)
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
 }
 
-WordSpace.generateWord = function(scene, wordText, grade, lenRate, isStrong)
+WordSpace.generateWord = 
 {
-    if(isStrong != undefined) word = new AttackWord(wordText, grade, isStrong);
-    else word = new WordObject(wordText);
-    if (typeof grade == 'number')
+    Normal: function(scene, grade, lenRate)
     {
-        word.wordGrade = grade;
-        word.wordWeight = WordReader.getWordWeight(grade);
+        word = new WordObject(SelectWord.selectWord(grade));
+        WordSpace.pushWord(scene, word, lenRate);
+    },
+    Attack: function(scene, wordText, grade, attacker, isStrong, lenRate)
+    {
+        word = new AttackWord(wordText, grade, attacker, isStrong);
+        WordSpace.pushWord(scene, word, lenRate);
+    },
+    Name: function(scene, isStrong, lenRate)
+    {
+        //To do
+        word = new NameWord(playerName, isStrong);
+        WordSpace.pushWord(scene, word, lenRate);
     }
+}
+
+WordSpace.pushWord = function(scene, word, lenRate)
+{
     word.instantiate(scene, lenRate);
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
@@ -307,6 +322,8 @@ WordSpace.findWord = function(wordText)
             case 3: WordSpace.attackGauge.add(0.5); break;
             default: console.log('[ERR] wrong grade of word'); break;
         }
+        //if(typeof(weightest) == 'AttackWord')
+            console.log(weightest instanceof AttackWord);
         weightest.destroy();
         WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce);
         
@@ -315,7 +332,7 @@ WordSpace.findWord = function(wordText)
             WordSpace.genWordByProb(WordSpace.gameSceneForTest);
             WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, 0);
         }
-        WordSpace.playerTyping.add(wordText);
+        WordSpace.setPlayerTyping.add(wordText);
     }
     else if (wordText === '공격' && WordSpace.attackGauge.value >= 3) // 공격모드 진입.
     {
@@ -324,7 +341,7 @@ WordSpace.findWord = function(wordText)
         Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
-        WordSpace.playerTyping.add(wordText);
+        WordSpace.setPlayerTyping.add(wordText);
     }
     else
     {
@@ -332,21 +349,20 @@ WordSpace.findWord = function(wordText)
     }
 }
 
-WordSpace.playerTyping = 
+WordSpace.setPlayerTyping = 
 {
     totalTyping: 0,
-    playerTyping: 0,
     add: function(wordText)
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
-        this.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 1000;
-        this.text.setText('현재 타수 : ' + this.playerTyping.toFixed(1));
+        WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 1000;
+        this.text.setText('현재 타수 : ' + WordSpace.playerTyping.toFixed(1));
     },
     initiate: function(scene)
     {
         WordSpace.gameTimer = new Phaser.Time.Clock(scene);
         WordSpace.gameTimer.start();
-        this.text = scene.add.text(100,200,'현재 타수 : ' + this.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
+        this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
     }
 }
 
@@ -356,12 +372,14 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
-        WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, undefined, true); // for test
+        //호패에 따른 isStrong 구분 필요함
+        WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, playerName, true);
+        //WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, undefined, true); // for test
         // 이부분에서 게이지에 따라 급수 결정
         // 이걸 서버로 공격을 보내야 함
         // 이부분은 서버 잘써야함
         WordSpace.attackGauge.resetValue();
-        WordSpace.playerTyping.add(wordText);
+        WordSpace.setPlayerTyping.add(wordText);
     }
     else
     {
