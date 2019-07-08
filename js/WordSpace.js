@@ -252,12 +252,7 @@ WordSpace.generateWord =
     },
     Name: function(scene, isStrong, lenRate)
     {
-        //To do
-        /*RoomData.players.forEach(function(element)
-        {
-            WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
-        });*/
-        word = new NameWord(PlayerData.nickname, isStrong);
+        word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
         WordSpace.pushWord(scene, word, lenRate);
     }
 }
@@ -280,6 +275,7 @@ function gameOver()
 {
     WordSpace.wordCycle.currentCycle.remove();
     WordSpace.nameCycle.currentCycle.remove();
+    WordSpace.varAdjustCycle.currentCycle.remove();
     //To Do
     console.log('defeat');
 }
@@ -368,7 +364,6 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
-        //호패에 따른 isStrong 구분 필요함
         WordSpace.nameGroup.forEach(function(element)
         {
             let attackData = 
@@ -384,7 +379,6 @@ WordSpace.attack = function(wordText, grade)
             //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
         });
         WordSpace.nameGroup = [];
-        
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
     }
@@ -396,6 +390,7 @@ WordSpace.attack = function(wordText, grade)
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
 }
+
 WordSpace.nameQueue = 
 {
     queue: [],
@@ -414,13 +409,18 @@ WordSpace.nameQueue =
             if(element.nickname != PlayerData.nickname && element.isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });
-        console.log(WordSpace.nameQueue.queue);
-        console.log(RoomData.aliveCount);
+        /*console.log(WordSpace.nameQueue.queue);
+        console.log(RoomData.aliveCount);*/
     },
     pop: function()
     {
-        let tempElement = WordSpace.nameQueue.queue.pop();
+        let tempElement = WordSpace.nameQueue.queue.shift();
         if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
         return tempElement;
+    },
+    initiate: function()
+    {
+        this.shuffle();
+        this.shuffle();
     }
 }

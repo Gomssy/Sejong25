@@ -60,8 +60,7 @@ var gameScene = new Phaser.Class(
         WordSpace.setPlayerTyping.initiate(this);
 
         WordSpace.nameWordTextForTest = WordSpace.gameSceneForTest.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
-        WordSpace.nameQueue.shuffle();
-    
+        WordSpace.nameQueue.initiate();
     },
 
     update: function()
