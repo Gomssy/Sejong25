@@ -175,7 +175,6 @@ WordSpace.varAdjustCycle =
             {
                 //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
                 //WordSpace.GetPhase();
-                WordSpace.GetPlayerTypingRate();
                 WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
             },
             callbackScope: scene,

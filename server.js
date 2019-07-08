@@ -50,8 +50,9 @@ io.on('connection', function(socket)
     socket.on('setPlayerTyping', function(msg) // number playerTyping
     {
         socket.playerData.playerTyping = msg;
-        //let playerTypingRate = (msg - (socket.currnetRoom.minPlayerTyping - socket.currnetRoom.rateArrangePoint)) / (socket.currnetRoom.maxPlayerTyping - socket.currnetRoom.minPlayerTyping + socket.currnetRoom.rateArrangePoint * 2);
-        //socket.emit('setPlayerTypingRate', playerTypingRate);
+        let playerTypingRate = (msg - (socket.currnetRoom.minTypingPlayer.playerTyping - socket.currnetRoom.rateArrangePoint)) /
+        (socket.currnetRoom.maxTypingPlayer.playerTyping - socket.currnetRoom.minTypingPlayer.playerTyping + socket.currnetRoom.rateArrangePoint * 2);
+        socket.emit('setPlayerTypingRate', playerTypingRate);
     });
 
     socket.on('disconnect', function(reason)
@@ -67,7 +68,7 @@ io.on('connection', function(socket)
             // 룸에서도 제거
             if (socket.playerData.currentRoom != null)
             {
-                GameServer.anounceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', 
+                GameServer.announceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', 
                 {
                     id: socket.playerData.id,
                     nickname: socket.playerData.nickname

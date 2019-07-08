@@ -38,8 +38,8 @@ GameServer.makeRoom = function()
         currnetPhase: GameServer.Phase.READY,
 
         rateArrangePoint: 300,
-        maxPlayerTyping: 0,
-        minPlayerTyping: 0
+        maxTypingPlayer: null,
+        minTypingPlayer: null
     }
     this.playingRoom.push(roomOption);
     console.log('[SERVER] new room #'+roomOption.roomNum+' made, roomCount: ' + this.playingRoom.length);
@@ -79,13 +79,16 @@ GameServer.enterEmptyRoom = function(playerData)
 }
 GameServer.startRoom = function(roomIdx)
 {
-    this.playingRoom[roomIdx].Phase = this.Phase.START;
-    console.log('[ROOM#'+this.playingRoom[roomIdx].roomNum+'] Game Start');
-    this.anounceToRoom(roomIdx, 'phaseChange', this.Phase.START);
-    this.anounceToRoom(roomIdx, 'startGame');
+    let room = this.playingRoom[roomIdx];
+    room.Phase = this.Phase.START;
+    room.maxTypingPlayer = room.currentPlayer[0];
+    room.mimTypingPlayer = room.currentPlayer[1];
+    console.log('[ROOM#'+room.roomNum+'] Game Start');
+    this.announceToRoom(roomIdx, 'phaseChange', this.Phase.START);
+    this.announceToRoom(roomIdx, 'startGame');
     // 데이터 동기화도
 }
-GameServer.anounceToRoom = function(roomIdx, message, data = null)
+GameServer.announceToRoom = function(roomIdx, message, data = null)
 {
     this.playingRoom[roomIdx].currentPlayer.forEach(element => 
     {
