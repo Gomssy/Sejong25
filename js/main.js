@@ -9,44 +9,20 @@ var config = {
         }
     },
     backgroundColor: Phaser.Display.Color.GetColor(0,0,0),
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
+    scene: [ menuScene, gameScene ]
 };
 
 var game = new Phaser.Game(config)
 
-// load assets
-function preload()
-{
-    BackGround.loadImage(this);
-    WordSpace.loadImage(this);
-    Input.inputField.loadImage(this);
-    CSVParsing.loadText(this);
-}
+//플레이어 정보, 서버 통신시 필요할 듯
+//테스트용이므로 차후 수정 요망
+var PlayerData = PlayerData || {};
 
-function create()
-{
-    BackGround.drawBrain(this);
-    Input.inputField.generate(this);
-    WordSpace.wordPhysicsGroup = this.physics.add.group();
-    WordSpace.wordCycle.resetCycle(this, 3000);
-    WordSpace.attackGauge.resetCycle(this);
-    CSVParsing.CSVParse(this);
-}
+PlayerData.idNum = -1; //플레이어 아이디, 고유 번호
+PlayerData.nickname = '홍길동'; //플레이어 닉네임
 
-function update()
-{
-    WordSpace.wordForcedGroup.forEach(function(element)
-    {
-        element.attract();
-    });
-}
+// 현재 들어가있는 Game Room의 정보
+var RoomData = RoomData || {};
 
-var socket = io.connect();
-socket.on('hi', function(msg) {
-    console.log(msg);
-});
-socket.emit('hello');
+RoomData.roomNum = -1;
+RoomData.players = null;

@@ -39,6 +39,7 @@ WordReader.getWordTyping = function(stringText)
     var temp = 0;
     for(var i = 0; i < stringText.length; i++)
     {
+        if(stringText.charCodeAt(i) < parseInt('0xac00',16) || stringText.charCodeAt(i) > parseInt('0xd7af',16)) return -1;
         temp += parseFloat(firstSound(stringText.charAt(i))) + middleSound(stringText.charAt(i)) + lastSound(stringText.charAt(i));
     }
     return temp;
@@ -47,9 +48,10 @@ WordReader.getWordTyping = function(stringText)
 //입력 받은 단어의 등급을 반환함
 WordReader.getWordGrade = function(_wordTyping)
 {
-    return 2 <= _wordTyping && _wordTyping < 7 ? 3 :
-    7 <= _wordTyping && _wordTyping < 12 ? 2 : 
-    12 <= _wordTyping && _wordTyping < 17 ? 1 : 0;
+    return 4 <= _wordTyping && _wordTyping < 7  ? 3 :
+           7 <= _wordTyping && _wordTyping < 12 ? 2 : 
+          12 <= _wordTyping && _wordTyping < 17 ? 1 :
+          17 <= _wordTyping && _wordTyping < 26 ? 0 : -1;
 }
 
 WordReader.getWordWeight = function(_wordGrade)
