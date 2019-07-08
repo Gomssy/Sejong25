@@ -9,6 +9,7 @@ socket.on('idSet', function(msg) // {str, num playerNum}
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {
     WordSpace.PlayerTypingRate = msg;
+    console.log('rate: ' + msg);
 });
 socket.on('phaseChange', function(msg) // number Phase
 {

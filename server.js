@@ -49,11 +49,17 @@ io.on('connection', function(socket)
     socket.on('setPlayerTyping', function(msg) // number playerTyping
     {
         socket.playerData.playerTyping = msg;
-        //console.log(socket.playerData.currentRoom);
-        //console.log(socket.playerData.currentRoom.currentPlayer.length);
-        //let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
-        //(socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
-        //socket.emit('setPlayerTypingRate', playerTypingRate);
+        if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
+        {
+            socket.playerData.currentRoom.maxTypingPlayer = socket.playerData;
+        }
+        if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg)
+        {
+            socket.playerData.currentRoom.minTypingPlayer = socket.playerData;
+        }
+        let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
+        (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
+        socket.emit('setPlayerTypingRate', playerTypingRate);
     });
 
     socket.on('disconnect', function(reason)

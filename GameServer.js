@@ -1,7 +1,7 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 2;
+GameServer.startCount = 4;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
@@ -33,7 +33,7 @@ GameServer.makeRoom = function()
     var roomOption = 
     {
         roomNum: GameServer.nextRoomNumber++,
-        maxPlayer: 3,
+        maxPlayer: 5,
         currentPlayer: [],
         currentPhase: GameServer.Phase.READY,
 
@@ -80,9 +80,9 @@ GameServer.enterEmptyRoom = function(playerData)
 GameServer.startRoom = function(roomIdx)
 {
     let room = this.playingRoom[roomIdx];
-    this.playingRoom[roomIdx].currentPhase = this.Phase.START;
-    this.playingRoom[roomIdx].maxTypingPlayer = room.currentPlayer[0];
-    this.playingRoom[roomIdx].mimTypingPlayer = room.currentPlayer[0];
+    room.currentPhase = this.Phase.START;
+    room.maxTypingPlayer = room.currentPlayer[0];
+    room.minTypingPlayer = room.currentPlayer[0];
     
     console.log('[ROOM#'+room.roomNum+'] Game Start');
     this.announceToRoom(roomIdx, 'phaseChange', this.Phase.START);
