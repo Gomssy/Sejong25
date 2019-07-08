@@ -382,7 +382,7 @@ WordSpace.attack = function(wordText, grade)
     {
         WordSpace.attackGauge.cutValue(0.3);
     }
-    Input.maxInput = 5;
+    Input.maxInput = 6;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
 }
