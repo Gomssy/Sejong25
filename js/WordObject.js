@@ -120,7 +120,7 @@ class AttackWord extends WordObject
         this.wordGrade = _wordGrade;
         this.wordWeight = WordReader.getWordWeight(this.wordGrade);
         if(WordReader.getWordTyping(_attacker) <= 9)
-            this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(playerName) - 9);
+            this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(PlayerData.nickname) - 9);
         this.wordWeight *= isStrong ? 3 : 2;
         this.attacker = _attacker;
         //서버 사용하게 되면 PlayerTyping을 피격자의 것으로 바꿔야 함

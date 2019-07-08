@@ -4,7 +4,7 @@ socket.emit('idRequest');
 socket.on('idSet', function(msg) // {str, num playerNum}
 {
     console.log(msg.str);
-    playerNum = msg.num;
+    PlayerData.idNum = msg.num;
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {

@@ -247,7 +247,7 @@ WordSpace.generateWord =
     Name: function(scene, isStrong, lenRate)
     {
         //To do
-        word = new NameWord(playerName, isStrong);
+        word = new NameWord(PlayerData.nickname, isStrong);
         WordSpace.pushWord(scene, word, lenRate);
     }
 }
@@ -359,7 +359,7 @@ WordSpace.attack = function(wordText, grade)
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
         //호패에 따른 isStrong 구분 필요함
-        WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, playerName, true);
+        WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, true);
         //WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, undefined, true); // for test
         // 이부분에서 게이지에 따라 급수 결정
         // 이걸 서버로 공격을 보내야 함
