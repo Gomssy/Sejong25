@@ -33,7 +33,7 @@ io.on('connection', function(socket)
         };
         GameServer.currentPlayer.push(socket.playerData);
         console.log('['+socket.playerData.id+'] client request');
-        socket.emit('idSet', 
+        socket.emit('setId', 
         {
             str: 'your number is ' + socket.playerData.id,
             num: socket.playerData.id
