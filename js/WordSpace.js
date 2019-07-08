@@ -10,11 +10,11 @@ WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
 WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
-WordSpace.defeatTime = 5000;
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
 
 WordSpace.wordGroup = [];
+WordSpace.nameGroup = [];
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
@@ -22,10 +22,15 @@ WordSpace.GradeProb = [0.35, 0.6, 0.8];
 WordSpace.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
 WordSpace.CurrentPhase = WordSpace.Phase.READY;
 WordSpace.playerTyping = 0;
-WordSpace.PlayerTypingRate = 0;
+WordSpace.playerTypingRate = 0;
 
-WordSpace.WordSpawnDelay = 3000;
-WordSpace.NameSpawnDelay = 3000;
+WordSpace.delay = 
+{
+    WordSpawn: 3000,
+    NameSpawn: 3000,
+    GameOver: 5000,
+}
+
 WordSpace.NameSpawnReduce = 1000;
 
 WordSpace.gravityPoint = {x: 640, y: 300};
@@ -69,10 +74,10 @@ WordSpace.nameCycle = new Cycle(function()
 //이건 뭐지
 WordSpace.varAdjustCycle = new Cycle(function()
 {
-    //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
+    //나중에는 메세지 분석해서 Phase랑 playerTypingRate 받겠지만 일단 이렇게 해둠
     //WordSpace.GetPhase();
     //WordSpace.GetPlayerTypingRate();
-    WordSpace.AdjustVarByPhase(WordSpace.PlayerTypingRate, WordSpace.CurrentPhase);
+    WordSpace.AdjustVarByPhase(WordSpace.playerTypingRate, WordSpace.CurrentPhase);
 });
 
 WordSpace.getSpawnPoint = function(_lenRate)
@@ -104,8 +109,8 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
 {
     if(phase == WordSpace.Phase.READY)
     {
-        WordSpace.WordSpawnDelay = 10000;
-        WordSpace.NameSpawnDelay = 10000;
+        WordSpace.delay.WordSpawn = 10000;
+        WordSpace.delay.NameSpawn = 10000;
         WordSpace.NameSpawnReduce = 0;
         WordSpace.GradeProb[0] = 1;
         WordSpace.GradeProb[1] = 1;
@@ -113,8 +118,8 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     }
     else if(phase == WordSpace.Phase.START)
     {
-        WordSpace.WordSpawnDelay = 3000;
-        WordSpace.NameSpawnDelay = 6000;
+        WordSpace.delay.WordSpawn = 3000;
+        WordSpace.delay.NameSpawn = 6000;
         WordSpace.NameSpawnReduce = 1000;
         WordSpace.GradeProb[0] = 0.35;
         WordSpace.GradeProb[1] = 1 - 0.4 * typingRate;
@@ -122,8 +127,8 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     }
     else if(phase == WordSpace.Phase.MAIN)
     {
-        WordSpace.WordSpawnDelay = 3000 - typingRate * 1000;
-        WordSpace.NameSpawnDelay = 6000;
+        WordSpace.delay.WordSpawn = 3000 - typingRate * 1000;
+        WordSpace.delay.NameSpawn = 6000;
         WordSpace.NameSpawnReduce = 1000;
         WordSpace.GradeProb[0] = 0.4 - 0.4 * typingRate;
         WordSpace.GradeProb[1] = 0.8 - 0.4 * typingRate;
@@ -131,15 +136,15 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     }
     else if(phase == WordSpace.Phase.MUSIC)
     {
-        WordSpace.WordSpawnDelay = 1500;
-        WordSpace.NameSpawnDelay = 4000;
+        WordSpace.delay.WordSpawn = 1500;
+        WordSpace.delay.NameSpawn = 4000;
         WordSpace.NameSpawnReduce = 500;
         WordSpace.GradeProb[0] = 0.2 - 0.2 * typingRate;
         WordSpace.GradeProb[1] = 0.8 - 0.5 * typingRate;
         WordSpace.GradeProb[2] = 0.9 - 0.2 * typingRate;
     }
-    WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, WordSpace.wordCycle.currentCycle.getElapsed(), true);
-    WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed(), true);
+    WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
+    WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);
 }
 
 WordSpace.attackGauge = 
@@ -281,7 +286,7 @@ WordSpace.setGameOverTimer = function()
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
         this.isTimerOn = true;
-        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.defeatTime, 0, false);
+        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.gameOver, 0, false);
         console.log('Game over timer On');
     }
 }
@@ -310,12 +315,12 @@ WordSpace.findWord = function(wordText)
             if (weightest.wordWeight < element.wordWeight) weightest = element;
         });
         weightest.destroy();
-        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce, true);
+        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce, true);
         
         while(WordSpace.totalWordNum < 5)
         {
             WordSpace.genWordByProb(WordSpace.gameSceneForTest);
-            WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, 0);
+            WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, 0);
         }
         WordSpace.setPlayerTyping.add(wordText);
     }
@@ -359,7 +364,12 @@ WordSpace.attack = function(wordText, grade)
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
         //호패에 따른 isStrong 구분 필요함
-        WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, playerName, true);
+        WordSpace.nameGroup.forEach(function(element) 
+        {
+            WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, playerName, element.isStrong);
+        });
+        WordSpace.nameGroup = [];
+
         //WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, undefined, true); // for test
         // 이부분에서 게이지에 따라 급수 결정
         // 이걸 서버로 공격을 보내야 함

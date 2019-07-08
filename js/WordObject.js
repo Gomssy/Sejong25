@@ -156,6 +156,7 @@ class NameWord extends WordObject
     destroy()
     {
         WordSpace.attackGauge.add(this.wordTyping * 0.1);
+        WordSpace.nameGroup.push(this);
         super.destroy();
     }
 }
