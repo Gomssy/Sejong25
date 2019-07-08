@@ -47,6 +47,6 @@ socket.on('defeat', function(msg) // object player
 socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
 {
     console.log(msg.index + ' / ' + msg.id + ' / ' + msg.nickname + ' disconnected');
-    RoomData.players[msg.index].isAlive = false;
+    RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
 });
