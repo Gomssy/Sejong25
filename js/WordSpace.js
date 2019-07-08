@@ -9,7 +9,7 @@ WordSpace.isImageLoaded = false;
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
 WordSpace.totalWordNum = 0;
-WordSpace.brainCapacity = 50; //수용 가능한 단어 무게 최대치
+WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.defeatTime = 5000;
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
@@ -30,7 +30,7 @@ WordSpace.NameSpawnReduce = 1000;
 
 WordSpace.gravityPoint = {x: 640, y: 300};
 
-class cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
+class Cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
 {
     constructor(_callback)
     {
@@ -55,19 +55,19 @@ class cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
 }
 
 //단어 생성 사이클
-WordSpace.wordCycle = new cycle(function()
+WordSpace.wordCycle = new Cycle(function()
 {
     WordSpace.genWordByProb(this);
 });
 //게임 오버 사이클
-WordSpace.gameOverCycle = new cycle(gameOver);
+WordSpace.gameOverCycle = new Cycle(gameOver);
 //호패 생성 사이클
-WordSpace.nameCycle = new cycle(function()
+WordSpace.nameCycle = new Cycle(function()
 {
     WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
 });
 //이건 뭐지
-WordSpace.varAdjustCycle = new cycle(function()
+WordSpace.varAdjustCycle = new Cycle(function()
 {
     //나중에는 메세지 분석해서 Phase랑 PlayerTypingRate 받겠지만 일단 이렇게 해둠
     //WordSpace.GetPhase();
@@ -140,13 +140,6 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     }
     WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.WordSpawnDelay, WordSpace.wordCycle.currentCycle.getElapsed(), true);
     WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.NameSpawnDelay, WordSpace.nameCycle.currentCycle.getElapsed(), true);
-}
-
-WordSpace.GetPlayerTypingRate = function()
-{
-    //서버통신하셈~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //임시
-    WordSpace.PlayerTypingRate = 0.5;
 }
 
 WordSpace.attackGauge = 

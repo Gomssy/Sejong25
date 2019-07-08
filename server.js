@@ -50,7 +50,7 @@ io.on('connection', function(socket)
     {
         socket.playerData.playerTyping = msg;
         //console.log(socket.playerData.currentRoom);
-        console.log(socket.playerData.currentRoom.currentPlayer.length);
+        //console.log(socket.playerData.currentRoom.currentPlayer.length);
         //let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
         //(socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
         //socket.emit('setPlayerTypingRate', playerTypingRate);
