@@ -11,17 +11,14 @@ var menuScene = new Phaser.Class(
 
     preload: function()
     {
-        //Input.inputField.loadImage(this);
+        Input.inputField.loadImage(this);
+        BackGround.loadImage(this);
     },
 
     create: function()
     {
-        //Input.inputField.generate(this);
-    },
-
-    update: function()
-    {
-        
+        Input.inputField.generate(this, Input.menuSceneEnterReaction);
+        BackGround.drawMenu(this);
     }
 });
 
@@ -51,7 +48,7 @@ var gameScene = new Phaser.Class(
 
         WordSpace.wordPhysicsGroup = this.physics.add.group();
 
-        Input.inputField.generate(this);
+        Input.inputField.generate(this, Input.gameSceneEnterReaction);
         WordSpace.attackGauge.generate(this);
         WordSpace.spaceInitiate(this);
         WordSpace.attackGauge.resetCycle(this);
