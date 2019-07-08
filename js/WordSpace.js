@@ -367,14 +367,20 @@ WordSpace.attack = function(wordText, grade)
         //호패에 따른 isStrong 구분 필요함
         WordSpace.nameGroup.forEach(function(element)
         {
-            WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
+            let attackData = 
+            {
+                roomNum: RoomData.roomNum,
+                attacker: PlayerData.nickname, 
+                target: element.ownerId,
+                text: wordText, 
+                grade: grade, 
+                isStrong: element.isStrong
+            }
+            socket.emit('attack', attackData);
+            //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
         });
         WordSpace.nameGroup = [];
-
-        //WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, undefined, true); // for test
-        // 이부분에서 게이지에 따라 급수 결정
-        // 이걸 서버로 공격을 보내야 함
-        // 이부분은 서버 잘써야함
+        
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
     }

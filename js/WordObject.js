@@ -146,12 +146,16 @@ class AttackWord extends WordObject
 
 class NameWord extends WordObject
 {
-    constructor(text, _isStrong = false)
+    constructor(name, _isStrong = false)
     {
-        super(text);
+        super(name);
+        this.ownerId = RoomData.players.find(function(element)
+        {
+            return element.nickname === name;
+        }).id;
         this.wordWeight = 2;
         this.isStrong = _isStrong;
-        console.log('Name : ' + text + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
+        console.log('Name : ' + name + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
     }
     destroy()
     {
