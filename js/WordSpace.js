@@ -253,7 +253,7 @@ WordSpace.generateWord =
     Name: function(scene, isStrong, lenRate)
     {
         //To do
-        word = new NameWord(playerName, isStrong);
+        word = new NameWord(PlayerData.nickname, isStrong);
         WordSpace.pushWord(scene, word, lenRate);
     }
 }
@@ -346,8 +346,8 @@ WordSpace.setPlayerTyping =
     add: function(wordText)
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
-        WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 1000;
-        socket.emit('setPlayerTyping', this.playerTyping);
+        WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 60 * 1000;
+        socket.emit('setPlayerTyping', WordSpace.playerTyping);
         this.text.setText('현재 타수 : ' + WordSpace.playerTyping.toFixed(1));
     },
     initiate: function(scene)
@@ -365,9 +365,9 @@ WordSpace.attack = function(wordText, grade)
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
         //호패에 따른 isStrong 구분 필요함
-        WordSpace.nameGroup.forEach(function(element) 
+        WordSpace.nameGroup.forEach(function(element)
         {
-            WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, playerName, element.isStrong);
+            WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
         });
         WordSpace.nameGroup = [];
 
