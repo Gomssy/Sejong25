@@ -26,3 +26,4 @@ var RoomData = RoomData || {};
 
 RoomData.roomNum = -1;
 RoomData.players = null;
+RoomData.aliveCount = -1;

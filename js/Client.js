@@ -14,6 +14,7 @@ socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
     console.log(msg);
     RoomData.roomNum = msg.roomNum;
     RoomData.players = msg.players;
+    RoomData.aliveCount = msg.players.length;
 });
 socket.on('startGame', function()
 { 
@@ -41,4 +42,5 @@ socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
 {
     console.log(msg.index + ' / ' + msg.id + ' / ' + msg.nickname + ' disconnected');
     RoomData.players[msg.index].isAlive = false;
+    RoomData.aliveCount--;
 });
