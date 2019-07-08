@@ -4,6 +4,7 @@ Input.input = [];
 Input.convInput = ''; // converted input
 
 Input.isShifted = false;
+Input.isEntered = false;
 Input.pressCount = 0;
 Input.justPressed = '';
 Input.maxInput = 5;
@@ -13,10 +14,14 @@ Input.attackOption = null;
 
 Input.gameSceneEnterReaction = function()
 {
-    Input.convInput = Input.removeConVow(Input.convInput);
-    if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
-    else WordSpace.findWord(Input.convInput);
-    Input.reset();
+    if (!Input.isEntered)
+    {
+        Input.convInput = Input.removeConVow(Input.convInput);
+        if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
+        else WordSpace.findWord(Input.convInput);
+        Input.reset();
+        Input.isEntered = true;
+    }
 }
 Input.menuSceneEnterReaction = function()
 {
@@ -317,6 +322,7 @@ Input.inputField =
             }
         });
         scene.input.keyboard.on('keydown-ENTER', enterCallback);
+        scene.input.keyboard.on('keyup-ENTER', function(){Input.isEntered = false;})
         // upside 10 keys
         scene.input.keyboard.on('keydown-Q', function() {Input.pushInput('ㅂ')});
         scene.input.keyboard.on('keydown-W', function() {Input.pushInput('ㅈ')});
