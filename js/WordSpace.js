@@ -3,6 +3,7 @@ var WordSpace = WordSpace || {};
 // for test
 WordSpace.gameSceneForTest = null;
 WordSpace.weightTextObjForTest = null;
+WordSpace.nameWordTextForTest = null;
 
 WordSpace.isImageLoaded = false;
 

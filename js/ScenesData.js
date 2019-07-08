@@ -58,6 +58,8 @@ var gameScene = new Phaser.Class(
         WordSpace.varAdjustCycle.resetCycle(this, 100, 0, true);
         
         WordSpace.setPlayerTyping.initiate(this);
+
+        WordSpace.nameWordTextForTest = WordSpace.gameSceneForTest.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
     },
 
     update: function()
@@ -66,6 +68,13 @@ var gameScene = new Phaser.Class(
         {
             element.attract();
         });
+        let tempNames = '';
+        WordSpace.nameGroup.forEach(function(element)
+        {
+            tempNames += element.wordText + '\n';
+        });
+        
+        WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);
         WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
         WordSpace.setPlayerTyping.add('');
     }
