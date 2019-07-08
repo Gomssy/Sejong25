@@ -253,6 +253,10 @@ WordSpace.generateWord =
     Name: function(scene, isStrong, lenRate)
     {
         //To do
+        /*RoomData.players.forEach(function(element)
+        {
+            WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
+        });*/
         word = new NameWord(PlayerData.nickname, isStrong);
         WordSpace.pushWord(scene, word, lenRate);
     }
@@ -391,4 +395,32 @@ WordSpace.attack = function(wordText, grade)
     Input.maxInput = 6;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
+}
+WordSpace.nameQueue = 
+{
+    queue: [],
+    shuffle: function()
+    {
+        let tempIdx, tempElement, tempLength;
+        let tempQueue = RoomData.players;
+        for(tempLength = tempQueue.length; tempLength; tempLength -= 1)
+        {
+            tempIdx = Math.floor(Math.random() * tempLength);
+            tempElement = tempQueue[tempLength - 1];
+            tempQueue[tempLength - 1] = tempQueue[tempIdx];
+            tempQueue[tempIdx] = tempElement;
+        }
+        tempQueue.forEach(function(element){
+            if(element.nickname != PlayerData.nickname && element.isAlive)
+                WordSpace.nameQueue.queue.push(element);
+        });
+        console.log(WordSpace.nameQueue.queue);
+        console.log(RoomData.aliveCount);
+    },
+    pop: function()
+    {
+        let tempElement = WordSpace.nameQueue.queue.pop();
+        if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
+        return tempElement;
+    }
 }

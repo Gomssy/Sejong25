@@ -1,7 +1,7 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 2;
+GameServer.startCount = 3;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
