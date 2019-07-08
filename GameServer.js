@@ -35,7 +35,7 @@ GameServer.makeRoom = function()
         roomNum: GameServer.nextRoomNumber++,
         maxPlayer: 3,
         currentPlayer: [],
-        currnetPhase: GameServer.Phase.READY,
+        currentPhase: GameServer.Phase.READY,
 
         rateArrangePoint: 300,
         maxTypingPlayer: null,
@@ -57,7 +57,7 @@ GameServer.enterRoom = function(roomIdx, playerData)
     this.playingRoom[roomIdx].currentPlayer.push(playerData);
     playerData.currentRoom = this.playingRoom[roomIdx];
     console.log('[' + playerData.id + '] entered to room #' + this.playingRoom[roomIdx].roomNum);
-    if (this.playingRoom[roomIdx].currentPlayer.length >= this.startCount && this.playingRoom[roomIdx].Phase != GameServer.Phase.START) GameServer.startRoom(roomIdx);
+    if (this.playingRoom[roomIdx].currentPlayer.length >= this.startCount) GameServer.startRoom(roomIdx);
     return this.playingRoom[roomIdx];
 }
 GameServer.enterEmptyRoom = function(playerData)
@@ -65,7 +65,7 @@ GameServer.enterEmptyRoom = function(playerData)
     var toEnter = -1;
     for (let i = 0; i < this.playingRoom.length; i++)
     {
-        if (this.playingRoom[i].currentPlayer.length < this.playingRoom[i].maxPlayer)
+        if (this.playingRoom[i].currentPlayer.length < this.playingRoom[i].maxPlayer && this.playingRoom[i].currentPhase == this.Phase.READY)
         {
             toEnter = i;
             break;
@@ -80,7 +80,7 @@ GameServer.enterEmptyRoom = function(playerData)
 GameServer.startRoom = function(roomIdx)
 {
     let room = this.playingRoom[roomIdx];
-    this.playingRoom[roomIdx].Phase = this.Phase.START;
+    this.playingRoom[roomIdx].currentPhase = this.Phase.START;
     this.playingRoom[roomIdx].maxTypingPlayer = room.currentPlayer[0];
     this.playingRoom[roomIdx].mimTypingPlayer = room.currentPlayer[0];
     
