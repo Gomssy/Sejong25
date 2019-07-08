@@ -4,7 +4,7 @@ BackGround.brainGroup = null;
 
 BackGround.loadImage = function(scene)
 {
-    scene.load.image('brainGround', 'assets/placeholder/playback.png');
+    scene.load.image('brainGround', 'assets/image/background/background_brain.png');
     scene.load.image('menuBackground', 'assets/placeholder/menuBackground.png')
 }
 

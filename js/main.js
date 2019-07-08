@@ -8,7 +8,7 @@ var config = {
             debug: true
         }
     },
-    backgroundColor: Phaser.Display.Color.GetColor(0,0,0),
+    backgroundColor: Phaser.Display.Color.HexStringToColor('#F0CB85').color,//GetColor(245,208,138),
     scene: [ menuScene, gameScene ]
 };
 
