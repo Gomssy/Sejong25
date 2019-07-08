@@ -17,10 +17,20 @@ class WordObject
         let scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
         let fontscale = 25;
         var random = WordSpace.getSpawnPoint(lenRate);
+
         this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
-        .setMass(this.wordWeight)
+        .setMass(this.wordWeight * 10)
         .setScale(scale)
+        .setFrictionX(0)
+        .setFrictionY(0)
         .setBounce(0.5);
+
+        let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
+        let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
+
+        //임시땜빵
+        this.moveStarted = false;
+        this.initSpeed = {x: Math.max(0, 200-WordSpace.totalWeight) * Math.cos(angle), y: Math.max(0, 200-WordSpace.totalWeight) * Math.sin(angle)};
         
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
@@ -48,19 +58,35 @@ class WordObject
         WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
     }
 
+
     attract()
     {
-        let gravityScale = 0.1;
-        let accel = {x: 0, y: 0};
-        let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
-        let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
-        accel.x += Math.pow(dist,2) * gravityScale * Math.cos(angle);
-        accel.y += Math.pow(dist,2) * gravityScale * Math.sin(angle);
+        if(!this.moveStarted)
+        {
+            this.moveStarted = true;
+            this.physicsObj.setVelocity(this.initSpeed.x, this.initSpeed.y);
+        }
+        let gravityScale = 0.8, velocityLimit;
+        let accel = {x: this.physicsObj.body.velocity.x, y: this.physicsObj.body.velocity.y};
+        let dist, angle;
+        let vel;
 
-        this.physicsObj.setVelocity(dist * Math.cos(angle) * this.wordSpeed, dist * Math.sin(angle) * this.wordSpeed);
+        dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
+        angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
+        velocityLimit = dist * 0.9;
+        accel.x += gravityScale * Math.cos(angle);
+        accel.y += gravityScale * Math.sin(angle);
+
+        vel = Phaser.Math.Distance.Between(accel.x,accel.y,0,0);
+        if(vel > velocityLimit)
+        {
+            accel.x *= velocityLimit / vel;
+            accel.y *= velocityLimit / vel;
+        }
+
+        this.physicsObj.setVelocity(accel.x, accel.y);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
-        this.physicsObj.setVelocity(dist * Math.cos(angle) * this.wordSpeed, dist * Math.sin(angle) * this.wordSpeed);
-        this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
+
     }
 
     isEqualObject(_generationCode) { return _generationCode === this.generationCode; }

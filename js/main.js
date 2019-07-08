@@ -119,4 +119,5 @@ window.addEventListener("message", function (event) {
             alert("Your browser does not support postMessage. Sorry but you will be forced to default to the standard setInterval and setTimeout functions. This means you may experience pauses in your game when you navigate away from the tab it is playing in.");
         }
     });
-})(this);*/
+})(this);
+*/

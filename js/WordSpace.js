@@ -79,8 +79,8 @@ WordSpace.getSpawnPoint = function(_lenRate)
 {
     let lenRate = 1;
     if(typeof _lenRate == 'number') lenRate  = _lenRate;
-    let xLen = 600 * lenRate;
-    let yLen = 300 * lenRate;
+    let xLen = 550 * lenRate;
+    let yLen = 350 * lenRate;
     const angle = Math.random() * Math.PI * 2;
     let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
     let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
@@ -229,6 +229,10 @@ WordSpace.loadImage = function(scene)
             {
                 scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
             }
+        }
+        for (let i = 0; i < 4; i++)
+        {
+            scene.load.image('attackAlert' + i, 'assets/placeholder/attackalert' + (i+1) + '.png');
         }
     }
     WordSpace.gameSceneForTest = scene; // for test
