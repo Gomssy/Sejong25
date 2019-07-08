@@ -27,6 +27,7 @@ io.on('connection', function(socket)
             nickname: '게스트',
             socketId: socket,
             currentRoom: null,
+            playingData: null,
             
             playerTyping: 0
         };
@@ -67,6 +68,15 @@ io.on('connection', function(socket)
         GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attacked', msg);
     });
 
+    socket.on('defeated', function()
+    {
+        socket.playerData.playingData.isAlive = false;
+        socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
+        // 패배단어 체크
+        GameServer.announceToRoom(socket.playerData.currentRoom.roomNum, 'defeat', socket.playerData.playingData);
+        console.log('['+socket.playerData.id+']'+ ' defeated');
+    });
+
     socket.on('disconnect', function(reason)
     {
         let idxToDel = GameServer.currentPlayer.findIndex(function(element)
@@ -81,7 +91,7 @@ io.on('connection', function(socket)
             if (socket.playerData.currentRoom != null)
             {
                 socket.playerData.playingData.isAlive = false;
-                socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
+                if (socket.playerData.playingData.rank === -1) socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
                 socket.playerData.currentRoom.currentSocket.splice(socket.playerData.playingData.index, 1);
                 GameServer.announceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', socket.playerData.playingData);
             }

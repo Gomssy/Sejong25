@@ -277,7 +277,9 @@ function gameOver()
     WordSpace.wordCycle.currentCycle.remove();
     WordSpace.nameCycle.currentCycle.remove();
     //To Do
+    socket.emit('defeated');
     console.log('defeat');
+    alert('defeat');
 }
 
 //게임 오버 판정을 위한 타이머
@@ -380,7 +382,7 @@ WordSpace.attack = function(wordText, grade)
             //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
         });
         WordSpace.nameGroup = [];
-        
+
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
     }
