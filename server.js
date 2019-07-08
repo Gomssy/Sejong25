@@ -27,12 +27,11 @@ io.on('connection', function(socket)
             nickname: '게스트',
             socketId: socket,
             currentRoom: null,
-            
-            playerTyping: 0
+            playingData: null
         };
         GameServer.currentPlayer.push(socket.playerData);
         console.log('['+socket.playerData.id+'] client request');
-        socket.emit('idSet', 
+        socket.emit('setId', 
         {
             str: 'your number is ' + socket.playerData.id,
             num: socket.playerData.id
@@ -48,7 +47,7 @@ io.on('connection', function(socket)
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping
     {
-        socket.playerData.playerTyping = msg;
+        socket.playerData.playingData.playerTyping = msg;
         if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
         {
             socket.playerData.currentRoom.maxTypingPlayer = socket.playerData;
@@ -84,9 +83,11 @@ io.on('connection', function(socket)
                 {
                     return element.id === socket.playerData.id;
                 });
-                if (idxToDel != -1)
+                if (_idxToDel != -1)
                 {
-                    socket.playerData.currentRoom.currentPlayer.splice(_idxToDel, 1);
+                    socket.playerData.currentRoom.currentPlayer[_idxToDel].isAlive = false;
+                    socket.playerData.currentRoom.currentPlayer[_idxToDel].rank = socket.playerData.currentRoom.nextRank--;
+                    socket.playerData.currentRoom.currentSocket.splice(_idxToDel, 1);
                 }
             }
         }

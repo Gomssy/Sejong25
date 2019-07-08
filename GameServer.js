@@ -34,7 +34,9 @@ GameServer.makeRoom = function()
     {
         roomNum: GameServer.nextRoomNumber++,
         maxPlayer: 5,
+        nextRank: 5,
         currentPlayer: [],
+        currentSocket: [],
         currentPhase: GameServer.Phase.READY,
 
         rateArrangePoint: 300,
@@ -54,11 +56,17 @@ GameServer.findRoomIndex = function(roomNum)
 }
 GameServer.enterRoom = function(roomIdx, playerData)
 {
-    this.playingRoom[roomIdx].currentPlayer.push(playerData);
-    playerData.currentRoom = this.playingRoom[roomIdx];
-    console.log('[' + playerData.id + '] entered to room #' + this.playingRoom[roomIdx].roomNum);
-    if (this.playingRoom[roomIdx].currentPlayer.length >= this.startCount) GameServer.startRoom(roomIdx);
-    return this.playingRoom[roomIdx];
+    let room = this.playingRoom[roomIdx];
+    let player = new Player(room.currentPlayer.length, playerData);
+
+    room.currentPlayer.push(player);
+    room.currentSocket.push(playerData);
+    playerData.playingData = player;
+    playerData.currentRoom = room;
+
+    console.log('[' + playerData.id + '] entered to room #' + room.roomNum);
+    if (room.currentPlayer.length >= this.startCount) GameServer.startRoom(roomIdx);
+    return room;
 }
 GameServer.enterEmptyRoom = function(playerData)
 {
@@ -83,20 +91,41 @@ GameServer.startRoom = function(roomIdx)
     room.currentPhase = this.Phase.START;
     room.maxTypingPlayer = room.currentPlayer[0];
     room.minTypingPlayer = room.currentPlayer[0];
-    
-    console.log('[ROOM#'+room.roomNum+'] Game Start');
-    this.announceToRoom(roomIdx, 'phaseChange', this.Phase.START);
-    this.announceToRoom(roomIdx, 'startGame');
-    // 데이터 동기화도
-}
-GameServer.announceToRoom = function(roomIdx, message, data = null)
-{
-    this.playingRoom[roomIdx].currentPlayer.forEach(element => 
+
+    // sync roomData
+    let toSync =
     {
-        element.socketId.emit(message, data);
+        roomNum: room.roomNum,
+        players: room.currentPlayer
+    };
+    console.log(toSync);
+    this.announceToRoom(roomIdx, 'syncRoomData', toSync);
+
+    console.log('[ROOM#'+room.roomNum+'] Game Start');
+    this.announceToRoom(roomIdx, 'changePhase', this.Phase.START);
+    this.announceToRoom(roomIdx, 'startGame');
+}
+GameServer.announceToRoom = function(roomIdx, _message, _data = null)
+{
+    this.playingRoom[roomIdx].currentSocket.forEach(function(element) 
+    {
+        element.socketId.emit(_message, _data);
     });
 }
 // 데이터 동기화 함수 만들기
 // 동기화할것: 유저리스트(id - nickname 쌍)
+
+class Player
+{
+    constructor(index, playerData)
+    {
+        this.index = index;
+        this.id = playerData.id;
+        this.nickname = playerData.nickname;
+        this.isAlive = true;
+        this.rank = -1;
+        this.playerTyping = 0;
+    }
+}
 
 module.exports = GameServer;
