@@ -69,19 +69,10 @@ io.on('connection', function(socket)
             // 룸에서도 제거
             if (socket.playerData.currentRoom != null)
             {
-                GameServer.announceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', 
-                {
-                    id: socket.playerData.id,
-                    nickname: socket.playerData.nickname
-                });
-                let _idxToDel = socket.playerData.currentRoom.currentPlayer.findIndex(function(element)
-                {
-                    return element.id === socket.playerData.id;
-                });
-                if (idxToDel != -1)
-                {
-                    socket.playerData.currentRoom.currentPlayer.splice(_idxToDel, 1);
-                }
+                socket.playerData.playingData.isAlive = false;
+                socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
+                socket.playerData.currentRoom.currentSocket.splice(socket.playerData.playingData.index, 1);
+                GameServer.announceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', socket.playerData.playingData);
             }
         }
     });

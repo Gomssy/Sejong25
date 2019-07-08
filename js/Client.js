@@ -29,7 +29,8 @@ socket.on('changePhase', function(msg) // number Phase
     WordSpace.CurrentPhase = msg;
 });
 
-socket.on('userDisconnect', function(msg) // {num id, str nickname}
+socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
 {
-    console.log(msg.id + ' / ' + msg.nickname + ' disconnected');
+    console.log(msg.index + ' / ' + msg.id + ' / ' + msg.nickname + ' disconnected');
+    RoomData.players[msg.index].isAlive = false;
 });
