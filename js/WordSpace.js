@@ -5,8 +5,6 @@ WordSpace.gameSceneForTest = null;
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
 
-WordSpace.isImageLoaded = false;
-
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
 WordSpace.totalWordNum = 0;
@@ -32,6 +30,7 @@ WordSpace.delay =
     GameOver: 5000,
 }
 
+WordSpace.playerTypingCycle = null;
 WordSpace.NameSpawnReduce = 1000;
 
 WordSpace.gravityPoint = {x: 640, y: 300};
@@ -277,8 +276,11 @@ function gameOver()
     WordSpace.wordCycle.currentCycle.remove();
     WordSpace.nameCycle.currentCycle.remove();
     WordSpace.varAdjustCycle.currentCycle.remove();
+    clearInterval(WordSpace.playerTypingCycle);
     //To Do
+    socket.emit('defeated');
     console.log('defeat');
+    alert('defeat');
 }
 
 //게임 오버 판정을 위한 타이머
@@ -365,7 +367,6 @@ WordSpace.setPlayerTyping =
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
         WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 60 * 1000;
-        socket.emit('setPlayerTyping', WordSpace.playerTyping);
         this.text.setText('현재 타수 : ' + WordSpace.playerTyping.toFixed(1));
     },
     initiate: function(scene)
@@ -398,6 +399,7 @@ WordSpace.attack = function(wordText, grade)
         //테스트용, 자기 자신에게 공격함
         //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
         WordSpace.nameGroup = [];
+
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
     }

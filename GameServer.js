@@ -118,7 +118,7 @@ GameServer.announceToTarget = function(roomIdx, targetNum, _message, _data = nul
     {
         return element.id === targetNum;
     }).socketId;
-    targetSocket.emit(_message, _data);
+    if (targetSocket != 'undefined') targetSocket.emit(_message, _data);
 }
 // 데이터 동기화 함수 만들기
 // 동기화할것: 유저리스트(id - nickname 쌍)
