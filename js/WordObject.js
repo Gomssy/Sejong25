@@ -14,7 +14,7 @@ class WordObject
 
     instantiate(scene, lenRate)
     {
-        let p = [{x : 3, y : 0.7}, {x : 20, y : 1.8}];
+        let p = [{x : 3, y : 0.7}, {x : 20, y : 1.2}];
         let scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
         let fontscale = 25;
         var random = WordSpace.getSpawnPoint(lenRate);

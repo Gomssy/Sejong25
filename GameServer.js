@@ -1,7 +1,7 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 4;
+GameServer.startCount = 2;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
@@ -98,10 +98,10 @@ GameServer.startRoom = function(roomIdx)
         roomNum: room.roomNum,
         players: room.currentPlayer
     };
-    console.log(toSync);
+    //console.log(toSync);
     this.announceToRoom(roomIdx, 'syncRoomData', toSync);
 
-    console.log('[ROOM#'+room.roomNum+'] Game Start');
+    console.log('[ROOM#'+room.roomNum+'] Game Start with ' + room.currentPlayer.length + ' players');
     this.announceToRoom(roomIdx, 'changePhase', this.Phase.START);
     this.announceToRoom(roomIdx, 'startGame');
 }
