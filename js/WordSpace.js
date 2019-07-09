@@ -70,7 +70,7 @@ WordSpace.gameOverCycle = new Cycle(gameOver);
 //호패 생성 사이클
 WordSpace.nameCycle = new Cycle(function()
 {
-    WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+    //WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
 });
 //이건 뭐지
 WordSpace.varAdjustCycle = new Cycle(function()
@@ -288,7 +288,6 @@ WordSpace.setGameOverTimer = function()
     {
         this.isTimerOn = true;
         WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.gameOver, 0, false);
-        console.log('Game over timer On');
     }
 }
 
@@ -298,7 +297,6 @@ WordSpace.resetGameOverTimer = function()
     {
         this.isTimerOn = false;
         WordSpace.gameOverCycle.currentCycle.paused = true;
-        console.log('Game over timer Off');
     }
 }
 
@@ -334,9 +332,26 @@ WordSpace.findWord = function(wordText)
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else
+    else // 오타 체크
     {
-        // 오타 체크
+        WordSpace.wordGroup.forEach(function(element)
+        {
+            let inputWord = [], checkWord = [], diff = [];
+            let inputUnused = 0, checkUnused = 0;
+            for(let i = 0; i < wordText.lenRate; i++)
+            {
+                inputWord.push(WordReader.firstSound(wordText[i]));
+                inputWord.push(WordReader.middleSound(wordText[i]));
+                inputWord.push(WordReader.lastSound(wordText[i]));
+            }
+            for(let i = 0; i < element.lenRate; i++)
+            {
+                checkWord.push(WordReader.firstSound(element[i]));
+                checkWord.push(WordReader.middleSound(element[i]));
+                checkWord.push(WordReader.lastSound(element[i]));
+            }
+            
+        });
     }
 }
 
@@ -423,4 +438,41 @@ WordSpace.nameQueue =
         this.shuffle();
         this.shuffle();
     }
+}
+
+
+
+WordSpace.testDistance = function(input, check) {
+    var inputWords = [], checkWords = []
+    for(let i = 0; i < input.length; i++)
+    {
+        inputWords.push(parseInt(((input[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
+        inputWords.push(parseInt(((input[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
+        inputWords.push(parseInt((input[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
+    }
+    for(let i = 0; i < check.length; i++)
+    {
+        checkWords.push(parseInt(((check[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
+        checkWords.push(parseInt(((check[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
+        checkWords.push(parseInt((check[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
+    }  
+    var matrix = [];
+    // increment along the first column of each row
+    var i, j;
+    for(i = 0; i <= checkWords.length; i++)
+        matrix[i] = [i];
+  
+    // increment each column in the first row
+    for(j = 0; j <= inputWords.length; j++)
+        matrix[0][j] = j;
+  
+    // Fill in the rest of the matrix
+    for(i = 1; i <= checkWords.length; i++)
+        for(j = 1; j <= inputWords.length; j++){
+            if(checkWords[i-1] == inputWords[j-1]) matrix[i][j] = matrix[i-1][j-1];
+            else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
+                                    Math.min(matrix[i][j-1] + 1, // insertion
+                                            matrix[i-1][j] + 1)); // deletion
+        }
+    console.log('edit distance is ' + matrix[checkWords.length][inputWords.length]);
 }
