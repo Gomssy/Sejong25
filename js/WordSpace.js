@@ -120,7 +120,7 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     else if(phase == WordSpace.Phase.START)
     {
         WordSpace.delay.WordSpawn = 3000;
-        WordSpace.delay.NameSpawn = 6000;
+        WordSpace.delay.NameSpawn = 15000;
         WordSpace.NameSpawnReduce = 1000;
         WordSpace.GradeProb[0] = 0.35;
         WordSpace.GradeProb[1] = 1 - 0.4 * typingRate;
@@ -129,20 +129,20 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     else if(phase == WordSpace.Phase.MAIN)
     {
         WordSpace.delay.WordSpawn = 3000 - typingRate * 1000;
-        WordSpace.delay.NameSpawn = 6000;
+        WordSpace.delay.NameSpawn = 12000;
         WordSpace.NameSpawnReduce = 1000;
-        WordSpace.GradeProb[0] = 0.4 - 0.4 * typingRate;
-        WordSpace.GradeProb[1] = 0.8 - 0.4 * typingRate;
-        WordSpace.GradeProb[2] = 1 - 0.2 * typingRate;
+        WordSpace.GradeProb[0] = 0.5 - 0.5 * typingRate;
+        WordSpace.GradeProb[1] = 1 - 0.5 * typingRate;
+        WordSpace.GradeProb[2] = 1 - 0.15 * typingRate;
     }
     else if(phase == WordSpace.Phase.MUSIC)
     {
         WordSpace.delay.WordSpawn = 1500;
-        WordSpace.delay.NameSpawn = 4000;
-        WordSpace.NameSpawnReduce = 500;
+        WordSpace.delay.NameSpawn = 8000;
+        WordSpace.NameSpawnReduce = 400;
         WordSpace.GradeProb[0] = 0.2 - 0.2 * typingRate;
-        WordSpace.GradeProb[1] = 0.8 - 0.5 * typingRate;
-        WordSpace.GradeProb[2] = 0.9 - 0.2 * typingRate;
+        WordSpace.GradeProb[1] = 0.8 - 0.45 * typingRate;
+        WordSpace.GradeProb[2] = 0.9 - 0.15 * typingRate;
     }
     WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
     WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);

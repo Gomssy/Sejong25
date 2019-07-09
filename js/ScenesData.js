@@ -72,7 +72,7 @@ var gameScene = new Phaser.Class(
         let tempNames = '';
         WordSpace.nameGroup.forEach(function(element)
         {
-            tempNames += element.wordText + '\n';
+            tempNames += element.wordText + element.isStrong + '\n';
         });
         
         WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);
