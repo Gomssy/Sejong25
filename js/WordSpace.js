@@ -433,8 +433,8 @@ WordSpace.nameQueue =
             tempQueue[tempLength - 1] = tempQueue[tempIdx];
             tempQueue[tempIdx] = tempElement;
         }
-        tempQueue.forEach(function(element){
-            //console.log(element.id + ' ' + PlayerData.idNum);
+        tempQueue.forEach(function(element)
+        {
             if(element.id != PlayerData.idNum && element.isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });

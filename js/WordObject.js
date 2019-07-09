@@ -139,8 +139,8 @@ class AttackWord extends WordObject
             this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(_playerData.nickname) - 9);
         this.wordWeight *= isStrong ? 3 : 2;
         this.attacker = _playerData;
-        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (WordSpace.playerTyping / 60) * 1.5 :
-                            ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (WordSpace.playerTyping / 60) * 1.5);
+        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
+                            ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
     }
@@ -157,8 +157,6 @@ class AttackWord extends WordObject
         if(WordSpace.gameTimer.now < this.counterTime)
         {
             WordSpace.nameGroup.push(new NameWord(this.attacker, true));
-            WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
-            WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
         }
         //강호패 넣기 구현해야됨
         //WordSpace.generateWord.Name(WordSpace.gameSceneForTest, true);
