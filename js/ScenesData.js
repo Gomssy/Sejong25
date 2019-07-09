@@ -61,6 +61,15 @@ var gameScene = new Phaser.Class(
 
         WordSpace.nameWordTextForTest = WordSpace.gameSceneForTest.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
+        RoomData.players.forEach(function(element)
+        {
+            if(element.nickname == PlayerData.nickname)
+            {
+                RoomData.myself = element;
+                return;
+            }
+        });
+        console.log(RoomData.myself);
     },
 
     update: function()

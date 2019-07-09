@@ -24,6 +24,7 @@ PlayerData.nickname = '홍길동'; //플레이어 닉네임
 // 현재 들어가있는 Game Room의 정보
 var RoomData = RoomData || {};
 
+RoomData.myself = null;
 RoomData.roomNum = -1;
 RoomData.players = null;
 RoomData.aliveCount = -1;
