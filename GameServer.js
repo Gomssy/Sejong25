@@ -1,7 +1,7 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 1;
+GameServer.startCount = 2;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
@@ -98,10 +98,10 @@ GameServer.startRoom = function(roomIdx)
         roomNum: room.roomNum,
         players: room.currentPlayer
     };
-    console.log(toSync);
+    //console.log(toSync);
     this.announceToRoom(roomIdx, 'syncRoomData', toSync);
 
-    console.log('[ROOM#'+room.roomNum+'] Game Start');
+    console.log('[ROOM#'+room.roomNum+'] Game Start with ' + room.currentPlayer.length + ' players');
     this.announceToRoom(roomIdx, 'changePhase', this.Phase.START);
     this.announceToRoom(roomIdx, 'startGame');
 }
@@ -111,6 +111,14 @@ GameServer.announceToRoom = function(roomIdx, _message, _data = null)
     {
         element.socketId.emit(_message, _data);
     });
+}
+GameServer.announceToTarget = function(roomIdx, targetNum, _message, _data = null)
+{
+    let targetSocket = this.playingRoom[roomIdx].currentSocket.find(function(element)
+    {
+        return element.id === targetNum;
+    });
+    if (targetSocket != undefined) targetSocket.socketId.emit(_message, _data);
 }
 // 데이터 동기화 함수 만들기
 // 동기화할것: 유저리스트(id - nickname 쌍)

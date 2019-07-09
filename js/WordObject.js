@@ -1,6 +1,6 @@
 class WordObject
 {
-    constructor(text)
+    constructor(text, isNameWord = false)
     {
         this.generationCode = WordSpace.nextWordCode++;
         this.wordText = text;
@@ -9,21 +9,35 @@ class WordObject
         this.wordWeight = WordReader.getWordWeight(this.wordGrade);
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
         this.wordSpeed = 0.5;
+        this.isNameWord = isNameWord;
     }
 
-    instantiate(scene,lenRate)
+    instantiate(scene, lenRate)
     {
-        let p = [{x : 3, y : 0.7}, {x : 20, y : 1.8}];
+        let p = [{x : 3, y : 0.7}, {x : 20, y : 1.2}];
         let scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
         let fontscale = 25;
         var random = WordSpace.getSpawnPoint(lenRate);
 
-        this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
-        .setMass(this.wordWeight * 10)
-        .setScale(scale)
-        .setFrictionX(0)
-        .setFrictionY(0)
-        .setBounce(0.5);
+        if (!this.isNameWord)
+        {
+            this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
+            .setMass(this.wordWeight * 10)
+            .setScale(scale)
+            .setFrictionX(0)
+            .setFrictionY(0)
+            .setBounce(0.5);
+        }
+        else
+        {
+            this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'nameBgr' + Math.min(Math.max(2, this.wordText.length), 6))
+            .setMass(this.wordWeight * 10)
+            .setScale(scale)
+            .setFrictionX(0)
+            .setFrictionY(0)
+            .setBounce(0.5);
+        }
+        
 
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
@@ -37,7 +51,9 @@ class WordObject
                 fontSize: (scale * fontscale) +'pt',
                 fontFamily: '"궁서", 궁서체, serif',
                 fontStyle: (this.wordWeight > 5 ? 'bold' : '')
-            }).setColor('#000000').setOrigin(0.5,0.5);
+            });
+        if (!this.isNameWord) this.wordObj.setColor('#000000').setOrigin(0.5,0.5);
+        else this.wordObj.setColor('#ffffff').setOrigin(0.45,0.5);
         WordSpace.totalWeight += this.wordWeight;
         WordSpace.totalWordNum += 1;
         WordSpace.setGameOverTimer();
@@ -114,19 +130,19 @@ class NormalWord extends WordObject
 
 class AttackWord extends WordObject
 {
-    constructor(text, _wordGrade, _attacker, isStrong)
+    constructor(text, _wordGrade, _playerData, isStrong)
     {
         super(text);
         this.wordGrade = _wordGrade;
         this.wordWeight = WordReader.getWordWeight(this.wordGrade);
-        if(WordReader.getWordTyping(_attacker) <= 9)
-            this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(PlayerData.nickname) - 9);
+        if(WordReader.getWordTyping(_playerData.nickname) <= 9)
+            this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(_playerData.nickname) - 9);
         this.wordWeight *= isStrong ? 3 : 2;
-        this.attacker = _attacker;
+        this.attacker = _playerData;
         //서버 사용하게 되면 PlayerTyping을 피격자의 것으로 바꿔야 함
         this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping * (WordSpace.playerTyping / 60) * 2 :
                             ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 3) * (WordSpace.playerTyping / 60) * 2);
-        console.log('Attack text : ' + text + ', Attacker : ' + this.attacker + ', Weight : ' + this.wordWeight);
+        console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
     }
     destroy()
@@ -139,19 +155,22 @@ class AttackWord extends WordObject
             case 3: WordSpace.attackGauge.add(0.5); break;
             default: console.log('[ERR] wrong grade of word'); break;
         }
-        if(WordSpace.gameTimer.now < this.counterTime) WordSpace.generateWord.Name(WordSpace.gameSceneForTest, true);
+        if(WordSpace.gameTimer.now < this.counterTime) WordSpace.nameGroup.push(new NameWord(this.attacker, true));
+        //강호패 넣기 구현해야됨
+        //WordSpace.generateWord.Name(WordSpace.gameSceneForTest, true);
         super.destroy();
     }
 }
 
 class NameWord extends WordObject
 {
-    constructor(text, _isStrong = false)
+    constructor(player, _isStrong = false)
     {
-        super(text);
+        super(player.nickname, true);
+        this.ownerId = player.id;
         this.wordWeight = 2;
         this.isStrong = _isStrong;
-        console.log('Name : ' + text + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
+        console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
     }
     destroy()
     {

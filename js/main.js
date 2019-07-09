@@ -5,10 +5,10 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true
+            debug: false
         }
     },
-    backgroundColor: Phaser.Display.Color.GetColor(0,0,0),
+    backgroundColor: Phaser.Display.Color.HexStringToColor('#F0CB85').color,//GetColor(245,208,138),
     scene: [ menuScene, gameScene ]
 };
 
@@ -25,4 +25,6 @@ PlayerData.nickname = '홍길동'; //플레이어 닉네임
 var RoomData = RoomData || {};
 
 RoomData.roomNum = -1;
+RoomData.myself = null;
 RoomData.players = null;
+RoomData.aliveCount = -1;

@@ -27,12 +27,13 @@ io.on('connection', function(socket)
             nickname: '게스트',
             socketId: socket,
             currentRoom: null,
+            playingData: null,
             
             playerTyping: 0
         };
         GameServer.currentPlayer.push(socket.playerData);
         console.log('['+socket.playerData.id+'] client request');
-        socket.emit('idSet', 
+        socket.emit('setId', 
         {
             str: 'your number is ' + socket.playerData.id,
             num: socket.playerData.id
@@ -48,32 +49,62 @@ io.on('connection', function(socket)
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping
     {
-        socket.playerData.playerTyping = msg;
-        //console.log(socket.playerData.currentRoom);
-        //console.log(socket.playerData.currentRoom.currentPlayer.length);
-        //let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
-        //(socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
-        //socket.emit('setPlayerTypingRate', playerTypingRate);
+        socket.playerData.playingData.playerTyping = msg;
+        if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
+        {
+            socket.playerData.currentRoom.maxTypingPlayer = socket.playerData.playingData;
+        }
+        if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg)
+        {
+            socket.playerData.currentRoom.minTypingPlayer = socket.playerData.playingData;
+        }
+        let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
+        (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
+        socket.emit('setPlayerTypingRate', playerTypingRate);
+    });
+
+    socket.on('attack', function(msg)
+    {
+        GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attacked', msg);
+    });
+
+    socket.on('defeated', function()
+    {
+        socket.playerData.playingData.isAlive = false;
+        socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
+        // 패배단어 체크
+        GameServer.announceToRoom(socket.playerData.currentRoom.roomNum, 'defeat', socket.playerData.playingData);
+        console.log('['+socket.playerData.id+']'+ ' defeated');
     });
 
     socket.on('disconnect', function(reason)
     {
-        let idxToDel = GameServer.currentPlayer.findIndex(function(element)
+        let data = socket.playerData;
+        console.log('['+ data.id +'] client disconnected, reason: ' + reason);
+        if (data.id === undefined)
         {
-            return element.id === socket.playerData.id;
-        });
-        if (idxToDel != -1) 
+            console.log('[ERROR] data.id is undefined');
+            console.log(GameServer.currentPlayer);
+        }
+        else // data.id is not undefined
         {
-            console.log('['+ socket.playerData.id +'] client disconnected, reason: ' + reason);
-            GameServer.currentPlayer.splice(idxToDel, 1);
-            // 룸에서도 제거
-            if (socket.playerData.currentRoom != null)
+            let idxToDel = GameServer.currentPlayer.findIndex(function(element)
             {
-                socket.playerData.playingData.isAlive = false;
-                socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
-                socket.playerData.currentRoom.currentSocket.splice(socket.playerData.playingData.index, 1);
-                GameServer.announceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', socket.playerData.playingData);
+                return element.id === data.id;
+            });
+            if (idxToDel != -1) 
+            {
+                GameServer.currentPlayer.splice(idxToDel, 1);
+                // 룸에서도 제거
+                if (data.currentRoom != null)
+                {
+                    data.playingData.isAlive = false;
+                    if (data.playingData.rank === -1) data.playingData.rank = data.currentRoom.nextRank--;
+                    data.currentRoom.currentSocket.splice(data.playingData.index, 1);
+                    GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
+                }
             }
+            console.log('['+ data.id +'] disconnect complete');
         }
     });
 });

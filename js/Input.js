@@ -7,7 +7,7 @@ Input.isShifted = false;
 Input.isEntered = false;
 Input.pressCount = 0;
 Input.justPressed = '';
-Input.maxInput = 5;
+Input.maxInput = 6;
 
 Input.attackMode = false;
 Input.attackOption = null;
@@ -93,7 +93,7 @@ Input.convert = function()
             if (this.input[i] >= 'ㅏ'.charCodeAt(0)) vowels.push(krInput.length - 1); // 모음일 경우
         }
     }
-    if (vowels.length > 5) return false;
+    if (vowels.length > 6) return false;
     //console.log(vowels);
     //console.log(krInput);
 

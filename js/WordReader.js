@@ -1,7 +1,7 @@
 var WordReader = WordReader || {};
 
 //초성의 타수를 반환함
-function firstSound(charText)
+WordReader.firstSound = function(charText)
 {
     var r = parseInt(((charText.charCodeAt(0) - parseInt('0xac00',16)) /28) / 21);
     //쌍자음일 경우
@@ -10,7 +10,7 @@ function firstSound(charText)
 }
 
 //중성의 타수를 반환함
-function middleSound(charText)
+WordReader.middleSound = function(charText)
 {
     var r = parseInt(((charText.charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21);
     //'ㅒ' 또는 'ㅖ'일 경우
@@ -21,7 +21,7 @@ function middleSound(charText)
 }
 
 //종성의 타수를 반환함
-function lastSound(charText)
+WordReader.lastSound = function(charText)
 {
     var r = parseInt((charText.charCodeAt(0) - parseInt('0xac00',16)) % 28);
     //쌍자음일 경우
@@ -40,7 +40,7 @@ WordReader.getWordTyping = function(stringText)
     for(var i = 0; i < stringText.length; i++)
     {
         if(stringText.charCodeAt(i) < parseInt('0xac00',16) || stringText.charCodeAt(i) > parseInt('0xd7af',16)) return -1;
-        temp += parseFloat(firstSound(stringText.charAt(i))) + middleSound(stringText.charAt(i)) + lastSound(stringText.charAt(i));
+        temp += parseFloat(WordReader.firstSound(stringText.charAt(i))) + WordReader.middleSound(stringText.charAt(i)) + WordReader.lastSound(stringText.charAt(i));
     }
     return temp;
 }
