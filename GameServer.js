@@ -57,10 +57,27 @@ GameServer.findRoomIndex = function(roomNum)
 GameServer.enterRoom = function(roomIdx, playerData)
 {
     let room = this.playingRoom[roomIdx];
-    let player = new Player(room.currentPlayer.length, playerData);
+    let nextIdx = -1;
+    for (let i = 0; i < room.currentPlayer.length; i++)
+    {
+        if (room.currentPlayer[i] === null)
+        {
+            nextIdx = i;
+            break
+        }
+    }
+    let player = new Player((nextIdx != -1 ? nextIdx : room.currentPlayer.length), playerData);
 
-    room.currentPlayer.push(player);
-    room.currentSocket.push(playerData);
+    if (nextIdx != -1)
+    {
+        room.currentPlayer[nextIdx] = player;
+        room.currentSocket[nextIdx] = playerData;
+    }
+    else
+    {
+        room.currentPlayer.push(player);
+        room.currentSocket.push(playerData);
+    }
     playerData.playingData = player;
     playerData.currentRoom = room;
 
@@ -91,6 +108,10 @@ GameServer.startRoom = function(roomIdx)
     room.currentPhase = this.Phase.START;
     room.maxTypingPlayer = room.currentPlayer[0];
     room.minTypingPlayer = room.currentPlayer[0];
+    room.currentSocket.forEach(function(element)
+    {
+        element.isReceivable = true;
+    });
 
     // sync roomData
     let toSync =
@@ -118,7 +139,7 @@ GameServer.announceToTarget = function(roomIdx, targetNum, _message, _data = nul
     {
         return element.id === targetNum;
     });
-    if (targetSocket != undefined) targetSocket.socketId.emit(_message, _data);
+    if (targetSocket != undefined && targetSocket.isReceivable) targetSocket.socketId.emit(_message, _data);
 }
 // 데이터 동기화 함수 만들기
 // 동기화할것: 유저리스트(id - nickname 쌍)

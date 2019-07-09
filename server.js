@@ -28,8 +28,7 @@ io.on('connection', function(socket)
             socketId: socket,
             currentRoom: null,
             playingData: null,
-            
-            playerTyping: 0
+            isReceivable: false
         };
         GameServer.currentPlayer.push(socket.playerData);
         console.log('['+socket.playerData.id+'] client request');
@@ -72,6 +71,7 @@ io.on('connection', function(socket)
     {
         socket.playerData.playingData.isAlive = false;
         socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
+        socket.playerData.isReceivable = false;
         // 패배단어 체크
         GameServer.announceToRoom(socket.playerData.currentRoom.roomNum, 'defeat', socket.playerData.playingData);
         console.log('['+socket.playerData.id+']'+ ' defeated');
@@ -98,10 +98,18 @@ io.on('connection', function(socket)
                 // 룸에서도 제거
                 if (data.currentRoom != null)
                 {
-                    data.playingData.isAlive = false;
-                    if (data.playingData.rank === -1) data.playingData.rank = data.currentRoom.nextRank--;
-                    data.currentRoom.currentSocket.splice(data.playingData.index, 1);
-                    GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
+                    if (data.currentRoom.currentPhase === GameServer.Phase.READY)
+                    {
+                        data.currentRoom.currentPlayer[data.playingData.index] = null;
+                        data.currentRoom.currentSocket[data.playingData.index] = null;
+                    }
+                    else 
+                    {
+                        data.playingData.isAlive = false;
+                        if (data.playingData.rank === -1) data.playingData.rank = data.currentRoom.nextRank--;
+                        data.currentRoom.currentSocket[data.playingData.index].isReceivable = false;
+                        GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
+                    }
                 }
             }
             console.log('['+ data.id +'] disconnect complete');
