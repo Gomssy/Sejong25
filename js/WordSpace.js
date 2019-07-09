@@ -70,7 +70,7 @@ WordSpace.gameOverCycle = new Cycle(gameOver);
 //호패 생성 사이클
 WordSpace.nameCycle = new Cycle(function()
 {
-    //WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+    WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
 });
 //이건 뭐지
 WordSpace.varAdjustCycle = new Cycle(function()
@@ -334,23 +334,24 @@ WordSpace.findWord = function(wordText)
     }
     else // 오타 체크
     {
+        let minDist = 5, tempDist = 0;
+        let attackWords = [];
         WordSpace.wordGroup.forEach(function(element)
         {
-            let inputWord = [], checkWord = [], diff = [];
-            let inputUnused = 0, checkUnused = 0;
-            for(let i = 0; i < wordText.lenRate; i++)
+            if(element instanceof AttackWord)
             {
-                inputWord.push(WordReader.firstSound(wordText[i]));
-                inputWord.push(WordReader.middleSound(wordText[i]));
-                inputWord.push(WordReader.lastSound(wordText[i]));
+                tempDist = WordSpace.getEditDistance(wordText, element.wordText);
+                attackWords.push(element);
+                if(tempDist <= minDist) minDist = tempDist;
             }
-            for(let i = 0; i < element.lenRate; i++)
+        });
+        attackWords.forEach(function(element)
+        {
+            if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
-                checkWord.push(WordReader.firstSound(element[i]));
-                checkWord.push(WordReader.middleSound(element[i]));
-                checkWord.push(WordReader.lastSound(element[i]));
+                //강호패 보내야 함
+                console.log('Attack word of ' + element.attacker.nickname + ' 오타임');
             }
-            
         });
     }
 }
@@ -384,23 +385,20 @@ WordSpace.attack = function(wordText, grade)
             let attackData = 
             {
                 roomNum: RoomData.roomNum,
-                attacker: PlayerData.nickname, 
+                attacker: PlayerData, 
                 target: element.ownerId,
                 text: wordText, 
                 grade: grade, 
                 isStrong: element.isStrong
             }
             socket.emit('attack', attackData);
-            //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
         });
+        //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
         WordSpace.nameGroup = [];
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else
-    {
-        WordSpace.attackGauge.cutValue(0.3);
-    }
+    else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
@@ -424,8 +422,6 @@ WordSpace.nameQueue =
             if(element.nickname != PlayerData.nickname && element.isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });
-        /*console.log(WordSpace.nameQueue.queue);
-        console.log(RoomData.aliveCount);*/
     },
     pop: function()
     {
@@ -440,9 +436,7 @@ WordSpace.nameQueue =
     }
 }
 
-
-
-WordSpace.testDistance = function(input, check) {
+WordSpace.getEditDistance = function(input, check) {
     var inputWords = [], checkWords = []
     for(let i = 0; i < input.length; i++)
     {
@@ -457,22 +451,17 @@ WordSpace.testDistance = function(input, check) {
         checkWords.push(parseInt((check[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
     }  
     var matrix = [];
-    // increment along the first column of each row
     var i, j;
-    for(i = 0; i <= checkWords.length; i++)
+    for(i = 0; i <= checkWords.length; i++) // increment along the first column of each row
         matrix[i] = [i];
-  
-    // increment each column in the first row
-    for(j = 0; j <= inputWords.length; j++)
+    for(j = 0; j <= inputWords.length; j++) // increment each column in the first row
         matrix[0][j] = j;
-  
-    // Fill in the rest of the matrix
-    for(i = 1; i <= checkWords.length; i++)
+    for(i = 1; i <= checkWords.length; i++) // Fill in the rest of the matrix
         for(j = 1; j <= inputWords.length; j++){
             if(checkWords[i-1] == inputWords[j-1]) matrix[i][j] = matrix[i-1][j-1];
             else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
                                     Math.min(matrix[i][j-1] + 1, // insertion
                                             matrix[i-1][j] + 1)); // deletion
         }
-    console.log('edit distance is ' + matrix[checkWords.length][inputWords.length]);
+    return matrix[checkWords.length][inputWords.length];
 }
