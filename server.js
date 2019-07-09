@@ -41,9 +41,19 @@ io.on('connection', function(socket)
 
     socket.on('setNickname', function(msg) // string new_nickname
     {
-        socket.playerData.nickname = msg;
-        console.log('['+socket.playerData.id+'] nickname set to ' + msg);
-        GameServer.enterEmptyRoom(socket.playerData);
+        let isAlreadyHave = false;
+        GameServer.currentPlayer.forEach(function(element)
+        {
+            if (element.nickname === msg) isAlreadyHave = true;
+        });
+        if (isAlreadyHave) socket.emit('errNicknameOverlaped');
+        else
+        {
+            socket.playerData.nickname = msg;
+            console.log('['+socket.playerData.id+'] nickname set to ' + msg);
+            GameServer.enterEmptyRoom(socket.playerData);
+        }
+        
     });
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping

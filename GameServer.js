@@ -82,6 +82,7 @@ GameServer.enterRoom = function(roomIdx, playerData)
     playerData.currentRoom = room;
 
     console.log('[' + playerData.id + '] entered to room #' + room.roomNum);
+    playerData.socketId.emit('enterRoom');
     if (room.currentPlayer.length >= this.startCount) GameServer.startRoom(roomIdx);
     return room;
 }

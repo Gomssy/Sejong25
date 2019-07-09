@@ -26,12 +26,11 @@ Input.gameSceneEnterReaction = function()
 Input.menuSceneEnterReaction = function()
 {
     Input.convInput = Input.removeConVow(Input.convInput);
-    if (Input.convInput.length > 0)
+    if (Input.convInput.length > 1)
     {
         socket.emit('setNickname', Input.convInput);
         PlayerData.nickname = Input.convInput;
         Input.reset();
-        game.scene.remove('menuScene');
     }
     else 
     {
