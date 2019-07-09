@@ -1,6 +1,6 @@
 class WordObject
 {
-    constructor(text)
+    constructor(text, isNameWord = false)
     {
         this.generationCode = WordSpace.nextWordCode++;
         this.wordText = text;
@@ -9,21 +9,35 @@ class WordObject
         this.wordWeight = WordReader.getWordWeight(this.wordGrade);
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
         this.wordSpeed = 0.5;
+        this.isNameWord = isNameWord;
     }
 
-    instantiate(scene,lenRate)
+    instantiate(scene, lenRate)
     {
         let p = [{x : 3, y : 0.7}, {x : 20, y : 1.8}];
         let scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
         let fontscale = 25;
         var random = WordSpace.getSpawnPoint(lenRate);
 
-        this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
-        .setMass(this.wordWeight * 10)
-        .setScale(scale)
-        .setFrictionX(0)
-        .setFrictionY(0)
-        .setBounce(0.5);
+        if (!this.isNameWord)
+        {
+            this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
+            .setMass(this.wordWeight * 10)
+            .setScale(scale)
+            .setFrictionX(0)
+            .setFrictionY(0)
+            .setBounce(0.5);
+        }
+        else
+        {
+            this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'nameBgr' + Math.min(Math.max(2, this.wordText.length), 6))
+            .setMass(this.wordWeight * 10)
+            .setScale(scale)
+            .setFrictionX(0)
+            .setFrictionY(0)
+            .setBounce(0.5);
+        }
+        
 
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
@@ -37,7 +51,9 @@ class WordObject
                 fontSize: (scale * fontscale) +'pt',
                 fontFamily: '"궁서", 궁서체, serif',
                 fontStyle: (this.wordWeight > 5 ? 'bold' : '')
-            }).setColor('#000000').setOrigin(0.5,0.5);
+            });
+        if (!this.isNameWord) this.wordObj.setColor('#000000').setOrigin(0.5,0.5);
+        else this.wordObj.setColor('#ffffff').setOrigin(0.45,0.5);
         WordSpace.totalWeight += this.wordWeight;
         WordSpace.totalWordNum += 1;
         WordSpace.setGameOverTimer();
@@ -150,7 +166,7 @@ class NameWord extends WordObject
 {
     constructor(player, _isStrong = false)
     {
-        super(player.nickname);
+        super(player.nickname, true);
         this.ownerId = player.id;
         this.wordWeight = 2;
         this.isStrong = _isStrong;
