@@ -426,7 +426,8 @@ WordSpace.nameQueue =
             tempQueue[tempIdx] = tempElement;
         }
         tempQueue.forEach(function(element){
-            if(element.ownerId != PlayerData.idNum && element.isAlive)
+            //console.log(element.id + ' ' + PlayerData.idNum);
+            if(element.id != PlayerData.idNum && element.isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });
     },

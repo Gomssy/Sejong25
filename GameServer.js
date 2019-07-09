@@ -1,7 +1,7 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 3;
+GameServer.startCount = 4;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
@@ -117,8 +117,8 @@ GameServer.announceToTarget = function(roomIdx, targetNum, _message, _data = nul
     let targetSocket = this.playingRoom[roomIdx].currentSocket.find(function(element)
     {
         return element.id === targetNum;
-    }).socketId;
-    if (targetSocket != 'undefined') targetSocket.emit(_message, _data);
+    });
+    if (targetSocket != undefined) targetSocket.socketId.emit(_message, _data);
 }
 // 데이터 동기화 함수 만들기
 // 동기화할것: 유저리스트(id - nickname 쌍)
