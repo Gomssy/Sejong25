@@ -354,8 +354,14 @@ WordSpace.findWord = function(wordText)
         {
             if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
-                //강호패 보내야 함
-                console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
+                //console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
+                let attackedData = 
+                {
+                    roomNum: RoomData.roomNum,
+                    victim: RoomData.myself, 
+                    target: element.attacker.ownerId
+                }
+                socket.emit('defenseFailed', attackedData);
             }
         });
         this.attackGauge.sub(2);
