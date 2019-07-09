@@ -406,6 +406,8 @@ WordSpace.attack = function(wordText, grade)
         });
         //테스트용, 자기 자신에게 공격함
         //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
+        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
         WordSpace.nameGroup = [];
 
         WordSpace.attackGauge.resetValue();
