@@ -16,8 +16,7 @@ Input.gameSceneEnterReaction = function()
 {
     if (!Input.isEntered)
     {
-        Input.convInput = Input.removeConVow(Input.convInput);
-        if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
+        if (Input.attackMode) WordSpace.attack(Input.removeConVow(Input.convInput), Input.attackOption.wordGrade);
         else WordSpace.findWord(Input.convInput);
         Input.reset();
         Input.isEntered = true;

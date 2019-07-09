@@ -355,13 +355,13 @@ WordSpace.findWord = function(wordText)
             if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
                 console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
-                let attackedData = 
+                let victimData = 
                 {
                     roomNum: RoomData.roomNum,
                     victim: RoomData.myself, 
-                    target: element.attacker.ownerId
+                    target: element.attacker.idNum
                 }
-                socket.emit('defenseFailed', attackedData);
+                socket.emit('defenseFailed', victimData);
             }
         });
         this.attackGauge.sub(2);
