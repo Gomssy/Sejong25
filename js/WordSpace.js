@@ -253,6 +253,7 @@ WordSpace.generateWord =
     Name: function(scene, isStrong, lenRate)
     {
         word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        //word = new NameWord(RoomData.myself, false);
         WordSpace.pushWord(scene, word, lenRate);
     }
 }
@@ -334,7 +335,7 @@ WordSpace.findWord = function(wordText)
     }
     else // 오타 체크
     {
-        let minDist = 5, tempDist = 0;
+        let minDist = WordReader.getWordTyping(wordText) / 2 + 1, tempDist = 0;
         let attackWords = [];
         WordSpace.wordGroup.forEach(function(element)
         {
@@ -350,9 +351,10 @@ WordSpace.findWord = function(wordText)
             if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
                 //강호패 보내야 함
-                console.log('Attack word of ' + element.attacker.nickname + ' 오타임');
+                console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
             }
         });
+        this.attackGauge.sub(2);
     }
 }
 
@@ -393,6 +395,7 @@ WordSpace.attack = function(wordText, grade)
             }
             socket.emit('attack', attackData);
         });
+        //테스트용, 자기 자신에게 공격함
         //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
         WordSpace.nameGroup = [];
         WordSpace.attackGauge.resetValue();
