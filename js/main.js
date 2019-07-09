@@ -25,4 +25,6 @@ PlayerData.nickname = '홍길동'; //플레이어 닉네임
 var RoomData = RoomData || {};
 
 RoomData.roomNum = -1;
+RoomData.myself = null;
 RoomData.players = null;
+RoomData.aliveCount = -1;

@@ -48,12 +48,23 @@ io.on('connection', function(socket)
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping
     {
-        socket.playerData.playerTyping = msg;
-        //console.log(socket.playerData.currentRoom);
-        //console.log(socket.playerData.currentRoom.currentPlayer.length);
-        //let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
-        //(socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
-        //socket.emit('setPlayerTypingRate', playerTypingRate);
+        socket.playerData.playingData.playerTyping = msg;
+        if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
+        {
+            socket.playerData.currentRoom.maxTypingPlayer = socket.playerData.playingData;
+        }
+        if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg)
+        {
+            socket.playerData.currentRoom.minTypingPlayer = socket.playerData.playingData;
+        }
+        let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
+        (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
+        socket.emit('setPlayerTypingRate', playerTypingRate);
+    });
+
+    socket.on('attack', function(msg)
+    {
+        GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attacked', msg);
     });
 
     socket.on('disconnect', function(reason)

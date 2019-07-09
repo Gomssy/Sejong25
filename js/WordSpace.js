@@ -120,7 +120,7 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     else if(phase == WordSpace.Phase.START)
     {
         WordSpace.delay.WordSpawn = 3000;
-        WordSpace.delay.NameSpawn = 6000;
+        WordSpace.delay.NameSpawn = 15000;
         WordSpace.NameSpawnReduce = 1000;
         WordSpace.GradeProb[0] = 0.35;
         WordSpace.GradeProb[1] = 1 - 0.4 * typingRate;
@@ -129,20 +129,20 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
     else if(phase == WordSpace.Phase.MAIN)
     {
         WordSpace.delay.WordSpawn = 3000 - typingRate * 1000;
-        WordSpace.delay.NameSpawn = 6000;
+        WordSpace.delay.NameSpawn = 12000;
         WordSpace.NameSpawnReduce = 1000;
-        WordSpace.GradeProb[0] = 0.4 - 0.4 * typingRate;
-        WordSpace.GradeProb[1] = 0.8 - 0.4 * typingRate;
-        WordSpace.GradeProb[2] = 1 - 0.2 * typingRate;
+        WordSpace.GradeProb[0] = 0.5 - 0.5 * typingRate;
+        WordSpace.GradeProb[1] = 1 - 0.5 * typingRate;
+        WordSpace.GradeProb[2] = 1 - 0.15 * typingRate;
     }
     else if(phase == WordSpace.Phase.MUSIC)
     {
         WordSpace.delay.WordSpawn = 1500;
-        WordSpace.delay.NameSpawn = 4000;
-        WordSpace.NameSpawnReduce = 500;
+        WordSpace.delay.NameSpawn = 8000;
+        WordSpace.NameSpawnReduce = 400;
         WordSpace.GradeProb[0] = 0.2 - 0.2 * typingRate;
-        WordSpace.GradeProb[1] = 0.8 - 0.5 * typingRate;
-        WordSpace.GradeProb[2] = 0.9 - 0.2 * typingRate;
+        WordSpace.GradeProb[1] = 0.8 - 0.45 * typingRate;
+        WordSpace.GradeProb[2] = 0.9 - 0.15 * typingRate;
     }
     WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
     WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);
@@ -252,8 +252,8 @@ WordSpace.generateWord =
     },
     Name: function(scene, isStrong, lenRate)
     {
-        //To do
-        word = new NameWord(PlayerData.nickname, isStrong);
+        word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        //word = new NameWord(RoomData.myself, false);
         WordSpace.pushWord(scene, word, lenRate);
     }
 }
@@ -276,6 +276,7 @@ function gameOver()
 {
     WordSpace.wordCycle.currentCycle.remove();
     WordSpace.nameCycle.currentCycle.remove();
+    WordSpace.varAdjustCycle.currentCycle.remove();
     //To Do
     console.log('defeat');
 }
@@ -288,7 +289,6 @@ WordSpace.setGameOverTimer = function()
     {
         this.isTimerOn = true;
         WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.gameOver, 0, false);
-        console.log('Game over timer On');
     }
 }
 
@@ -298,7 +298,6 @@ WordSpace.resetGameOverTimer = function()
     {
         this.isTimerOn = false;
         WordSpace.gameOverCycle.currentCycle.paused = true;
-        console.log('Game over timer Off');
     }
 }
 
@@ -334,9 +333,28 @@ WordSpace.findWord = function(wordText)
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else
+    else // 오타 체크
     {
-        // 오타 체크
+        let minDist = WordReader.getWordTyping(wordText) / 2 + 1, tempDist = 0;
+        let attackWords = [];
+        WordSpace.wordGroup.forEach(function(element)
+        {
+            if(element instanceof AttackWord)
+            {
+                tempDist = WordSpace.getEditDistance(wordText, element.wordText);
+                attackWords.push(element);
+                if(tempDist <= minDist) minDist = tempDist;
+            }
+        });
+        attackWords.forEach(function(element)
+        {
+            if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
+            {
+                //강호패 보내야 함
+                console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
+            }
+        });
+        this.attackGauge.sub(2);
     }
 }
 
@@ -364,25 +382,89 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
-        //호패에 따른 isStrong 구분 필요함
         WordSpace.nameGroup.forEach(function(element)
         {
-            WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData.nickname, element.isStrong);
+            let attackData = 
+            {
+                roomNum: RoomData.roomNum,
+                attacker: PlayerData, 
+                target: element.ownerId,
+                text: wordText, 
+                grade: grade, 
+                isStrong: element.isStrong
+            }
+            socket.emit('attack', attackData);
         });
+        //테스트용, 자기 자신에게 공격함
+        //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
         WordSpace.nameGroup = [];
-
-        //WordSpace.generateWord(WordSpace.gameSceneForTest, wordText, grade, undefined, true); // for test
-        // 이부분에서 게이지에 따라 급수 결정
-        // 이걸 서버로 공격을 보내야 함
-        // 이부분은 서버 잘써야함
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else
-    {
-        WordSpace.attackGauge.cutValue(0.3);
-    }
+    else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
+}
+
+WordSpace.nameQueue = 
+{
+    queue: [],
+    shuffle: function()
+    {
+        let tempIdx, tempElement, tempLength;
+        let tempQueue = RoomData.players;
+        for(tempLength = tempQueue.length; tempLength; tempLength -= 1)
+        {
+            tempIdx = Math.floor(Math.random() * tempLength);
+            tempElement = tempQueue[tempLength - 1];
+            tempQueue[tempLength - 1] = tempQueue[tempIdx];
+            tempQueue[tempIdx] = tempElement;
+        }
+        tempQueue.forEach(function(element){
+            if(element.ownerId != PlayerData.idNum && element.isAlive)
+                WordSpace.nameQueue.queue.push(element);
+        });
+    },
+    pop: function()
+    {
+        let tempElement = WordSpace.nameQueue.queue.shift();
+        if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
+        return tempElement;
+    },
+    initiate: function()
+    {
+        this.shuffle();
+        this.shuffle();
+    }
+}
+
+WordSpace.getEditDistance = function(input, check) {
+    var inputWords = [], checkWords = []
+    for(let i = 0; i < input.length; i++)
+    {
+        inputWords.push(parseInt(((input[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
+        inputWords.push(parseInt(((input[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
+        inputWords.push(parseInt((input[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
+    }
+    for(let i = 0; i < check.length; i++)
+    {
+        checkWords.push(parseInt(((check[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
+        checkWords.push(parseInt(((check[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
+        checkWords.push(parseInt((check[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
+    }  
+    var matrix = [];
+    var i, j;
+    for(i = 0; i <= checkWords.length; i++) // increment along the first column of each row
+        matrix[i] = [i];
+    for(j = 0; j <= inputWords.length; j++) // increment each column in the first row
+        matrix[0][j] = j;
+    for(i = 1; i <= checkWords.length; i++) // Fill in the rest of the matrix
+        for(j = 1; j <= inputWords.length; j++){
+            if(checkWords[i-1] == inputWords[j-1]) matrix[i][j] = matrix[i-1][j-1];
+            else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
+                                    Math.min(matrix[i][j-1] + 1, // insertion
+                                            matrix[i-1][j] + 1)); // deletion
+        }
+    return matrix[checkWords.length][inputWords.length];
 }
