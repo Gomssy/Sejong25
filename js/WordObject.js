@@ -140,8 +140,8 @@ class AttackWord extends WordObject
         this.wordWeight *= isStrong ? 3 : 2;
         this.attacker = _playerData;
         //서버 사용하게 되면 PlayerTyping을 피격자의 것으로 바꿔야 함
-        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping * (WordSpace.playerTyping / 60) * 1.5 :
-                            ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) * (WordSpace.playerTyping / 60) * 1.5);
+        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (WordSpace.playerTyping / 60) * 1.5 :
+                            ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (WordSpace.playerTyping / 60) * 1.5);
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
     }

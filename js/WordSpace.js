@@ -354,7 +354,7 @@ WordSpace.findWord = function(wordText)
         {
             if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
-                //console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
+                console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
                 let attackedData = 
                 {
                     roomNum: RoomData.roomNum,
