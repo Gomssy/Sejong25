@@ -5,8 +5,6 @@ WordSpace.gameSceneForTest = null;
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
 
-WordSpace.isImageLoaded = false;
-
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
 WordSpace.totalWordNum = 0;
@@ -220,20 +218,22 @@ WordSpace.genWordByProb = function(scene)
 
 WordSpace.loadImage = function(scene)
 {
-    if (!this.isImageLoaded)
+    for (let i = 0; i < 4; i++)
     {
-        for (let i = 0; i < 4; i++)
+        for (let j = 2; j < 7; j++)
         {
-            for (let j = 2; j < 7; j++)
-            {
-                scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
-            }
-        }
-        for (let i = 0; i < 4; i++)
-        {
-            scene.load.image('attackAlert' + i, 'assets/placeholder/attackalert' + (i+1) + '.png');
+            scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
         }
     }
+    for (let i = 0; i < 4; i++)
+    {
+        scene.load.image('attackAlert' + i, 'assets/placeholder/attackalert' + (i+1) + '.png');
+    }
+    for (let i = 2; i < 7; i++)
+    {
+        scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
+    }
+
     WordSpace.gameSceneForTest = scene; // for test
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
 }
