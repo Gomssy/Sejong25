@@ -13,12 +13,14 @@ var menuScene = new Phaser.Class(
     {
         Input.inputField.loadImage(this);
         BackGround.loadImage(this);
+        Audio.loadSound(this);
     },
 
     create: function()
     {
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         BackGround.drawMenu(this);
+        Audio.playSound(this);
     }
 });
 
