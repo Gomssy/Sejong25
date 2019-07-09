@@ -43,7 +43,7 @@ socket.on('defeat', function(msg) // object player
     console.log(RoomData.players[msg.index].nickname + ' defeated');
 });
 
-socket.on('attacksuccess', function(msg)
+socket.on('attackSucceed', function(msg)
 {
     WordSpace.nameGroup.push(new NameWord(msg.victim, true));
 });
