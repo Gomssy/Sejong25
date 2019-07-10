@@ -10,21 +10,26 @@ Audio.playSound = function(scene)
     var bgm = scene.sound.add('BGM');
     bgm.setLoop(true);
     bgm.play();
+    console.log('PlayMusic');
 
 }
 
 Audio.pauseSound = function(scene)
 {
-    bgm = scene.sound.pause();
+    var bgm = scene.sound.add('BGM');
+    bgm.pause();
 }
 
 Audio.resumeSound = function(scene)
 {
+    var bgm = scene.sound.add('BGM');
     bgm = scene.sound.resume();
 }
 
 Audio.stopSound = function(scene)
 {
-    bgm = scene.sound.stop();
+    var bgm = scene.sound.add('BGM');
+    bgm.stop();
+    console.log('StopMusic');
 }
 
