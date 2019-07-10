@@ -91,7 +91,7 @@ io.on('connection', function(socket)
     {
         let data = socket.playerData;
         console.log('['+ data.id +'] client disconnected, reason: ' + reason);
-        if (data.id === undefined)
+        if (typeof data.id === undefined)
         {
             console.log('[ERROR] data.id is undefined');
             console.log(GameServer.currentPlayer);
