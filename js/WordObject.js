@@ -140,7 +140,7 @@ class AttackWord extends WordObject
         this.wordWeight *= isStrong ? 3 : 2;
         this.attacker = _playerData;
         this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
-                            ((5 - _wordGrade) * 2.5 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
+                            ((5 - _wordGrade) * 3 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
     }

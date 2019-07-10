@@ -292,7 +292,7 @@ WordSpace.setGameOverTimer = function()
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
         this.isTimerOn = true;
-        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.gameOver, 0, false);
+        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.GameOver, 0, false);
     }
 }
 
