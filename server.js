@@ -46,7 +46,7 @@ io.on('connection', function(socket)
         {
             if (element.nickname === msg) isAlreadyHave = true;
         });
-        if (isAlreadyHave) socket.emit('errNicknameOverlaped');
+        if (isAlreadyHave) socket.emit('alert' ,'errNicknameOverlaped');
         else
         {
             socket.playerData.nickname = msg;
@@ -79,12 +79,7 @@ io.on('connection', function(socket)
 
     socket.on('defeated', function()
     {
-        socket.playerData.playingData.isAlive = false;
-        socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
-        socket.playerData.isReceivable = false;
-        // 패배단어 체크
-        GameServer.announceToRoom(socket.playerData.currentRoom.roomNum, 'defeat', socket.playerData.playingData);
-        console.log('['+socket.playerData.id+']'+ ' defeated');
+        GameServer.playerDefeat(socket.playerData);
     });
 
     socket.on('defenseFailed', function(msg)
@@ -118,13 +113,11 @@ io.on('connection', function(socket)
                         data.currentRoom.currentPlayer[data.playingData.index] = null;
                         data.currentRoom.currentSocket[data.playingData.index] = null;
                     }
-                    else 
+                    else if (data.playingData.isAlive)
                     {
-                        data.playingData.isAlive = false;
-                        if (data.playingData.rank === -1) data.playingData.rank = data.currentRoom.nextRank--;
-                        data.currentRoom.currentSocket[data.playingData.index].isReceivable = false;
-                        GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
+                        GameServer.playerDefeat(socket.playerData);
                     }
+                    GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
                 }
             }
             console.log('['+ data.id +'] disconnect complete');

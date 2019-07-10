@@ -1,7 +1,7 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 4;
+GameServer.startCount = 2;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
@@ -30,12 +30,14 @@ GameServer.findPlayer = function(playerId)
 GameServer.nextRoomNumber = 0;
 GameServer.makeRoom = function()
 {
+    // 나중에 room 삭제시 생긴 null에 채워넣는식으로 만들것, 룸의 인덱스를 고정
     var roomOption = 
     {
         roomNum: GameServer.nextRoomNumber++,
         maxPlayer: 5,
         nextRank: 5,
         currentPlayer: [],
+        aliveCount: -1,
         currentSocket: [],
         currentPhase: GameServer.Phase.READY,
 
@@ -107,6 +109,8 @@ GameServer.startRoom = function(roomIdx)
 {
     let room = this.playingRoom[roomIdx];
     room.currentPhase = this.Phase.START;
+    room.nextRank = room.currentPlayer.length;
+    room.aliveCount = room.currentPlayer.length;
     room.maxTypingPlayer = room.currentPlayer[0];
     room.minTypingPlayer = room.currentPlayer[0];
     room.currentSocket.forEach(function(element)
@@ -126,6 +130,27 @@ GameServer.startRoom = function(roomIdx)
     console.log('[ROOM#'+room.roomNum+'] Game Start with ' + room.currentPlayer.length + ' players');
     this.announceToRoom(roomIdx, 'changePhase', this.Phase.START);
     this.announceToRoom(roomIdx, 'startGame');
+}
+GameServer.playerDefeat = function(playerData)
+{
+    playerData.playingData.isAlive = false;
+    playerData.playingData.rank = playerData.currentRoom.nextRank--;
+    playerData.isReceivable = false;
+    playerData.currentRoom.aliveCount--;
+    // 끝내기단어 체크
+    GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'defeat', playerData.playingData);
+    console.log('['+playerData.id+']'+ ' defeated, rank: ' + playerData.playingData.rank);
+
+    if (playerData.currentRoom.aliveCount === 1)
+    {
+        let winner = playerData.currentRoom.currentPlayer.find(function(element)
+        {
+            return element.isAlive;
+        });
+        GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'gameEnd', winner);
+        GameServer.announceToTarget(this.findRoomIndex(playerData.currentRoom.roomNum), winner.id, 'alert', 'gameWin');
+        console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
+    }
 }
 GameServer.announceToRoom = function(roomIdx, _message, _data = null)
 {

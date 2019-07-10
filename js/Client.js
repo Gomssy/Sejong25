@@ -2,14 +2,19 @@ var socket = io.connect();
 
 // init account
 socket.emit('idRequest');
+
+socket.on('alert', function(msg) // string errorcode
+{
+    let toAlert = 'null alert';
+    if (msg === 'errNicknameOverlaped') toAlert = '이미 사용중인 닉네임입니다.';
+    if (msg === 'gameWin') toAlert = '승리!';
+    alert(toAlert);
+});
+
 socket.on('setId', function(msg) // {str, num playerNum}
 {
     console.log(msg.str);
     PlayerData.idNum = msg.num;
-});
-socket.on('errNicknameOverlaped', function()
-{
-    alert('이미 사용중인 닉네임입니다.');
 });
 socket.on('enterRoom', function()
 {
@@ -49,6 +54,10 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
     console.log(RoomData.players[msg.index].nickname + ' defeated');
+});
+socket.on('gameEnd', function(msg) // object player
+{
+    console.log(msg.nickname + ' Win!!!!!!');
 });
 
 socket.on('attackSucceed', function(msg)
