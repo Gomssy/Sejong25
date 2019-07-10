@@ -354,8 +354,14 @@ WordSpace.findWord = function(wordText)
         {
             if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
-                //강호패 보내야 함
                 console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
+                let victimData = 
+                {
+                    roomNum: RoomData.roomNum,
+                    victim: RoomData.myself, 
+                    target: element.attacker.idNum
+                }
+                socket.emit('defenseFailed', victimData);
             }
         });
         this.attackGauge.sub(2);
@@ -400,6 +406,8 @@ WordSpace.attack = function(wordText, grade)
         });
         //테스트용, 자기 자신에게 공격함
         //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
+        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
         WordSpace.nameGroup = [];
 
         WordSpace.attackGauge.resetValue();
@@ -425,8 +433,8 @@ WordSpace.nameQueue =
             tempQueue[tempLength - 1] = tempQueue[tempIdx];
             tempQueue[tempIdx] = tempElement;
         }
-        tempQueue.forEach(function(element){
-            //console.log(element.id + ' ' + PlayerData.idNum);
+        tempQueue.forEach(function(element)
+        {
             if(element.id != PlayerData.idNum && element.isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });

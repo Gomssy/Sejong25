@@ -87,6 +87,11 @@ io.on('connection', function(socket)
         console.log('['+socket.playerData.id+']'+ ' defeated');
     });
 
+    socket.on('defenseFailed', function(msg)
+    {
+        GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attackSucceed', msg);
+    });
+
     socket.on('disconnect', function(reason)
     {
         let data = socket.playerData;

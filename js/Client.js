@@ -51,6 +51,11 @@ socket.on('defeat', function(msg) // object player
     console.log(RoomData.players[msg.index].nickname + ' defeated');
 });
 
+socket.on('attackSucceed', function(msg)
+{
+    WordSpace.nameGroup.push(new NameWord(msg.victim, true));
+});
+
 // out game
 socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
 {
