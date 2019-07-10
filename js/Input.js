@@ -16,8 +16,7 @@ Input.gameSceneEnterReaction = function()
 {
     if (!Input.isEntered)
     {
-        Input.convInput = Input.removeConVow(Input.convInput);
-        if (Input.attackMode) WordSpace.attack(Input.convInput, Input.attackOption.wordGrade);
+        if (Input.attackMode) WordSpace.attack(Input.removeConVow(Input.convInput), Input.attackOption.wordGrade);
         else WordSpace.findWord(Input.convInput);
         Input.reset();
         Input.isEntered = true;
@@ -26,12 +25,11 @@ Input.gameSceneEnterReaction = function()
 Input.menuSceneEnterReaction = function()
 {
     Input.convInput = Input.removeConVow(Input.convInput);
-    if (Input.convInput.length > 0)
+    if (Input.convInput.length > 1)
     {
         socket.emit('setNickname', Input.convInput);
         PlayerData.nickname = Input.convInput;
         Input.reset();
-        game.scene.remove('menuScene');
     }
     else 
     {

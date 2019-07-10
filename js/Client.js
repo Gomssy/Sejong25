@@ -7,6 +7,14 @@ socket.on('setId', function(msg) // {str, num playerNum}
     console.log(msg.str);
     PlayerData.idNum = msg.num;
 });
+socket.on('errNicknameOverlaped', function()
+{
+    alert('이미 사용중인 닉네임입니다.');
+});
+socket.on('enterRoom', function()
+{
+    game.scene.remove('menuScene');
+});
 
 // init game
 socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
@@ -41,6 +49,11 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
     console.log(RoomData.players[msg.index].nickname + ' defeated');
+});
+
+socket.on('attackSucceed', function(msg)
+{
+    WordSpace.nameGroup.push(new NameWord(msg.victim, true));
 });
 
 // out game
