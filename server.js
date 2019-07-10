@@ -28,8 +28,7 @@ io.on('connection', function(socket)
             socketId: socket,
             currentRoom: null,
             playingData: null,
-            
-            playerTyping: 0
+            isReceivable: false
         };
         GameServer.currentPlayer.push(socket.playerData);
         console.log('['+socket.playerData.id+'] client request');
@@ -42,9 +41,19 @@ io.on('connection', function(socket)
 
     socket.on('setNickname', function(msg) // string new_nickname
     {
-        socket.playerData.nickname = msg;
-        console.log('['+socket.playerData.id+'] nickname set to ' + msg);
-        GameServer.enterEmptyRoom(socket.playerData);
+        let isAlreadyHave = false;
+        GameServer.currentPlayer.forEach(function(element)
+        {
+            if (element.nickname === msg) isAlreadyHave = true;
+        });
+        if (isAlreadyHave) socket.emit('errNicknameOverlaped');
+        else
+        {
+            socket.playerData.nickname = msg;
+            console.log('['+socket.playerData.id+'] nickname set to ' + msg);
+            GameServer.enterEmptyRoom(socket.playerData);
+        }
+        
     });
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping
@@ -72,6 +81,7 @@ io.on('connection', function(socket)
     {
         socket.playerData.playingData.isAlive = false;
         socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
+        socket.playerData.isReceivable = false;
         // 패배단어 체크
         GameServer.announceToRoom(socket.playerData.currentRoom.roomNum, 'defeat', socket.playerData.playingData);
         console.log('['+socket.playerData.id+']'+ ' defeated');
@@ -79,22 +89,40 @@ io.on('connection', function(socket)
 
     socket.on('disconnect', function(reason)
     {
-        let idxToDel = GameServer.currentPlayer.findIndex(function(element)
+        let data = socket.playerData;
+        console.log('['+ data.id +'] client disconnected, reason: ' + reason);
+        if (typeof data.id === undefined)
         {
-            return element.id === socket.playerData.id;
-        });
-        if (idxToDel != -1) 
+            console.log('[ERROR] data.id is undefined');
+            console.log(GameServer.currentPlayer);
+        }
+        else // data.id is not undefined
         {
-            console.log('['+ socket.playerData.id +'] client disconnected, reason: ' + reason);
-            GameServer.currentPlayer.splice(idxToDel, 1);
-            // 룸에서도 제거
-            if (socket.playerData.currentRoom != null)
+            let idxToDel = GameServer.currentPlayer.findIndex(function(element)
             {
-                socket.playerData.playingData.isAlive = false;
-                if (socket.playerData.playingData.rank === -1) socket.playerData.playingData.rank = socket.playerData.currentRoom.nextRank--;
-                socket.playerData.currentRoom.currentSocket.splice(socket.playerData.playingData.index, 1);
-                GameServer.announceToRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum), 'userDisconnect', socket.playerData.playingData);
+                return element.id === data.id;
+            });
+            if (idxToDel != -1) 
+            {
+                GameServer.currentPlayer.splice(idxToDel, 1);
+                // 룸에서도 제거
+                if (data.currentRoom != null)
+                {
+                    if (data.currentRoom.currentPhase === GameServer.Phase.READY)
+                    {
+                        data.currentRoom.currentPlayer[data.playingData.index] = null;
+                        data.currentRoom.currentSocket[data.playingData.index] = null;
+                    }
+                    else 
+                    {
+                        data.playingData.isAlive = false;
+                        if (data.playingData.rank === -1) data.playingData.rank = data.currentRoom.nextRank--;
+                        data.currentRoom.currentSocket[data.playingData.index].isReceivable = false;
+                        GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
+                    }
+                }
             }
+            console.log('['+ data.id +'] disconnect complete');
         }
     });
 });
