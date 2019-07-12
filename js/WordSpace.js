@@ -1,7 +1,6 @@
 var WordSpace = WordSpace || {};
 
 // for test
-WordSpace.gameSceneForTest = null;
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
 WordSpace.killLogTextForTest = null;
@@ -71,7 +70,7 @@ WordSpace.gameOverCycle = new Cycle(gameOver);
 //호패 생성 사이클
 WordSpace.nameCycle = new Cycle(function()
 {
-    WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+    WordSpace.generateWord.Name(ScenesData.gameScene, false);
 });
 //이건 뭐지
 WordSpace.varAdjustCycle = new Cycle(function()
@@ -145,8 +144,8 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
         WordSpace.GradeProb[1] = 0.8 - 0.45 * typingRate;
         WordSpace.GradeProb[2] = 0.9 - 0.15 * typingRate;
     }
-    WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
-    WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);
+    WordSpace.wordCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
+    WordSpace.nameCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);
 }
 
 WordSpace.attackGauge = 
@@ -237,7 +236,6 @@ WordSpace.loadImage = function(scene)
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
     }
 
-    WordSpace.gameSceneForTest = scene; // for test
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
     WordSpace.killLogTextForTest = scene.add.text(1100, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
 }
@@ -295,7 +293,7 @@ WordSpace.setGameOverTimer = function()
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
         this.isTimerOn = true;
-        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.GameOver, 0, false);
+        WordSpace.gameOverCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.GameOver, 0, false);
     }
 }
 
@@ -322,12 +320,12 @@ WordSpace.findWord = function(wordText)
             if (weightest.wordWeight < element.wordWeight) weightest = element;
         });
         weightest.destroy();
-        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce, true);
+        WordSpace.nameCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce, true);
         
         while(WordSpace.totalWordNum < 5)
         {
-            WordSpace.genWordByProb(WordSpace.gameSceneForTest);
-            WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, 0);
+            WordSpace.genWordByProb(ScenesData.gameScene);
+            WordSpace.wordCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.WordSpawn, 0);
         }
         WordSpace.setPlayerTyping.add(wordText);
     }
@@ -408,9 +406,9 @@ WordSpace.attack = function(wordText, grade)
             socket.emit('attack', attackData);
         });
         //테스트용, 자기 자신에게 공격함
-        //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
-        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
-        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+        //WordSpace.generateWord.Attack(ScenesData.gameScene, wordText, grade, PlayerData, false);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false);
         WordSpace.nameGroup = [];
 
         WordSpace.attackGauge.resetValue();
