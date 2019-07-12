@@ -42,7 +42,7 @@ socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 });
 socket.on('attacked', function(msg) // object attackData
 {
-    WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, msg.text, msg.grade, msg.attacker, msg.isStrong);
+    WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong);
 });
 socket.on('defeat', function(msg) // object player
 {

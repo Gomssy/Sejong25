@@ -1,3 +1,5 @@
+var ScenesData = ScenesData || {};
+
 var menuScene = new Phaser.Class(
 {
     Extends: Phaser.Scene,
@@ -11,6 +13,7 @@ var menuScene = new Phaser.Class(
 
     preload: function()
     {
+        ScenesData.menuScene = this;
         Input.inputField.loadImage(this);
         BackGround.loadImage(this);
         Audio.loadSound(this);
@@ -37,6 +40,7 @@ var gameScene = new Phaser.Class(
 
     preload: function()
     {
+        ScenesData.gameScene = this;
         BackGround.loadImage(this);
         WordSpace.loadImage(this);
         Input.inputField.loadImage(this);
@@ -65,7 +69,7 @@ var gameScene = new Phaser.Class(
         
         WordSpace.setPlayerTyping.initiate(this);
 
-        WordSpace.nameWordTextForTest = WordSpace.gameSceneForTest.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
+        WordSpace.nameWordTextForTest = ScenesData.gameScene.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
         RoomData.players.forEach(function(element)
         {
