@@ -53,8 +53,9 @@ socket.on('defeat', function(msg) // object player
 
 socket.on('attackSucceed', function(msg)
 {
-    
-    WordSpace.nameGroup.push(new NameWord(msg.victim, true));
+    let tempWord = new NameWord(msg.victim, true);
+    tempWord.instantiate(WordSpace.gameSceneForTest);
+    tempWord.destroy();
 });
 
 // out game

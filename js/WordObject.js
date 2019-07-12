@@ -66,12 +66,15 @@ class WordObject
         WordSpace.totalWeight -= this.wordWeight;
         WordSpace.totalWordNum -= 1;
         WordSpace.resetGameOverTimer();
-        this.wordObj.destroy();
         const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
         const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
-        WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
+        if(!this.isNameWord)
+        {
+            this.wordObj.destroy();
+            WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
+        }
     }
 
 
@@ -187,15 +190,6 @@ class NameWord extends WordObject
         this.physicsObj.setVelocity(0, 0);
         this.physicsObj.setPosition(100 + WordSpace.nameGroup.length * 50, 650).setDepth(2);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
-
-        console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
-        WordSpace.totalWeight -= this.wordWeight;
-        WordSpace.totalWordNum -= 1;
-        WordSpace.resetGameOverTimer();
-        const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
-        if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
-        const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
-        if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
-        //WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
+        super.destroy();
     }
 }
