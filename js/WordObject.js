@@ -172,12 +172,30 @@ class NameWord extends WordObject
         this.ownerId = player.id;
         this.wordWeight = 2;
         this.isStrong = _isStrong;
+        this.isActive = true;
         console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
+    }
+    attract()
+    {
+        if(this.isActive) super.attract();
     }
     destroy()
     {
         WordSpace.attackGauge.add(this.wordTyping * 0.1);
         WordSpace.nameGroup.push(this);
-        super.destroy();
+        this.isActive = false;
+        this.physicsObj.setVelocity(0, 0);
+        this.physicsObj.setPosition(100 + WordSpace.nameGroup.length * 50, 650).setDepth(2);
+        this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
+
+        console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
+        WordSpace.totalWeight -= this.wordWeight;
+        WordSpace.totalWordNum -= 1;
+        WordSpace.resetGameOverTimer();
+        const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
+        if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
+        const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
+        if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
+        //WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
     }
 }

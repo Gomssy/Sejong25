@@ -403,6 +403,8 @@ WordSpace.attack = function(wordText, grade)
                 isStrong: element.isStrong
             }
             socket.emit('attack', attackData);
+            element.physicsObj.destroy();
+            element.wordObj.destroy();
         });
         //테스트용, 자기 자신에게 공격함
         //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
