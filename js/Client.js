@@ -19,6 +19,12 @@ socket.on('setId', function(msg) // {str, num playerNum}
 socket.on('enterRoom', function()
 {
     game.scene.remove('menuScene');
+    game.scene.start('roomScene');
+});
+socket.on('setCount', function(msg)
+{
+    ScenesData.roomScene.isCounting = msg.isEnable;
+    ScenesData.roomScene.endTime = msg.endTime;
 });
 
 // init game
@@ -30,7 +36,8 @@ socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
     RoomData.aliveCount = msg.players.length;
 });
 socket.on('startGame', function()
-{ 
+{
+    game.scene.remove('roomScene');
     game.scene.start('gameScene');
 });
 

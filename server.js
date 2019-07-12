@@ -72,6 +72,15 @@ io.on('connection', function(socket)
         socket.emit('setPlayerTypingRate', playerTypingRate);
     });
 
+    socket.on('endCount')
+    {
+        socket.currentRoom.aliveCount--;
+        if (socket.currentRoom.aliveCount === 0)
+        {
+            GameServer.startRoom(GameServer.findRoomIndex(socket.currentRoom.roomNum));
+        }
+    }
+
     socket.on('attack', function(msg)
     {
         GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attacked', msg);

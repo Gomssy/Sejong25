@@ -27,6 +27,47 @@ var menuScene = new Phaser.Class(
     }
 });
 
+var roomScene = new Phaser.Class(
+{
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function roomScene ()
+    {
+        Phaser.Scene.call(this, {key: 'roomScene'});
+    },
+
+    preload: function()
+    {
+        ScenesData.roomScene = this;
+    },
+
+    create: function()
+    {
+        this.isCounting = false;
+        this.endTime = 0;
+        this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000');
+    },
+
+    update: function()
+    {
+        if (this.isCounting)
+        {
+            this.countText.setText((this.endTime - Date.now()) / 1000);
+            if (this.endTime - Date.now() < 0) 
+            {
+                socket.emit('endCount');
+                this.isCounting = false;
+            }
+        }
+        else
+        {
+            this.countText.setText('사람들을 위해 대기중입니다...');
+        }
+    }
+})
+
 var gameScene = new Phaser.Class(
 {
     Extends: Phaser.Scene,

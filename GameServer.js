@@ -1,6 +1,6 @@
 var GameServer = GameServer || {};
 
-GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
+GameServer.Phase = {READY: 0, COUNT: -1, START: 1, MAIN: 2, MUSIC: 3};
 GameServer.startCount = 2;
 
 GameServer.currentPlayer = [];
@@ -35,9 +35,9 @@ GameServer.makeRoom = function()
     {
         roomNum: GameServer.nextRoomNumber++,
         maxPlayer: 5,
-        nextRank: 5,
+        nextRank: 0,
         currentPlayer: [],
-        aliveCount: -1,
+        aliveCount: 0,
         currentSocket: [],
         currentPhase: GameServer.Phase.READY,
 
@@ -82,10 +82,26 @@ GameServer.enterRoom = function(roomIdx, playerData)
     }
     playerData.playingData = player;
     playerData.currentRoom = room;
+    room.aliveCount++;
 
     console.log('[' + playerData.id + '] entered to room #' + room.roomNum);
     playerData.socketId.emit('enterRoom');
-    if (room.currentPlayer.length >= this.startCount) GameServer.startRoom(roomIdx);
+    let endTimeToAnnounce = Date.now() + 6000;
+    if (room.currentPlayer.length >= this.startCount)
+    {
+        if (room.currentPhase === this.Phase.READY) // start count
+        {
+            this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: endTimeToAnnounce});
+        }
+        else if (room.currentPhase === this.Phase.COUNT) // countinue count
+        {
+            playerData.socketId.emit('setCount', {isEnable: true, endTime: endTimeToAnnounce});
+        }
+    }
+    else // stop count
+    {
+        this.announceToRoom(room.roomNum, 'setCount', {isEnable: false, endTime: 0});
+    }
     return room;
 }
 GameServer.enterEmptyRoom = function(playerData)
