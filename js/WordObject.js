@@ -188,8 +188,10 @@ class NameWord extends WordObject
         WordSpace.nameGroup.push(this);
         this.isActive = false;
         this.physicsObj.setVelocity(0, 0);
-        this.physicsObj.setPosition(100 + WordSpace.nameGroup.length * 50, 650).setDepth(2);
+        this.physicsObj.setPosition(500 + WordSpace.nameGroup.length * 25, 650).setDepth(2);
+        this.physicsObj.angle = 90;
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
+        this.wordObj.angle = 90;
         super.destroy();
     }
 }
