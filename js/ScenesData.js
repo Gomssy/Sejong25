@@ -92,6 +92,7 @@ var gameScene = new Phaser.Class(
         
         WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);
         WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
+        WordSpace.killLogTextForTest.setText(WordSpace.killLogForTest);
         WordSpace.setPlayerTyping.add('');
     }
 });

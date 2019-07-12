@@ -18,12 +18,12 @@ GameServer.findPlayer = function(playerId)
 {
     var idx = this.currentPlayer.findIndex(function(element)
     {
-        return element.id === socket;
+        return element.id === playerId;
     });
     if (idx != -1) return this.currentPlayer[idx];
     else
     {
-        console.log('[ERR] wrong playerId to find');
+        console.log('[ERR] wrong playerId('+ playerId +') to find');
         return null;
     }
 }
@@ -137,7 +137,19 @@ GameServer.playerDefeat = function(playerData)
     playerData.playingData.rank = playerData.currentRoom.nextRank--;
     playerData.isReceivable = false;
     playerData.currentRoom.aliveCount--;
-    // 끝내기단어 체크
+    if (playerData.playingData.lastAttacks.length > 0)
+    {
+        playerData.playingData.lastAttack = playerData.playingData.lastAttacks[playerData.playingData.lastAttacks.length - 1];
+        if (Date.now() - playerData.playingData.lastAttack.time > 40000) playerData.playingData.lastAttack = null;
+        else
+        {
+            playerData.playingData.lastAttacks.forEach(function(element)
+            {
+                if (Date.now() - element.time < 40000 && element.wordGrade > playerData.playingData.lastAttack.wordGrade) playerData.playingData.lastAttack = element;
+            }); 
+        }
+    }
+
     GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'defeat', playerData.playingData);
     console.log('['+playerData.id+']'+ ' defeated, rank: ' + playerData.playingData.rank);
 
@@ -179,7 +191,10 @@ class Player
         this.nickname = playerData.nickname;
         this.isAlive = true;
         this.rank = -1;
+
         this.playerTyping = 0;
+        this.lastAttacks = []; // { attackerId, word, wordGrade, time }
+        this.lastAttack = null;
     }
 }
 

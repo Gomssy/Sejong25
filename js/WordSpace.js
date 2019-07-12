@@ -4,6 +4,8 @@ var WordSpace = WordSpace || {};
 WordSpace.gameSceneForTest = null;
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
+WordSpace.killLogTextForTest = null;
+WordSpace.killLogForTest = '';
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
@@ -237,6 +239,7 @@ WordSpace.loadImage = function(scene)
 
     WordSpace.gameSceneForTest = scene; // for test
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
+    WordSpace.killLogTextForTest = scene.add.text(1100, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
 }
 
 WordSpace.generateWord = 

@@ -47,13 +47,25 @@ socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 });
 socket.on('attacked', function(msg) // object attackData
 {
-    WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, msg.text, msg.grade, msg.attacker, msg.isStrong);
+    setTimeout(function()
+    {
+        WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, msg.text, msg.grade, msg.attacker, msg.isStrong);
+    }, 4000);
 });
 socket.on('defeat', function(msg) // object player
 {
     RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
-    console.log(RoomData.players[msg.index].nickname + ' defeated');
+    if (msg.lastAttack != null) 
+    {
+        console.log(RoomData.players[msg.index].nickname + ' defeated by ' + msg.lastAttack.attacker + ', with ' + msg.lastAttack.word);
+        WordSpace.killLogForTest += ('\n' + msg.lastAttack.attacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.players[msg.index].nickname);
+    }
+    else 
+    {
+        console.log(RoomData.players[msg.index].nickname + ' defeated');
+        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.players[msg.index].nickname);
+    }
 });
 socket.on('gameEnd', function(msg) // object player
 {
