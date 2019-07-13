@@ -84,6 +84,10 @@ var gameScene = new Phaser.Class(
         {
             element.attract();
         });
+        WordSpace.nameGroup.forEach(function(element)
+        {
+            element.attract();
+        })
         let tempNames = '';
         WordSpace.nameGroup.forEach(function(element)
         {

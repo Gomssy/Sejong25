@@ -10,6 +10,7 @@ class WordObject
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
         this.wordSpeed = 0.5;
         this.isNameWord = isNameWord;
+        this.collider = null;
     }
 
     instantiate(scene, lenRate)
@@ -181,6 +182,13 @@ class NameWord extends WordObject
     attract()
     {
         if(this.isActive) super.attract();
+        else{
+            this.path.getPoint(this.follower.t, this.follower.vec);
+            this.physicsObj.setPosition(this.follower.vec.x, this.follower.vec.y);
+            this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
+            this.physicsObj.angle = 90 * this.follower.t;
+            this.wordObj.angle = this.physicsObj.angle;
+        }
     }
     destroy()
     {
@@ -188,10 +196,32 @@ class NameWord extends WordObject
         WordSpace.nameGroup.push(this);
         this.isActive = false;
         this.physicsObj.setVelocity(0, 0);
-        this.physicsObj.setPosition(500 + WordSpace.nameGroup.length * 25, 650).setDepth(2);
-        this.physicsObj.angle = 90;
+        //this.physicsObj.setPosition(500 + WordSpace.nameGroup.length * 25, 650).setDepth(2);
+        //this.physicsObj.angle = 90;
+        this.physicsObj.setDepth(2);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
         this.wordObj.angle = 90;
+        WordSpace.gameSceneForTest.physics.world.removeCollider(this.physicsObj);
+
+        this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+
+        this.path = new Phaser.Curves.Spline([
+            this.physicsObj.x, this.physicsObj.y,
+            (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 25) / 2, this.physicsObj.y - 50,
+            500 + WordSpace.nameGroup.length * 25, 650
+        ]);
+        WordSpace.gameSceneForTest.tweens.add({
+            targets: this.follower,
+            t: 1,
+            ease: 'Sine.easeInOut',
+            duration: 4000,
+            repeat: 0
+        });
+
+        var graphics = WordSpace.gameSceneForTest.add.graphics();
+        graphics.lineStyle(2, 0xffffff, 1);
+        this.path.draw(graphics);
+        
         super.destroy();
     }
 }

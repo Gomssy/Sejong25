@@ -237,6 +237,8 @@ WordSpace.loadImage = function(scene)
 
     WordSpace.gameSceneForTest = scene; // for test
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
+
+    scene.load.image('test', 'assets/placeholder/attackalert1.png')
 }
 
 WordSpace.generateWord = 
