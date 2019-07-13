@@ -10,7 +10,6 @@ class WordObject
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
         this.wordSpeed = 0.5;
         this.isNameWord = isNameWord;
-        this.collider = null;
     }
 
     instantiate(scene, lenRate)
@@ -38,8 +37,8 @@ class WordObject
             .setFrictionY(0)
             .setBounce(0.5);
         }
-        
 
+        this.physicsObj.wordCollider = null;
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
 
@@ -71,10 +70,11 @@ class WordObject
         if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
         const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
+        WordSpace.wordPhysicsGroup.remove(this.physicsObj);
         if(!this.isNameWord)
         {
             this.wordObj.destroy();
-            WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
+            this.physicsObj.destroy();
         }
     }
 
@@ -192,19 +192,23 @@ class NameWord extends WordObject
     }
     destroy()
     {
+        super.destroy();
+        WordSpace.gameSceneForTest.physics.world.removeCollider(this.physicsObj.wordCollider);
+        WordSpace.wordGroup.forEach(function(element)
+        {
+            WordSpace.gameSceneForTest.physics.world.removeCollider(element.physicsObj.wordCollider);
+            element.physicsObj.wordCollider = WordSpace.gameSceneForTest.physics.add.collider(element.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
+            {
+                object1.topObj.attract();
+            });
+        });
         WordSpace.attackGauge.add(this.wordTyping * 0.1);
         WordSpace.nameGroup.push(this);
         this.isActive = false;
-        this.physicsObj.setVelocity(0, 0);
-        //this.physicsObj.setPosition(500 + WordSpace.nameGroup.length * 25, 650).setDepth(2);
-        //this.physicsObj.angle = 90;
-        this.physicsObj.setDepth(2);
+        this.physicsObj.setVelocity(0, 0).setDepth(2);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
-        this.wordObj.angle = 90;
-        WordSpace.gameSceneForTest.physics.world.removeCollider(this.physicsObj);
 
         this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
-
         this.path = new Phaser.Curves.Spline([
             this.physicsObj.x, this.physicsObj.y,
             (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 25) / 2, this.physicsObj.y - 50,
@@ -213,15 +217,14 @@ class NameWord extends WordObject
         WordSpace.gameSceneForTest.tweens.add({
             targets: this.follower,
             t: 1,
-            ease: 'Sine.easeInOut',
+            ease: 'Sine',
             duration: 4000,
             repeat: 0
         });
 
-        var graphics = WordSpace.gameSceneForTest.add.graphics();
+        //이동경로 디버그
+        /*var graphics = WordSpace.gameSceneForTest.add.graphics();
         graphics.lineStyle(2, 0xffffff, 1);
-        this.path.draw(graphics);
-        
-        super.destroy();
+        this.path.draw(graphics);*/
     }
 }

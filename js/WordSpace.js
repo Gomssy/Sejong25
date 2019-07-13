@@ -267,7 +267,7 @@ WordSpace.pushWord = function(scene, word, lenRate)
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
     word.physicsObj.topObj = word;
-    scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
+    word.physicsObj.wordCollider = scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
     {
         //object1.topObj.wordSpeed = 0.1;
         object1.topObj.attract();

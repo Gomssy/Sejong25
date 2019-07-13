@@ -76,6 +76,20 @@ var gameScene = new Phaser.Class(
             }
         });
         console.log(RoomData.myself);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
+        WordSpace.generateWord.Name(this, false);
     },
 
     update: function()
