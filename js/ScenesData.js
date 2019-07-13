@@ -80,6 +80,7 @@ var gameScene = new Phaser.Class(
 
     update: function()
     {
+        WordSpace.deltaTime = this.sys.game.loop.delta;
         WordSpace.wordForcedGroup.forEach(function(element)
         {
             element.attract();

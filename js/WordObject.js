@@ -104,8 +104,7 @@ class WordObject
         }
 
         this.physicsObj.setVelocity(accel.x, accel.y);
-        this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
-
+        this.wordObj.setPosition(this.physicsObj.x + (accel.x / 1000 * WordSpace.deltaTime), this.physicsObj.y + (accel.y / 1000 * WordSpace.deltaTime));
     }
 
     isEqualObject(_generationCode) { return _generationCode === this.generationCode; }
