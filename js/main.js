@@ -2,6 +2,11 @@ var config = {
     type: Phaser.AUTO,
     width: 1280,
     height: 720,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    autoRound: false,
     physics: {
         default: 'arcade',
         arcade: {
@@ -9,7 +14,7 @@ var config = {
         }
     },
     backgroundColor: Phaser.Display.Color.HexStringToColor('#F0CB85').color,//GetColor(245,208,138),
-    scene: [ menuScene, gameScene ]
+    scene: [ menuScene, roomScene, gameScene ]
 };
 
 var game = new Phaser.Game(config)

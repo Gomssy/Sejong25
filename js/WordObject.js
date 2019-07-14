@@ -15,15 +15,15 @@ class WordObject
     instantiate(scene, lenRate)
     {
         let p = [{x : 3, y : 0.7}, {x : 20, y : 1.2}];
-        let scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
-        let fontscale = 25;
+        this.scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
+        this.fontScale = 25;
         var random = WordSpace.getSpawnPoint(lenRate);
 
         if (!this.isNameWord)
         {
             this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
             .setMass(this.wordWeight * 10)
-            .setScale(scale)
+            .setScale(this.scale)
             .setFrictionX(0)
             .setFrictionY(0)
             .setBounce(0.5);
@@ -32,13 +32,12 @@ class WordObject
         {
             this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'nameBgr' + Math.min(Math.max(2, this.wordText.length), 6))
             .setMass(this.wordWeight * 10)
-            .setScale(scale)
+            .setScale(this.scale)
             .setFrictionX(0)
             .setFrictionY(0)
             .setBounce(0.5);
         }
-        
-
+        this.physicsObj.wordCollider = null;
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
 
@@ -48,7 +47,7 @@ class WordObject
         
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
-                fontSize: (scale * fontscale) +'pt',
+                fontSize: (this.scale * this.fontScale) +'pt',
                 fontFamily: '"궁서", 궁서체, serif',
                 fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             });
@@ -62,16 +61,20 @@ class WordObject
 
     destroy()
     {
-        console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
+        //console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
         WordSpace.totalWeight -= this.wordWeight;
         WordSpace.totalWordNum -= 1;
         WordSpace.resetGameOverTimer();
-        this.wordObj.destroy();
         const groupIdx = WordSpace.wordGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (groupIdx > -1) WordSpace.wordGroup.splice(groupIdx, 1);
         const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
-        WordSpace.wordPhysicsGroup.remove(this.physicsObj, true, true);
+        WordSpace.wordPhysicsGroup.remove(this.physicsObj);
+        if(!this.isNameWord)
+        {
+            this.wordObj.destroy();
+            this.physicsObj.destroy();
+        }
     }
 
 
@@ -101,8 +104,7 @@ class WordObject
         }
 
         this.physicsObj.setVelocity(accel.x, accel.y);
-        this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
-
+        this.wordObj.setPosition(this.physicsObj.x + (accel.x / 1000 * WordSpace.deltaTime), this.physicsObj.y + (accel.y / 1000 * WordSpace.deltaTime));
     }
 
     isEqualObject(_generationCode) { return _generationCode === this.generationCode; }
@@ -156,10 +158,10 @@ class AttackWord extends WordObject
         }
         if(WordSpace.gameTimer.now < this.counterTime)
         {
-            WordSpace.nameGroup.push(new NameWord(this.attacker, true));
+            let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, this.attacker);
+            tempWord.destroy();
         }
-        //강호패 넣기 구현해야됨
-        //WordSpace.generateWord.Name(WordSpace.gameSceneForTest, true);
+        //WordSpace.nameGroup.push(new NameWord(this.attacker, true));
         super.destroy();
     }
 }
@@ -172,12 +174,63 @@ class NameWord extends WordObject
         this.ownerId = player.id;
         this.wordWeight = 2;
         this.isStrong = _isStrong;
-        console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
+        this.isActive = true;
+        //console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
+    }
+    attract()
+    {
+        if(this.isActive) super.attract();
+        else{
+            this.path.getPoint(this.follower.t, this.follower.vec);
+            this.physicsObj.setPosition(this.follower.vec.x, this.follower.vec.y);
+            this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
+            this.physicsObj.angle = 90 * this.follower.t;
+            this.wordObj.angle = this.physicsObj.angle;
+            if(this.isStrong)
+            {
+                this.physicsObj.setScale(this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale);
+                this.wordObj.setFont({
+                    fontSize: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt',
+                    fontFamily: '"궁서", 궁서체, serif',
+                    fontStyle: (this.wordWeight > 5 ? 'bold' : '')
+                });
+            }
+        }
     }
     destroy()
     {
-        WordSpace.attackGauge.add(this.wordTyping * 0.1);
-        WordSpace.nameGroup.push(this);
         super.destroy();
+        ScenesData.gameScene.physics.world.removeCollider(this.physicsObj.wordCollider);
+        WordSpace.wordGroup.forEach(function(element)
+        {
+            ScenesData.gameScene.physics.world.removeCollider(element.physicsObj.wordCollider);
+            element.physicsObj.wordCollider = ScenesData.gameScene.physics.add.collider(element.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
+            {
+                object1.topObj.attract();
+            });
+        });
+        if(!this.isStrong) WordSpace.attackGauge.add(this.wordTyping * 0.1);
+        WordSpace.nameGroup.push(this);
+        this.isActive = false;
+        this.physicsObj.setVelocity(0, 0).setDepth(2);
+        this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
+        this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+        this.path = new Phaser.Curves.Spline([
+            this.physicsObj.x, this.physicsObj.y,
+            (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 15) / 2, this.physicsObj.y - 50,
+            500 + WordSpace.nameGroup.length * 15, 680 + this.wordText.length * 10 + (Math.random() * 20 - 10)
+        ]);
+        ScenesData.gameScene.tweens.add({
+            targets: this.follower,
+            t: 1,
+            ease: 'Sine',
+            duration: 2000,
+            repeat: 0
+        });
+
+        //이동경로 디버그
+        /*var graphics = ScenesData.gameScene.add.graphics();
+        graphics.lineStyle(2, 0xffffff, 1);
+        this.path.draw(graphics);*/
     }
 }

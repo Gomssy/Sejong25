@@ -2,18 +2,29 @@ var socket = io.connect();
 
 // init account
 socket.emit('idRequest');
+
+socket.on('alert', function(msg) // string errorcode
+{
+    let toAlert = 'null alert';
+    if (msg === 'errNicknameOverlaped') toAlert = '이미 사용중인 닉네임입니다.';
+    if (msg === 'gameWin') toAlert = '승리!';
+    alert(toAlert);
+});
+
 socket.on('setId', function(msg) // {str, num playerNum}
 {
     console.log(msg.str);
     PlayerData.idNum = msg.num;
 });
-socket.on('errNicknameOverlaped', function()
-{
-    alert('이미 사용중인 닉네임입니다.');
-});
 socket.on('enterRoom', function()
 {
     game.scene.remove('menuScene');
+    game.scene.start('roomScene');
+});
+socket.on('setCount', function(msg)
+{
+    ScenesData.roomScene.isCounting = msg.isEnable;
+    ScenesData.roomScene.endTime = msg.endTime;
 });
 
 // init game
@@ -25,7 +36,8 @@ socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
     RoomData.aliveCount = msg.players.length;
 });
 socket.on('startGame', function()
-{ 
+{
+    game.scene.remove('roomScene');
     game.scene.start('gameScene');
 });
 
@@ -42,18 +54,35 @@ socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 });
 socket.on('attacked', function(msg) // object attackData
 {
-    WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, msg.text, msg.grade, msg.attacker, msg.isStrong);
+    setTimeout(function()
+    {
+        WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong);
+    }, 4000);
 });
 socket.on('defeat', function(msg) // object player
 {
     RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
-    console.log(RoomData.players[msg.index].nickname + ' defeated');
+    if (msg.lastAttack != null) 
+    {
+        console.log(RoomData.players[msg.index].nickname + ' defeated by ' + msg.lastAttack.attacker + ', with ' + msg.lastAttack.word);
+        WordSpace.killLogForTest += ('\n' + msg.lastAttack.attacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.players[msg.index].nickname);
+    }
+    else 
+    {
+        console.log(RoomData.players[msg.index].nickname + ' defeated');
+        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.players[msg.index].nickname);
+    }
+});
+socket.on('gameEnd', function(msg) // object player
+{
+    console.log(msg.nickname + ' Win!!!!!!');
 });
 
 socket.on('attackSucceed', function(msg)
 {
-    WordSpace.nameGroup.push(new NameWord(msg.victim, true));
+    let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, msg.victim);
+    tempWord.destroy();
 });
 
 // out game

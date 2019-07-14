@@ -1,9 +1,12 @@
 var WordSpace = WordSpace || {};
 
+WordSpace.test = null;
+
 // for test
-WordSpace.gameSceneForTest = null;
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
+WordSpace.killLogTextForTest = null;
+WordSpace.killLogForTest = '';
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
@@ -23,6 +26,8 @@ WordSpace.CurrentPhase = WordSpace.Phase.READY;
 WordSpace.playerTyping = 0;
 WordSpace.playerTypingRate = 0;
 
+WordSpace.deltaTime = 10;
+
 WordSpace.delay = 
 {
     WordSpawn: 3000,
@@ -33,7 +38,7 @@ WordSpace.delay =
 WordSpace.playerTypingCycle = null;
 WordSpace.NameSpawnReduce = 1000;
 
-WordSpace.gravityPoint = {x: 640, y: 300};
+WordSpace.gravityPoint = {x: 640, y: 280};
 
 class Cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
 {
@@ -69,7 +74,7 @@ WordSpace.gameOverCycle = new Cycle(gameOver);
 //호패 생성 사이클
 WordSpace.nameCycle = new Cycle(function()
 {
-    WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+    WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
 });
 //이건 뭐지
 WordSpace.varAdjustCycle = new Cycle(function()
@@ -143,8 +148,8 @@ WordSpace.AdjustVarByPhase = function(typingRate, phase)
         WordSpace.GradeProb[1] = 0.8 - 0.45 * typingRate;
         WordSpace.GradeProb[2] = 0.9 - 0.15 * typingRate;
     }
-    WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
-    WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);
+    WordSpace.wordCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
+    WordSpace.nameCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);
 }
 
 WordSpace.attackGauge = 
@@ -235,8 +240,8 @@ WordSpace.loadImage = function(scene)
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
     }
 
-    WordSpace.gameSceneForTest = scene; // for test
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
+    WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
 }
 
 WordSpace.generateWord = 
@@ -245,17 +250,21 @@ WordSpace.generateWord =
     {
         word = new NormalWord(SelectWord.selectWord(grade));
         WordSpace.pushWord(scene, word, lenRate);
+        return word;
     },
     Attack: function(scene, wordText, grade, attacker, isStrong, lenRate)
     {
         word = new AttackWord(wordText, grade, attacker, isStrong);
         WordSpace.pushWord(scene, word, lenRate);
+        return word;
     },
-    Name: function(scene, isStrong, lenRate)
+    Name: function(scene, isStrong, newPlayerData, lenRate)
     {
-        word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        if(newPlayerData == null) word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        else word = new NameWord(newPlayerData, isStrong);
         //word = new NameWord(RoomData.myself, false);
         WordSpace.pushWord(scene, word, lenRate);
+        return word;
     }
 }
 
@@ -265,7 +274,7 @@ WordSpace.pushWord = function(scene, word, lenRate)
     WordSpace.wordGroup.push(word);
     WordSpace.wordForcedGroup.push(word);
     word.physicsObj.topObj = word;
-    scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
+    word.physicsObj.wordCollider = scene.physics.add.collider(word.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
     {
         //object1.topObj.wordSpeed = 0.1;
         object1.topObj.attract();
@@ -292,7 +301,7 @@ WordSpace.setGameOverTimer = function()
     if(this.brainCapacity < this.totalWeight && !this.isTimerOn)
     {
         this.isTimerOn = true;
-        WordSpace.gameOverCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.GameOver, 0, false);
+        WordSpace.gameOverCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.GameOver, 0, false);
     }
 }
 
@@ -319,12 +328,12 @@ WordSpace.findWord = function(wordText)
             if (weightest.wordWeight < element.wordWeight) weightest = element;
         });
         weightest.destroy();
-        WordSpace.nameCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce, true);
+        WordSpace.nameCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed() + WordSpace.NameSpawnReduce, true);
         
         while(WordSpace.totalWordNum < 5)
         {
-            WordSpace.genWordByProb(WordSpace.gameSceneForTest);
-            WordSpace.wordCycle.resetCycle(WordSpace.gameSceneForTest, WordSpace.delay.WordSpawn, 0);
+            WordSpace.genWordByProb(ScenesData.gameScene);
+            WordSpace.wordCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.WordSpawn, 0);
         }
         WordSpace.setPlayerTyping.add(wordText);
     }
@@ -350,7 +359,7 @@ WordSpace.findWord = function(wordText)
                 if(tempDist <= minDist) minDist = tempDist;
             }
         });
-        attackWords.forEach(function(element)
+        attackWords.some(function(element)
         {
             if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
@@ -362,6 +371,7 @@ WordSpace.findWord = function(wordText)
                     target: element.attacker.idNum
                 }
                 socket.emit('defenseFailed', victimData);
+                return true;
             }
         });
         this.attackGauge.sub(2);
@@ -403,11 +413,11 @@ WordSpace.attack = function(wordText, grade)
                 isStrong: element.isStrong
             }
             socket.emit('attack', attackData);
+            element.physicsObj.destroy();
+            element.wordObj.destroy();
         });
-        //테스트용, 자기 자신에게 공격함
-        //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
-        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
-        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.nameGroup = [];
 
         WordSpace.attackGauge.resetValue();
