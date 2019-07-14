@@ -42,7 +42,7 @@ var gameScene = new Phaser.Class(
         Input.inputField.loadImage(this);
         CSVParsing.loadText(this);
     },
-
+    
     create: function()
     {
         CSVParsing.CSVParse(this);
@@ -76,20 +76,21 @@ var gameScene = new Phaser.Class(
             }
         });
         console.log(RoomData.myself);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
-        WordSpace.generateWord.Name(this, false);
+        WordSpace.test = WordSpace.generateWord.Name(this, false, null);
+        console.log('1' + WordSpace.test.physicsObj.body.width);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.attackGauge.add(5);
+
+
+
     },
 
     update: function()

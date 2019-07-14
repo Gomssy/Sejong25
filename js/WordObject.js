@@ -37,7 +37,6 @@ class WordObject
             .setFrictionY(0)
             .setBounce(0.5);
         }
-
         this.physicsObj.wordCollider = null;
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
@@ -62,7 +61,7 @@ class WordObject
 
     destroy()
     {
-        console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
+        //console.log(this.generationCode + ': ' + this.wordText + ' destroyed');
         WordSpace.totalWeight -= this.wordWeight;
         WordSpace.totalWordNum -= 1;
         WordSpace.resetGameOverTimer();
@@ -177,7 +176,7 @@ class NameWord extends WordObject
         this.wordWeight = 2;
         this.isStrong = _isStrong;
         this.isActive = true;
-        console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
+        //console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
     }
     attract()
     {
@@ -202,23 +201,22 @@ class NameWord extends WordObject
                 object1.topObj.attract();
             });
         });
-        WordSpace.attackGauge.add(this.wordTyping * 0.1);
+        if(!this.isStrong) WordSpace.attackGauge.add(this.wordTyping * 0.1);
         WordSpace.nameGroup.push(this);
         this.isActive = false;
         this.physicsObj.setVelocity(0, 0).setDepth(2);
         this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
-
         this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
         this.path = new Phaser.Curves.Spline([
             this.physicsObj.x, this.physicsObj.y,
-            (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 25) / 2, this.physicsObj.y - 50,
-            500 + WordSpace.nameGroup.length * 25, 650
+            (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 15) / 2, this.physicsObj.y - 50,
+            500 + WordSpace.nameGroup.length * 15, 680 + this.wordText.length * 10 + (Math.random() * 20 - 10)
         ]);
         WordSpace.gameSceneForTest.tweens.add({
             targets: this.follower,
             t: 1,
             ease: 'Sine',
-            duration: 4000,
+            duration: 2000,
             repeat: 0
         });
 

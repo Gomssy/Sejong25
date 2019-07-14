@@ -1,5 +1,7 @@
 var WordSpace = WordSpace || {};
 
+WordSpace.test = null;
+
 // for test
 WordSpace.gameSceneForTest = null;
 WordSpace.weightTextObjForTest = null;
@@ -69,7 +71,7 @@ WordSpace.gameOverCycle = new Cycle(gameOver);
 //호패 생성 사이클
 WordSpace.nameCycle = new Cycle(function()
 {
-    WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+    WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false, null);
 });
 //이건 뭐지
 WordSpace.varAdjustCycle = new Cycle(function()
@@ -247,17 +249,21 @@ WordSpace.generateWord =
     {
         word = new NormalWord(SelectWord.selectWord(grade));
         WordSpace.pushWord(scene, word, lenRate);
+        return word;
     },
     Attack: function(scene, wordText, grade, attacker, isStrong, lenRate)
     {
         word = new AttackWord(wordText, grade, attacker, isStrong);
         WordSpace.pushWord(scene, word, lenRate);
+        return word;
     },
-    Name: function(scene, isStrong, lenRate)
+    Name: function(scene, isStrong, newPlayerData, lenRate)
     {
-        word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        if(newPlayerData == null) word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        else word = new NameWord(newPlayerData, isStrong);
         //word = new NameWord(RoomData.myself, false);
         WordSpace.pushWord(scene, word, lenRate);
+        return word;
     }
 }
 
@@ -352,7 +358,7 @@ WordSpace.findWord = function(wordText)
                 if(tempDist <= minDist) minDist = tempDist;
             }
         });
-        attackWords.forEach(function(element)
+        attackWords.some(function(element)
         {
             if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
             {
@@ -364,6 +370,7 @@ WordSpace.findWord = function(wordText)
                     target: element.attacker.idNum
                 }
                 socket.emit('defenseFailed', victimData);
+                return true;
             }
         });
         this.attackGauge.sub(2);
@@ -410,8 +417,8 @@ WordSpace.attack = function(wordText, grade)
         });
         //테스트용, 자기 자신에게 공격함
         //WordSpace.generateWord.Attack(WordSpace.gameSceneForTest, wordText, grade, PlayerData, false);
-        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
-        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false);
+        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false, null);
+        WordSpace.generateWord.Name(WordSpace.gameSceneForTest, false, null);
         WordSpace.nameGroup = [];
 
         WordSpace.attackGauge.resetValue();
