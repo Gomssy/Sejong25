@@ -2,7 +2,7 @@ var Audio = Audio || {}
 
 Audio.loadSound = function(scene)
 {
-    scene.load.audio('BGM', 'assets/sound/BGM_twochae.ogg');
+    scene.load.audio('BGM', 'assets/sound/login.ogg');
 }
 
 Audio.playSound = function(scene)
