@@ -18,7 +18,7 @@ var menuScene = new Phaser.Class(
 
     create: function()
     {
-        Audio.playLogin(this);
+        Audio.loopSound(this, 'login');
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         BackGround.drawMenu(this);
     }
@@ -48,7 +48,7 @@ var gameScene = new Phaser.Class(
     {
         CSVParsing.CSVParse(this);
         BackGround.drawBrain(this);
-        Audio.playStart(this);
+        Audio.playSound(this, 'startGame');
         WordSpace.wordPhysicsGroup = this.physics.add.group();
 
         Input.inputField.generate(this, Input.gameSceneEnterReaction);
