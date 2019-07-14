@@ -123,6 +123,7 @@ var gameScene = new Phaser.Class(
         });
         console.log(RoomData.myself);
         WordSpace.test = WordSpace.generateWord.Name(this, false, null);
+        WordSpace.attackGauge.add(11);
     },
 
     update: function()

@@ -30,7 +30,7 @@ class WordObject
         }
         else
         {
-            this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'nameBgr' + Math.min(Math.max(2, this.wordText.length), 6))
+            this.physicsObj = scene.physics.add.sprite(random.x, random.y, (this.isStrong ? 'strongBgr' : 'nameBgr') + Math.min(Math.max(2, this.wordText.length), 6))
             .setMass(this.wordWeight * 10)
             .setScale(this.scale)
             .setFrictionX(0)
@@ -158,6 +158,7 @@ class AttackWord extends WordObject
         }
         if(WordSpace.gameTimer.now < this.counterTime)
         {
+            console.log(this.attacker);
             let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, this.attacker);
             tempWord.destroy();
         }
