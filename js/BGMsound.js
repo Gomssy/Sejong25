@@ -2,16 +2,21 @@ var Audio = Audio || {}
 
 Audio.loadSound = function(scene)
 {
-    scene.load.audio('BGM', 'assets/sound/login.ogg');
+    scene.load.audio('login', 'assets/sound/login.ogg');
+    scene.load.audio('startGame', 'assets/sound/startGame.ogg');
 }
 
-Audio.playSound = function(scene)
+Audio.playLogin = function(scene)
 {
-    var bgm = scene.sound.add('BGM');
+    var bgm = scene.sound.add('login');
     bgm.setLoop(true);
     bgm.play();
-    console.log('PlayMusic');
+}
 
+Audio.playStart = function(scene)
+{
+    var bgm = scene.sound.add('startGame');
+    bgm.play();
 }
 
 Audio.pauseSound = function(scene)
@@ -28,8 +33,8 @@ Audio.resumeSound = function(scene)
 
 Audio.stopSound = function(scene)
 {
-    var bgm = scene.sound.add('BGM');
+    var bgm = scene.sound.add('login');
+    bgm.setLoop(false);
     bgm.stop();
-    console.log('StopMusic');
 }
 
