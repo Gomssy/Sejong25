@@ -1,6 +1,6 @@
 var GameServer = GameServer || {};
 
-GameServer.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
+GameServer.Phase = {READY: 0, COUNT: -1, START: 1, MAIN: 2, MUSIC: 3};
 GameServer.startCount = 2;
 
 GameServer.currentPlayer = [];
@@ -18,26 +18,29 @@ GameServer.findPlayer = function(playerId)
 {
     var idx = this.currentPlayer.findIndex(function(element)
     {
-        return element.id === socket;
+        return element.id === playerId;
     });
     if (idx != -1) return this.currentPlayer[idx];
     else
     {
-        console.log('[ERR] wrong playerId to find');
+        console.log('[ERR] wrong playerId('+ playerId +') to find');
         return null;
     }
 }
 GameServer.nextRoomNumber = 0;
 GameServer.makeRoom = function()
 {
+    // 나중에 room 삭제시 생긴 null에 채워넣는식으로 만들것, 룸의 인덱스를 고정
     var roomOption = 
     {
         roomNum: GameServer.nextRoomNumber++,
-        maxPlayer: 5,
-        nextRank: 5,
+        maxPlayer: 100,
+        nextRank: 100,
         currentPlayer: [],
+        aliveCount: 0,
         currentSocket: [],
         currentPhase: GameServer.Phase.READY,
+        endTime: 0,
 
         rateArrangePoint: 300,
         maxTypingPlayer: null,
@@ -80,10 +83,26 @@ GameServer.enterRoom = function(roomIdx, playerData)
     }
     playerData.playingData = player;
     playerData.currentRoom = room;
+    room.aliveCount++;
 
     console.log('[' + playerData.id + '] entered to room #' + room.roomNum);
     playerData.socketId.emit('enterRoom');
-    if (room.currentPlayer.length >= this.startCount) GameServer.startRoom(roomIdx);
+    room.endTime = Date.now() + 6000; // 테스트로 6초로 남겨둠
+    if (room.currentPlayer.length >= this.startCount)
+    {
+        if (room.currentPhase === this.Phase.READY) // start count
+        {
+            this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: room.endTime});
+        }
+        else if (room.currentPhase === this.Phase.COUNT) // countinue count
+        {
+            playerData.socketId.emit('setCount', {isEnable: true, endTime: room.endTime});
+        }
+    }
+    else // stop count
+    {
+        this.announceToRoom(room.roomNum, 'setCount', {isEnable: false, endTime: 0});
+    }
     return room;
 }
 GameServer.enterEmptyRoom = function(playerData)
@@ -107,6 +126,8 @@ GameServer.startRoom = function(roomIdx)
 {
     let room = this.playingRoom[roomIdx];
     room.currentPhase = this.Phase.START;
+    room.nextRank = room.currentPlayer.length;
+    room.aliveCount = room.currentPlayer.length;
     room.maxTypingPlayer = room.currentPlayer[0];
     room.minTypingPlayer = room.currentPlayer[0];
     room.currentSocket.forEach(function(element)
@@ -126,6 +147,39 @@ GameServer.startRoom = function(roomIdx)
     console.log('[ROOM#'+room.roomNum+'] Game Start with ' + room.currentPlayer.length + ' players');
     this.announceToRoom(roomIdx, 'changePhase', this.Phase.START);
     this.announceToRoom(roomIdx, 'startGame');
+}
+GameServer.playerDefeat = function(playerData)
+{
+    playerData.playingData.isAlive = false;
+    playerData.playingData.rank = playerData.currentRoom.nextRank--;
+    playerData.isReceivable = false;
+    playerData.currentRoom.aliveCount--;
+    if (playerData.playingData.lastAttacks.length > 0)
+    {
+        playerData.playingData.lastAttack = playerData.playingData.lastAttacks[playerData.playingData.lastAttacks.length - 1];
+        if (Date.now() - playerData.playingData.lastAttack.time > 40000) playerData.playingData.lastAttack = null;
+        else
+        {
+            playerData.playingData.lastAttacks.forEach(function(element)
+            {
+                if (Date.now() - element.time < 40000 && element.wordGrade > playerData.playingData.lastAttack.wordGrade) playerData.playingData.lastAttack = element;
+            }); 
+        }
+    }
+
+    GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'defeat', playerData.playingData);
+    console.log('['+playerData.id+']'+ ' defeated, rank: ' + playerData.playingData.rank);
+
+    if (playerData.currentRoom.aliveCount === 1)
+    {
+        let winner = playerData.currentRoom.currentPlayer.find(function(element)
+        {
+            return element.isAlive;
+        });
+        GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'gameEnd', winner);
+        GameServer.announceToTarget(this.findRoomIndex(playerData.currentRoom.roomNum), winner.id, 'alert', 'gameWin');
+        console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
+    }
 }
 GameServer.announceToRoom = function(roomIdx, _message, _data = null)
 {
@@ -154,7 +208,10 @@ class Player
         this.nickname = playerData.nickname;
         this.isAlive = true;
         this.rank = -1;
+
         this.playerTyping = 0;
+        this.lastAttacks = []; // { attackerId, word, wordGrade, time }
+        this.lastAttack = null;
     }
 }
 

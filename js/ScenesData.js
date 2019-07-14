@@ -1,3 +1,5 @@
+var ScenesData = ScenesData || {};
+
 var menuScene = new Phaser.Class(
 {
     Extends: Phaser.Scene,
@@ -11,6 +13,7 @@ var menuScene = new Phaser.Class(
 
     preload: function()
     {
+        ScenesData.menuScene = this;
         Input.inputField.loadImage(this);
         BackGround.loadImage(this);
         Audio.loadSound(this);
@@ -23,6 +26,47 @@ var menuScene = new Phaser.Class(
         BackGround.drawMenu(this);
     }
 });
+
+var roomScene = new Phaser.Class(
+{
+    Extends: Phaser.Scene,
+
+    initialize:
+
+    function roomScene ()
+    {
+        Phaser.Scene.call(this, {key: 'roomScene'});
+    },
+
+    preload: function()
+    {
+        ScenesData.roomScene = this;
+    },
+
+    create: function()
+    {
+        this.isCounting = false;
+        this.endTime = 0;
+        this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000');
+    },
+
+    update: function()
+    {
+        if (this.isCounting)
+        {
+            this.countText.setText((this.endTime - Date.now()) / 1000);
+            if (this.endTime - Date.now() < 0) 
+            {
+                socket.emit('endCount');
+                this.isCounting = false;
+            }
+        }
+        else
+        {
+            this.countText.setText('사람들을 위해 대기중입니다...');
+        }
+    }
+})
 
 var gameScene = new Phaser.Class(
 {
@@ -37,6 +81,7 @@ var gameScene = new Phaser.Class(
 
     preload: function()
     {
+        ScenesData.gameScene = this;
         BackGround.loadImage(this);
         WordSpace.loadImage(this);
         Input.inputField.loadImage(this);
@@ -65,7 +110,7 @@ var gameScene = new Phaser.Class(
         
         WordSpace.setPlayerTyping.initiate(this);
 
-        WordSpace.nameWordTextForTest = WordSpace.gameSceneForTest.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
+        WordSpace.nameWordTextForTest = ScenesData.gameScene.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
         RoomData.players.forEach(function(element)
         {
@@ -112,6 +157,7 @@ var gameScene = new Phaser.Class(
         
         WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);
         WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
+        WordSpace.killLogTextForTest.setText(WordSpace.killLogForTest);
         WordSpace.setPlayerTyping.add('');
     }
 });
