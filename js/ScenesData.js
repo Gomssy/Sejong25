@@ -21,7 +21,7 @@ var menuScene = new Phaser.Class(
 
     create: function()
     {
-        Audio.playSound(this);
+        Audio.loopSound(this, 'login');
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         BackGround.drawMenu(this);
     }
@@ -86,13 +86,14 @@ var gameScene = new Phaser.Class(
         WordSpace.loadImage(this);
         Input.inputField.loadImage(this);
         CSVParsing.loadText(this);
+        Audio.loadSound(this);
     },
     
     create: function()
     {
         CSVParsing.CSVParse(this);
         BackGround.drawBrain(this);
- 
+        Audio.playSound(this, 'startGame');
         WordSpace.wordPhysicsGroup = this.physics.add.group();
 
         Input.inputField.generate(this, Input.gameSceneEnterReaction);
