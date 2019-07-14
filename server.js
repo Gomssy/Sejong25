@@ -53,7 +53,6 @@ io.on('connection', function(socket)
             console.log('['+socket.playerData.id+'] nickname set to ' + msg);
             GameServer.enterEmptyRoom(socket.playerData);
         }
-        
     });
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping
@@ -84,6 +83,7 @@ io.on('connection', function(socket)
     socket.on('attack', function(msg)
     {
         GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attacked', msg);
+        //console.log('find ' + msg.target + ' by ' + msg.attacker.idNum + ' with ' + msg.text);
         let target = GameServer.findPlayer(msg.target);
         if (target != null)
         {
@@ -136,10 +136,15 @@ io.on('connection', function(socket)
                 // 룸에서도 제거
                 if (data.currentRoom != null)
                 {
-                    if (data.currentRoom.currentPhase === GameServer.Phase.READY)
+                    if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
                     {
                         data.currentRoom.currentPlayer[data.playingData.index] = null;
                         data.currentRoom.currentSocket[data.playingData.index] = null;
+                        data.currentRoom.aliveCount--;
+                        if (data.currentRoom.aliveCount < GameServer.startCount)
+                        {
+                            GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'setCount', {isEnable: false, endTime: 0});
+                        }
                     }
                     else if (data.playingData.isAlive)
                     {
