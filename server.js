@@ -72,14 +72,14 @@ io.on('connection', function(socket)
         socket.emit('setPlayerTypingRate', playerTypingRate);
     });
 
-    socket.on('endCount')
+    socket.on('endCount', function()
     {
-        socket.currentRoom.aliveCount--;
-        if (socket.currentRoom.aliveCount === 0)
+        socket.playerData.currentRoom.aliveCount--;
+        if (socket.playerData.currentRoom.aliveCount === 0)
         {
-            GameServer.startRoom(GameServer.findRoomIndex(socket.currentRoom.roomNum));
+            GameServer.startRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum));
         }
-    }
+    });
 
     socket.on('attack', function(msg)
     {
@@ -118,7 +118,6 @@ io.on('connection', function(socket)
     socket.on('disconnect', function(reason)
     {
         let data = socket.playerData;
-        console.log('['+ data.id +'] client disconnected, reason: ' + reason);
         if (typeof data.id === undefined)
         {
             console.log('[ERROR] data.id is undefined');
@@ -126,6 +125,7 @@ io.on('connection', function(socket)
         }
         else // data.id is not undefined
         {
+            console.log('['+ data.id +'] client disconnected, reason: ' + reason);
             let idxToDel = GameServer.currentPlayer.findIndex(function(element)
             {
                 return element.id === data.id;

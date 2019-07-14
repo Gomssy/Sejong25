@@ -34,12 +34,13 @@ GameServer.makeRoom = function()
     var roomOption = 
     {
         roomNum: GameServer.nextRoomNumber++,
-        maxPlayer: 5,
-        nextRank: 0,
+        maxPlayer: 100,
+        nextRank: 100,
         currentPlayer: [],
         aliveCount: 0,
         currentSocket: [],
         currentPhase: GameServer.Phase.READY,
+        endTime: 0,
 
         rateArrangePoint: 300,
         maxTypingPlayer: null,
@@ -86,16 +87,16 @@ GameServer.enterRoom = function(roomIdx, playerData)
 
     console.log('[' + playerData.id + '] entered to room #' + room.roomNum);
     playerData.socketId.emit('enterRoom');
-    let endTimeToAnnounce = Date.now() + 6000;
+    room.endTime = Date.now() + 6000; // 테스트로 6초로 남겨둠
     if (room.currentPlayer.length >= this.startCount)
     {
         if (room.currentPhase === this.Phase.READY) // start count
         {
-            this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: endTimeToAnnounce});
+            this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: room.endTime});
         }
         else if (room.currentPhase === this.Phase.COUNT) // countinue count
         {
-            playerData.socketId.emit('setCount', {isEnable: true, endTime: endTimeToAnnounce});
+            playerData.socketId.emit('setCount', {isEnable: true, endTime: room.endTime});
         }
     }
     else // stop count
