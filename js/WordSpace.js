@@ -238,6 +238,7 @@ WordSpace.loadImage = function(scene)
     for (let i = 2; i < 7; i++)
     {
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
+        scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
     }
 
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
@@ -406,7 +407,7 @@ WordSpace.attack = function(wordText, grade)
             let attackData = 
             {
                 roomNum: RoomData.roomNum,
-                attacker: PlayerData, 
+                attacker: RoomData.myself, 
                 target: element.ownerId,
                 text: wordText, 
                 grade: grade, 
