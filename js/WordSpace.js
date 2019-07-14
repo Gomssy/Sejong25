@@ -14,6 +14,7 @@ WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
+WordSpace.wordBreakAnim = null;
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
@@ -240,8 +241,9 @@ WordSpace.loadImage = function(scene)
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
         scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
     }
+    scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
 
-    WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
+    WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
     WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
 }
 

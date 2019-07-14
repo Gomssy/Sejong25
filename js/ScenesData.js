@@ -122,8 +122,14 @@ var gameScene = new Phaser.Class(
             }
         });
         console.log(RoomData.myself);
-        WordSpace.test = WordSpace.generateWord.Name(this, false, null);
         WordSpace.attackGauge.add(11);
+        WordSpace.wordBreakAnim = this.anims.create({
+            key: 'break',
+            frames: this.anims.generateFrameNumbers('wordBreak'),
+            frameRate: 10,
+            repeat: 0,
+            hideOnComplete: true
+        });
     },
 
     update: function()
@@ -140,6 +146,7 @@ var gameScene = new Phaser.Class(
         let tempNames = '';
         WordSpace.nameGroup.forEach(function(element)
         {
+            //테스트용
             tempNames += element.wordText + (element.isStrong?' [강]':'') + '\n';
         });
         
