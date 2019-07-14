@@ -128,7 +128,7 @@ var gameScene = new Phaser.Class(
             frames: this.anims.generateFrameNumbers('wordBreak'),
             frameRate: 10,
             repeat: 0,
-            hideOnComplete: true
+            hideOnComplete: false
         });
     },
 

@@ -371,7 +371,7 @@ WordSpace.findWord = function(wordText)
                 {
                     roomNum: RoomData.roomNum,
                     victim: RoomData.myself, 
-                    target: element.attacker.idNum
+                    target: element.attacker.id
                 }
                 socket.emit('defenseFailed', victimData);
                 return true;

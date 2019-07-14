@@ -81,6 +81,7 @@ socket.on('gameEnd', function(msg) // object player
 
 socket.on('attackSucceed', function(msg)
 {
+    console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, msg.victim);
     tempWord.destroy();
 });
