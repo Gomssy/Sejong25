@@ -156,7 +156,12 @@ class AttackWord extends WordObject
             case 3: WordSpace.attackGauge.add(0.5); break;
             default: console.log('[ERR] wrong grade of word'); break;
         }
-        if(WordSpace.gameTimer.now < this.counterTime) WordSpace.nameGroup.push(new NameWord(this.attacker, true));
+        if(WordSpace.gameTimer.now < this.counterTime)
+        {
+            let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, this.attacker);
+            tempWord.destroy();
+        }
+        //WordSpace.nameGroup.push(new NameWord(this.attacker, true));
         super.destroy();
     }
 }
@@ -195,11 +200,11 @@ class NameWord extends WordObject
     destroy()
     {
         super.destroy();
-        WordSpace.gameSceneForTest.physics.world.removeCollider(this.physicsObj.wordCollider);
+        ScenesData.gameScene.physics.world.removeCollider(this.physicsObj.wordCollider);
         WordSpace.wordGroup.forEach(function(element)
         {
-            WordSpace.gameSceneForTest.physics.world.removeCollider(element.physicsObj.wordCollider);
-            element.physicsObj.wordCollider = WordSpace.gameSceneForTest.physics.add.collider(element.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
+            ScenesData.gameScene.physics.world.removeCollider(element.physicsObj.wordCollider);
+            element.physicsObj.wordCollider = ScenesData.gameScene.physics.add.collider(element.physicsObj, WordSpace.wordPhysicsGroup, function(object1) 
             {
                 object1.topObj.attract();
             });
@@ -215,7 +220,7 @@ class NameWord extends WordObject
             (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 15) / 2, this.physicsObj.y - 50,
             500 + WordSpace.nameGroup.length * 15, 680 + this.wordText.length * 10 + (Math.random() * 20 - 10)
         ]);
-        WordSpace.gameSceneForTest.tweens.add({
+        ScenesData.gameScene.tweens.add({
             targets: this.follower,
             t: 1,
             ease: 'Sine',
@@ -224,7 +229,7 @@ class NameWord extends WordObject
         });
 
         //이동경로 디버그
-        /*var graphics = WordSpace.gameSceneForTest.add.graphics();
+        /*var graphics = ScenesData.gameScene.add.graphics();
         graphics.lineStyle(2, 0xffffff, 1);
         this.path.draw(graphics);*/
     }

@@ -38,7 +38,7 @@ WordSpace.delay =
 WordSpace.playerTypingCycle = null;
 WordSpace.NameSpawnReduce = 1000;
 
-WordSpace.gravityPoint = {x: 640, y: 300};
+WordSpace.gravityPoint = {x: 640, y: 280};
 
 class Cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
 {
@@ -241,7 +241,7 @@ WordSpace.loadImage = function(scene)
     }
 
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
-    WordSpace.killLogTextForTest = scene.add.text(1100, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
+    WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
 }
 
 WordSpace.generateWord = 
