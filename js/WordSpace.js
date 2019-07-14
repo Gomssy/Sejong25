@@ -25,6 +25,8 @@ WordSpace.CurrentPhase = WordSpace.Phase.READY;
 WordSpace.playerTyping = 0;
 WordSpace.playerTypingRate = 0;
 
+WordSpace.deltaTime = 10;
+
 WordSpace.delay = 
 {
     WordSpawn: 3000,
