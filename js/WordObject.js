@@ -15,15 +15,15 @@ class WordObject
     instantiate(scene, lenRate)
     {
         let p = [{x : 3, y : 0.7}, {x : 20, y : 1.2}];
-        let scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
-        let fontscale = 25;
+        this.scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
+        this.fontScale = 25;
         var random = WordSpace.getSpawnPoint(lenRate);
 
         if (!this.isNameWord)
         {
             this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
             .setMass(this.wordWeight * 10)
-            .setScale(scale)
+            .setScale(this.scale)
             .setFrictionX(0)
             .setFrictionY(0)
             .setBounce(0.5);
@@ -32,7 +32,7 @@ class WordObject
         {
             this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'nameBgr' + Math.min(Math.max(2, this.wordText.length), 6))
             .setMass(this.wordWeight * 10)
-            .setScale(scale)
+            .setScale(this.scale)
             .setFrictionX(0)
             .setFrictionY(0)
             .setBounce(0.5);
@@ -47,7 +47,7 @@ class WordObject
         
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
-                fontSize: (scale * fontscale) +'pt',
+                fontSize: (this.scale * this.fontScale) +'pt',
                 fontFamily: '"궁서", 궁서체, serif',
                 fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             });
@@ -157,12 +157,7 @@ class AttackWord extends WordObject
             case 3: WordSpace.attackGauge.add(0.5); break;
             default: console.log('[ERR] wrong grade of word'); break;
         }
-        if(WordSpace.gameTimer.now < this.counterTime)
-        {
-            WordSpace.nameGroup.push(new NameWord(this.attacker, true));
-        }
-        //강호패 넣기 구현해야됨
-        //WordSpace.generateWord.Name(WordSpace.gameSceneForTest, true);
+        if(WordSpace.gameTimer.now < this.counterTime) WordSpace.nameGroup.push(new NameWord(this.attacker, true));
         super.destroy();
     }
 }
@@ -187,6 +182,15 @@ class NameWord extends WordObject
             this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
             this.physicsObj.angle = 90 * this.follower.t;
             this.wordObj.angle = this.physicsObj.angle;
+            if(this.isStrong)
+            {
+                this.physicsObj.setScale(this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale);
+                this.wordObj.setFont({
+                    fontSize: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt',
+                    fontFamily: '"궁서", 궁서체, serif',
+                    fontStyle: (this.wordWeight > 5 ? 'bold' : '')
+                });
+            }
         }
     }
     destroy()
