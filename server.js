@@ -89,7 +89,7 @@ io.on('connection', function(socket)
         {
             let dataToPush = 
             {
-                attackerId: msg.attacker.idNum,
+                attackerId: msg.attacker.id,
                 attacker: msg.attacker.nickname,
                 word: msg.text,
                 wordGrade: msg.grade,

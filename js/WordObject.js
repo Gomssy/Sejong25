@@ -30,7 +30,7 @@ class WordObject
         }
         else
         {
-            this.physicsObj = scene.physics.add.sprite(random.x, random.y, 'nameBgr' + Math.min(Math.max(2, this.wordText.length), 6))
+            this.physicsObj = scene.physics.add.sprite(random.x, random.y, (this.isStrong ? 'strongBgr' : 'nameBgr') + Math.min(Math.max(2, this.wordText.length), 6))
             .setMass(this.wordWeight * 10)
             .setScale(this.scale)
             .setFrictionX(0)
@@ -70,6 +70,10 @@ class WordObject
         const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
         WordSpace.wordPhysicsGroup.remove(this.physicsObj);
+        let breakAnim = ScenesData.gameScene.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBreak').setScale(0.5).setDepth(3).play('break');
+        setTimeout(function() {
+            breakAnim.destroy();
+        }, 200);
         if(!this.isNameWord)
         {
             this.wordObj.destroy();
@@ -158,6 +162,7 @@ class AttackWord extends WordObject
         }
         if(WordSpace.gameTimer.now < this.counterTime)
         {
+            console.log(this.attacker);
             let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, this.attacker);
             tempWord.destroy();
         }
