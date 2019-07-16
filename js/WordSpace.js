@@ -160,7 +160,7 @@ WordSpace.attackGauge =
     setRect: function()
     {
         this.rectUI.setSize(20 * this.value, 11);
-        this.rectUI.setPosition(640 - 10 * this.value, 597);
+        this.rectUI.setPosition(640 - 10 * this.value, 547);
         let tmp = this.getAttackOption();
         this.rectUI.setFillStyle(Phaser.Display.Color.HexStringToColor(this.gradeColor[tmp.wordGrade + 1]).color);
     },
