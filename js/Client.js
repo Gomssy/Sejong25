@@ -18,6 +18,7 @@ socket.on('setId', function(msg) // {str, num playerNum}
 });
 socket.on('enterRoom', function()
 {
+    Audio.killSound(ScenesData.menuScene, 'login');
     game.scene.remove('menuScene');
     game.scene.start('roomScene');
 });
