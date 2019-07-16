@@ -48,14 +48,17 @@ var roomScene = new Phaser.Class(
     {
         this.isCounting = false;
         this.endTime = 0;
+        this.peopleCount = 1;
         this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000');
+        this.peopleText = this.add.text(640, 100, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000');
     },
 
     update: function()
     {
+        this.peopleText.setText(peopleCount + ' / 10');
         if (this.isCounting)
         {
-            this.countText.setText((this.endTime - Date.now()) / 1000);
+            this.countText.setText(((this.endTime - Date.now()) / 1000).toFixed(1));
             if (this.endTime - Date.now() < 0) 
             {
                 socket.emit('endCount');

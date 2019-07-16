@@ -93,6 +93,7 @@ GameServer.enterRoom = function(roomIdx, playerData)
         {
             room.endTime = Date.now() + 15000; // 테스트로 15초로 남겨둠
             this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: room.endTime});
+            room.currentPhase = this.Phase.COUNT;
         }
         else if (room.currentPhase === this.Phase.COUNT) // countinue count
         {
@@ -102,6 +103,7 @@ GameServer.enterRoom = function(roomIdx, playerData)
     else // stop count
     {
         this.announceToRoom(room.roomNum, 'setCount', {isEnable: false, endTime: 0});
+        room.currentPhase = this.Phase.READY;
     }
     return room;
 }
