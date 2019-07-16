@@ -121,7 +121,6 @@ var gameScene = new Phaser.Class(
                 return;
             }
         });
-        console.log(RoomData.myself);
         WordSpace.attackGauge.add(11);
         WordSpace.wordBreakAnim = this.anims.create({
             key: 'break',

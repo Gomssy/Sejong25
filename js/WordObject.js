@@ -217,8 +217,8 @@ class NameWord extends WordObject
         if(!this.isStrong) WordSpace.attackGauge.add(this.wordTyping * 0.1);
         WordSpace.nameGroup.push(this);
         this.isActive = false;
-        this.physicsObj.setVelocity(0, 0).setDepth(2);
-        this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(2);
+        this.physicsObj.setVelocity(0, 0).setDepth(20);
+        this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(20);
         this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
         this.path = new Phaser.Curves.Spline([
             this.physicsObj.x, this.physicsObj.y,
