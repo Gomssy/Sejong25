@@ -87,11 +87,11 @@ GameServer.enterRoom = function(roomIdx, playerData)
 
     console.log('[' + playerData.id + '] entered to room #' + room.roomNum);
     playerData.socketId.emit('enterRoom');
-    room.endTime = Date.now() + 6000; // 테스트로 6초로 남겨둠
     if (room.currentPlayer.length >= this.startCount)
     {
         if (room.currentPhase === this.Phase.READY) // start count
         {
+            room.endTime = Date.now() + 15000; // 테스트로 15초로 남겨둠
             this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: room.endTime});
         }
         else if (room.currentPhase === this.Phase.COUNT) // countinue count
@@ -185,14 +185,14 @@ GameServer.announceToRoom = function(roomIdx, _message, _data = null)
 {
     this.playingRoom[roomIdx].currentSocket.forEach(function(element) 
     {
-        element.socketId.emit(_message, _data);
+        if (element != null) element.socketId.emit(_message, _data);
     });
 }
 GameServer.announceToTarget = function(roomIdx, targetNum, _message, _data = null)
 {
     let targetSocket = this.playingRoom[roomIdx].currentSocket.find(function(element)
     {
-        return element.id === targetNum;
+        return (element != null && element.id === targetNum);
     });
     if (targetSocket != undefined && targetSocket.isReceivable) targetSocket.socketId.emit(_message, _data);
 }
