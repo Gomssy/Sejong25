@@ -24,6 +24,7 @@ var menuScene = new Phaser.Class(
         Audio.loopSound(this, 'login');
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         BackGround.drawMenu(this);
+
     }
 });
 
