@@ -55,7 +55,7 @@ var roomScene = new Phaser.Class(
 
     update: function()
     {
-        this.peopleText.setText(peopleCount + ' / 10');
+        this.peopleText.setText(this.peopleCount + ' / 10');
         if (this.isCounting)
         {
             this.countText.setText(((this.endTime - Date.now()) / 1000).toFixed(1));
@@ -95,8 +95,10 @@ var gameScene = new Phaser.Class(
     
     create: function()
     {
+        WordSpace.loadAnimation(this);
         CSVParsing.CSVParse(this);
         BackGround.drawBrain(this);
+        BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
         WordSpace.wordPhysicsGroup = this.physics.add.group();
 
@@ -126,13 +128,6 @@ var gameScene = new Phaser.Class(
             }
         });
         WordSpace.attackGauge.add(11);
-        WordSpace.wordBreakAnim = this.anims.create({
-            key: 'break',
-            frames: this.anims.generateFrameNumbers('wordBreak'),
-            frameRate: 10,
-            repeat: 0,
-            hideOnComplete: false
-        });
     },
 
     update: function()

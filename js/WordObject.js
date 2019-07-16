@@ -70,7 +70,7 @@ class WordObject
         const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
         WordSpace.wordPhysicsGroup.remove(this.physicsObj);
-        let breakAnim = ScenesData.gameScene.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBreak').setScale(0.5).setDepth(3).play('break');
+        let breakAnim = ScenesData.gameScene.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBreak').setScale(0.5).setDepth(3).play('wordBreakAnim');
         setTimeout(function() {
             breakAnim.destroy();
         }, 200);
@@ -79,9 +79,9 @@ class WordObject
             this.wordObj.destroy();
             this.physicsObj.destroy();
         }
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[0]);
     }
-
-
+    
     attract()
     {
         if(!this.moveStarted)
