@@ -53,6 +53,7 @@ class WordObject
             });
         if (!this.isNameWord) this.wordObj.setColor('#000000').setOrigin(0.5,0.5);
         else this.wordObj.setColor('#ffffff').setOrigin(0.45,0.5);
+        this.createdTime = WordSpace.gameTimer.now;
         WordSpace.totalWeight += this.wordWeight;
         WordSpace.totalWordNum += 1;
         WordSpace.setGameOverTimer();
@@ -145,8 +146,9 @@ class AttackWord extends WordObject
             this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(_playerData.nickname) - 9);
         this.wordWeight *= isStrong ? 3 : 2;
         this.attacker = _playerData;
-        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
-                            ((5 - _wordGrade) * 3 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
+        /*this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
+                            ((5 - _wordGrade) * 3 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);*/
+        this.counterTime = WordSpace.gameTimer.now + 10000;
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
     }
@@ -154,24 +156,39 @@ class AttackWord extends WordObject
     {
         super.instantiate(scene, lenRate);
         this.maskBackground = scene.physics.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
-        .setTint(Phaser.Display.Color.GetColor(120, 120, 120)).setScale(this.physicsObj.scale);
+        .setTint(Phaser.Display.Color.GetColor(120, 120, 120)).setScale(this.scale);
+        this.maskBackground.alpha = 0.5;
+        console.log('scale ' + this.scale);
+        console.log('this.physicsObj.width ' + this.physicsObj.width);
+        console.log('this.physicsObj.height ' + this.physicsObj.height);
+        console.log('this.physicsObj.body.width ' + this.physicsObj.body.width);
+        console.log('this.physicsObj.body.height ' + this.physicsObj.body.height);
 
         this.shape = scene.make.graphics();
-        var rect = new Phaser.Geom.Rectangle(0, 0, this.maskBackground.width, this.maskBackground.height);
-        this.shape.fillStyle(0xffffff);
-        this.shape.fillRectShape(rect);
+        var rect = new Phaser.Geom.Rectangle(0, 0, this.physicsObj.width, this.physicsObj.height);
+        console.log(rect);
+        console.log(this.shape);
+        this.shape.fillStyle(0xffffff).fillRectShape(rect);
 
         this.mask = this.shape.createGeometryMask();
         this.maskBackground.setMask(this.mask);
-
+        this.maskStart = this.physicsObj.x;
+        this.maskEnd = this.physicsObj.x - this.physicsObj.width;
     }
+
     attract()
     {
         super.attract();
-        this.maskBackground.setPosition(this.physicsObj.x, this.physicsObj.y);
-        this.mask.x = this.physicsObj.x;
-        this.mask.y = this.physicsObj.y;
+        if(WordSpace.gameTimer.now < this.counterTime)
+        {
+            this.maskBackground.setPosition(this.physicsObj.x, this.physicsObj.y);
+            this.shape.x = this.physicsObj.x + (this.maskEnd - this.maskStart) * 
+                            ((WordSpace.gameTimer.now - this.createdTime) / (this.counterTime - this.createdTime)) - this.physicsObj.width / 2;
+            this.shape.y = this.physicsObj.y - this.physicsObj.height / 2;
+        }
+        else if(this.maskBackground != null) this.maskBackground.destroy();
     }
+
     destroy()
     {
         switch(this.wordGrade)
@@ -188,7 +205,7 @@ class AttackWord extends WordObject
             let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, this.attacker);
             tempWord.destroy();
         }
-        //WordSpace.nameGroup.push(new NameWord(this.attacker, true));
+        if(this.maskBackground != null) this.maskBackground.destroy();
         super.destroy();
     }
 }

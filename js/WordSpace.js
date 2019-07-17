@@ -426,8 +426,6 @@ WordSpace.setPlayerTyping =
     },
     initiate: function(scene)
     {
-        WordSpace.gameTimer = new Phaser.Time.Clock(scene);
-        WordSpace.gameTimer.start();
         this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
     }
 }
