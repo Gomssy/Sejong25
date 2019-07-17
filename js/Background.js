@@ -1,11 +1,17 @@
 var BackGround = BackGround || {}
 
 BackGround.brainGroup = null;
+BackGround.myCharacter = null;
 
 BackGround.loadImage = function(scene)
 {
     scene.load.image('brainGround', 'assets/image/background/background_brain.png');
     scene.load.image('menuBackground', 'assets/placeholder/menuBackground.png')
+}
+
+BackGround.drawCharacter = function(scene)
+{
+    BackGround.myCharacter = scene.add.sprite(640, 615, 'pyeongminWrite').setScale(0.45).setDepth(2);
 }
 
 BackGround.drawBrain = function(scene)

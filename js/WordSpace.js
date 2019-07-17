@@ -1,7 +1,5 @@
 var WordSpace = WordSpace || {};
 
-WordSpace.test = null;
-
 // for test
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
@@ -14,7 +12,7 @@ WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
-WordSpace.wordBreakAnim = null;
+WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
@@ -242,9 +240,36 @@ WordSpace.loadImage = function(scene)
         scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
     }
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
+    scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 490, frameHeight: 423 });
+    scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 490, frameHeight: 423 });
 
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
     WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
+}
+
+WordSpace.loadAnimation = function(scene)
+{
+    scene.anims.create({
+        key: 'wordBreakAnim',
+        frames: scene.anims.generateFrameNumbers('wordBreak'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims.push(scene.anims.create({
+        key: 'write',
+        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    }));
+    WordSpace.pyeongminAnims.push(scene.anims.create({
+        key: 'throw',
+        frames: scene.anims.generateFrameNumbers('pyeongminThrow'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    }));
 }
 
 WordSpace.generateWord = 
@@ -340,7 +365,7 @@ WordSpace.findWord = function(wordText)
         }
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else if (wordText === '공격' && WordSpace.attackGauge.value >= 3) // 공격모드 진입.
+    else if (wordText === '공격' && WordSpace.attackGauge.value >= 3 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
     {
         console.log('attack mode');
         Input.attackOption = this.attackGauge.getAttackOption();
@@ -425,6 +450,7 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[1]);
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;

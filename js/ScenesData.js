@@ -95,8 +95,10 @@ var gameScene = new Phaser.Class(
     
     create: function()
     {
+        WordSpace.loadAnimation(this);
         CSVParsing.CSVParse(this);
         BackGround.drawBrain(this);
+        BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
         WordSpace.wordPhysicsGroup = this.physics.add.group();
 
@@ -126,13 +128,6 @@ var gameScene = new Phaser.Class(
             }
         });
         WordSpace.attackGauge.add(11);
-        WordSpace.wordBreakAnim = this.anims.create({
-            key: 'break',
-            frames: this.anims.generateFrameNumbers('wordBreak'),
-            frameRate: 10,
-            repeat: 0,
-            hideOnComplete: false
-        });
     },
 
     update: function()
