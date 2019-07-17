@@ -128,25 +128,30 @@ GameServer.startRoom = function(roomIdx)
 {
     let room = this.playingRoom[roomIdx];
     room.currentPhase = this.Phase.START;
-    room.nextRank = room.currentPlayer.length;
-    room.aliveCount = room.currentPlayer.length;
     room.maxTypingPlayer = room.currentPlayer[0];
     room.minTypingPlayer = room.currentPlayer[0];
     room.currentSocket.forEach(function(element)
     {
-        element.isReceivable = true;
+        if (element != null) element.isReceivable = true;
     });
+    let syncPlayers = [];
+    room.currentPlayer.forEach(function(element)
+    {
+        if (element != null) syncPlayers.push(element);
+    });
+    room.nextRank = syncPlayers.length;
+    room.aliveCount = syncPlayers.length;
 
     // sync roomData
     let toSync =
     {
         roomNum: room.roomNum,
-        players: room.currentPlayer
+        players: syncPlayers
     };
     //console.log(toSync);
     this.announceToRoom(roomIdx, 'syncRoomData', toSync);
 
-    console.log('[ROOM#'+room.roomNum+'] Game Start with ' + room.currentPlayer.length + ' players');
+    console.log('[ROOM#'+room.roomNum+'] Game Start with ' + syncPlayers.length + ' players');
     this.announceToRoom(roomIdx, 'changePhase', this.Phase.START);
     this.announceToRoom(roomIdx, 'startGame');
 }
@@ -176,7 +181,7 @@ GameServer.playerDefeat = function(playerData)
     {
         let winner = playerData.currentRoom.currentPlayer.find(function(element)
         {
-            return element.isAlive;
+            return element != null && element.isAlive;
         });
         GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'gameEnd', winner);
         GameServer.announceToTarget(this.findRoomIndex(playerData.currentRoom.roomNum), winner.id, 'alert', 'gameWin');

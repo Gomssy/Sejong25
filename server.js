@@ -150,8 +150,8 @@ io.on('connection', function(socket)
                     else if (data.playingData.isAlive)
                     {
                         GameServer.playerDefeat(socket.playerData);
+                        GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
                     }
-                    GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
                 }
             }
             console.log('['+ data.id +'] disconnect complete');
