@@ -112,7 +112,7 @@ GameServer.enterEmptyRoom = function(playerData)
     var toEnter = -1;
     for (let i = 0; i < this.playingRoom.length; i++)
     {
-        if (this.playingRoom[i].currentPlayer.length < this.playingRoom[i].maxPlayer && this.playingRoom[i].currentPhase == this.Phase.READY)
+        if (this.playingRoom[i].currentPlayer.length < this.playingRoom[i].maxPlayer && (this.playingRoom[i].currentPhase == this.Phase.READY || this.playingRoom[i].currentPhase == this.Phase.COUNT))
         {
             toEnter = i;
             break;

@@ -55,7 +55,7 @@ var roomScene = new Phaser.Class(
 
     update: function()
     {
-        this.peopleText.setText(peopleCount + ' / 10');
+        this.peopleText.setText(this.peopleCount + ' / 10');
         if (this.isCounting)
         {
             this.countText.setText(((this.endTime - Date.now()) / 1000).toFixed(1));

@@ -144,7 +144,7 @@ io.on('connection', function(socket)
                         if (data.currentRoom.aliveCount < GameServer.startCount)
                         {
                             GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'setCount', {isEnable: false, endTime: 0});
-                            room.currentPhase = this.Phase.READY;
+                            data.currentRoom.currentPhase = GameServer.Phase.READY;
                         }
                     }
                     else if (data.playingData.isAlive)
