@@ -137,12 +137,20 @@ io.on('connection', function(socket)
                     if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
                     {
                         data.currentRoom.exitRoom(data.id);
-                        if (data.currentRoom.aliveCount < GameServer.startCount)
+                        if (data.currentRoom.aliveCount < data.currentRoom.startCount)
                         {
-                            data.currentRoom.announceToRoom('setCount', {isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length});
+                            data.currentRoom.announceToRoom('setRoomCount', 
+                            {
+                                isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length,
+                                isEnter: false, player: data.playingData
+                            });
                             data.currentRoom.currentPhase = GameServer.Phase.READY;
                         }
-                        else data.currentRoom.announceToRoom('setCount', {isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length});
+                        else data.currentRoom.announceToRoom('setRoomCount', 
+                            {
+                                isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length,
+                                isEnter: false, player: data.playingData
+                            });
                     }
                     else if (data.playingData.isAlive)
                     {

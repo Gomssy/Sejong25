@@ -77,7 +77,7 @@ class GameRoom
     {
         this.roomId = GameServer.getRoomNumber();
         this.roomIndex = -1;
-        this.startCount = 2;
+        this.startCount = 4;
         this.maxPlayer = 100;
         this.nextRank = 100;
 
@@ -114,32 +114,47 @@ class GameRoom
     enterRoom(playerSocket)
     {
         let playerInst = new Player(this, playerSocket.playerData);
-        this.currentPlayer.push(playerInst);
-        this.currentSocket.push(playerSocket);
-
+        
         playerSocket.playerData.playingData = playerInst;
         playerSocket.playerData.currentRoom = this;
+        playerSocket.playerData.isReceivable = true;
+
+        playerSocket.emit('enterRoom');
+        this.currentSocket.push(playerSocket);
+        this.announceToTarget(playerInst.id, 'syncRoomScene', this.currentPlayer);
+        this.currentPlayer.push(playerInst);
 
         console.log('[' + playerInst.id + '] entered to room #' + this.roomId);
-        playerSocket.emit('enterRoom');
 
         this.aliveCount++;
         if (this.currentPlayer.length >= this.startCount)
         {
             if (this.currentPhase === GameServer.Phase.READY)
             {
-                this.endTime = Date.now() + 1000; // 테스트용 10초
-                this.announceToRoom('setCount', {isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length});
+                this.endTime = Date.now() + 5000; // 테스트용 10초
+                this.announceToRoom('setRoomCount', 
+                {
+                    isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
+                    isEnter: true, player: playerInst // 나중에는 플레이어의 외양데이터도 보내야됨
+                });
                 this.currentPhase = GameServer.Phase.COUNT;
             }
             else if (this.currentPhase === GameServer.Phase.COUNT)
             {
-                this.announceToRoom('setCount', {isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length});
+                this.announceToRoom('setRoomCount', 
+                {
+                    isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
+                    isEnter: true, player: playerInst
+                });
             }
         }
         else
         {
-            this.announceToRoom('setCount', {isEnable: false, endTime: 0, playerCount: this.currentPlayer.length});
+            this.announceToRoom('setRoomCount', 
+            {
+                isEnable: false, endTime: 0, playerCount: this.currentPlayer.length,
+                isEnter: true, player: playerInst
+            });
             this.currentPhase = GameServer.Phase.READY;
         }
     }

@@ -21,12 +21,49 @@ socket.on('enterRoom', function()
     Audio.killSound(ScenesData.menuScene, 'login');
     game.scene.remove('menuScene');
     game.scene.start('roomScene');
+    
 });
-socket.on('setCount', function(msg)
+socket.on('syncRoomScene', function(msg)
 {
-    ScenesData.roomScene.isCounting = msg.isEnable;
-    ScenesData.roomScene.endTime = msg.endTime;
-    ScenesData.roomScene.peopleCount = msg.playerCount;
+    setTimeout(function()
+    {
+        for (let i = 0; i < msg.length; i++)
+        {
+            let randX = Math.random() * 1120 + 80;
+            let randY = Math.random() * 380 + 100;
+            var playerSet = 
+            {
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
+                nickname: msg[i].nickname
+            }
+            ScenesData.roomScene.players.push(playerSet);
+        }
+    }, 100);
+});
+socket.on('setRoomCount', function(msg)
+{
+    setTimeout(function()
+    {
+        ScenesData.roomScene.isCounting = msg.isEnable;
+        ScenesData.roomScene.endTime = msg.endTime;
+        ScenesData.roomScene.peopleCount = msg.playerCount;
+
+        if (msg.isEnter) // generate charactor
+        {
+            let randX = Math.random() * 1120 + 80;
+            let randY = Math.random() * 380 + 100;
+            var playerSet = 
+            {
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
+                nickname: msg.player.nickname
+            }
+            ScenesData.roomScene.players.push(playerSet);
+        }
+        else // remove charactor
+        {
+
+        }
+    }, 200);
 });
 
 // init game
