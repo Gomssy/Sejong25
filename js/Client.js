@@ -34,7 +34,8 @@ socket.on('syncRoomScene', function(msg)
             var playerSet = 
             {
                 sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
-                nickname: msg[i].nickname
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg[i].nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                id: msg[i].id
             }
             ScenesData.roomScene.players.push(playerSet);
         }
@@ -55,13 +56,23 @@ socket.on('setRoomCount', function(msg)
             var playerSet = 
             {
                 sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
-                nickname: msg.player.nickname
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg.player.nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                id: msg.player.id
             }
             ScenesData.roomScene.players.push(playerSet);
         }
         else // remove charactor
         {
-
+            let idx = ScenesData.roomScene.players.findIndex(function(element)
+            {
+                return element.id === msg.player.id;
+            });
+            if (idx != -1)
+            {
+                ScenesData.roomScene.players[idx].sprite.destroy();
+                ScenesData.roomScene.players[idx].nickname.destroy();
+                ScenesData.roomScene.players.splice(idx, 1);
+            }
         }
     }, 200);
 });
