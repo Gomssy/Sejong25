@@ -394,7 +394,7 @@ WordSpace.findWord = function(wordText)
                 console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
                 let victimData = 
                 {
-                    roomNum: RoomData.roomNum,
+                    roomNum: RoomData.roomId,
                     victim: RoomData.myself, 
                     target: element.attacker.id
                 }
@@ -431,9 +431,10 @@ WordSpace.attack = function(wordText, grade)
         console.log('attack ' + wordText + ', grade: ' + grade);
         WordSpace.nameGroup.forEach(function(element)
         {
+            //console.log(RoomData.myself);
             let attackData = 
             {
-                roomNum: RoomData.roomNum,
+                roomNum: RoomData.roomId,
                 attacker: RoomData.myself, 
                 target: element.ownerId,
                 text: wordText, 
@@ -474,7 +475,7 @@ WordSpace.nameQueue =
         }
         tempQueue.forEach(function(element)
         {
-            if(element.id != PlayerData.idNum && element.isAlive)
+            if(element.id != PlayerData.id && element.isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });
     },

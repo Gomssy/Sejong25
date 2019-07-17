@@ -14,7 +14,7 @@ socket.on('alert', function(msg) // string errorcode
 socket.on('setId', function(msg) // {str, num playerNum}
 {
     console.log(msg.str);
-    PlayerData.idNum = msg.num;
+    PlayerData.id = msg.num;
 });
 socket.on('enterRoom', function()
 {
@@ -26,15 +26,24 @@ socket.on('setCount', function(msg)
 {
     ScenesData.roomScene.isCounting = msg.isEnable;
     ScenesData.roomScene.endTime = msg.endTime;
+    ScenesData.roomScene.peopleCount = msg.playerCount;
 });
 
 // init game
 socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
 {
-    console.log(msg);
-    RoomData.roomNum = msg.roomNum;
+    //console.log(msg);
+    RoomData.roomId = msg.roomId;
     RoomData.players = msg.players;
     RoomData.aliveCount = msg.players.length;
+    RoomData.players.forEach(function(element)
+    {
+        if(element.id === PlayerData.id)
+        {
+            RoomData.myself = element;
+            return;
+        }
+    });
 });
 socket.on('startGame', function()
 {
@@ -55,6 +64,7 @@ socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 });
 socket.on('attacked', function(msg) // object attackData
 {
+    //console.log('attacked by ' + msg.attacker.nickname);
     setTimeout(function()
     {
         WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong);
