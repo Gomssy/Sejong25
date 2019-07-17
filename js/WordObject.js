@@ -49,7 +49,7 @@ class WordObject
             {
                 fontSize: (this.scale * this.fontScale) +'pt',
                 fontFamily: '"궁서", 궁서체, serif',
-                fontStyle: (this.wordWeight > 5 ? 'bold' : '')
+                //fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             });
         if (!this.isNameWord) this.wordObj.setColor('#000000').setOrigin(0.5,0.5);
         else this.wordObj.setColor('#ffffff').setOrigin(0.45,0.5);
@@ -79,7 +79,7 @@ class WordObject
             this.wordObj.destroy();
             this.physicsObj.destroy();
         }
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[0]);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
     }
     
     attract()
@@ -149,6 +149,28 @@ class AttackWord extends WordObject
                             ((5 - _wordGrade) * 3 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
+    }
+    instantiate(scene, lenRate)
+    {
+        super.instantiate(scene, lenRate);
+        this.maskBackground = scene.physics.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
+        .setTint(Phaser.Display.Color.GetColor(120, 120, 120)).setScale(this.physicsObj.scale);
+
+        this.shape = scene.make.graphics();
+        var rect = new Phaser.Geom.Rectangle(0, 0, this.maskBackground.width, this.maskBackground.height);
+        this.shape.fillStyle(0xffffff);
+        this.shape.fillRectShape(rect);
+
+        this.mask = this.shape.createGeometryMask();
+        this.maskBackground.setMask(this.mask);
+
+    }
+    attract()
+    {
+        super.attract();
+        this.maskBackground.setPosition(this.physicsObj.x, this.physicsObj.y);
+        this.mask.x = this.physicsObj.x;
+        this.mask.y = this.physicsObj.y;
     }
     destroy()
     {
