@@ -81,11 +81,13 @@ class GameRoom
         this.maxPlayer = 100;
         this.nextRank = 100;
 
+        this.startTime = 0;
         this.currentPlayer = [];
         this.aliveCount = 0;
         this.currentSocket = [];
         this.currentPhase = GameServer.Phase.READY;
         
+        this.phaseChanger = -1;
         this.countEndTime = 0;
         this.rateArrangePoint = 300;
         this.maxTypingPlayer = null;
@@ -201,6 +203,37 @@ class GameRoom
         console.log('[ROOM#'+this.roomId+'] Game Start with ' + this.currentPlayer.length + ' players');
         this.announceToRoom('changePhase', GameServer.Phase.START);
         this.announceToRoom('startGame');
+        this.startTime = Date.now();
+    }
+
+    checkPhase(checkTime)
+    {
+        if (this.currentPhase === GameServer.Phase.START)
+        {
+            if (this.phaseChanger < 0 && checkTime - this.startTime > 60000)
+            {
+                this.currentPhase = GameServer.Phase.MAIN;
+                this.announceToRoom('changePhase', GameServer.Phase.MAIN);
+            }
+            else if (this.phaseChanger < 0)
+            {
+                this.phaseChanger = setTimeout(function(room)
+                {
+                    room.currentPhase = GameServer.Phase.MAIN;
+                    room.announceToRoom('changePhase', GameServer.Phase.MAIN);
+                    room.phaseChanger = -1;
+                }, 60000 - (checkTime - this.startTime), this);
+            }
+        }
+        else if (this.currentPhase === GameServer.Phase.MAIN)
+        {
+            let playerLimit = Math.max(this.currentPlayer.length / 10, 3);
+            if (this.aliveCount <= playerLimit)
+            {
+                this.currentPhase = GameServer.Phase.MUSIC;
+                this.announceToRoom('changePhase', GameServer.Phase.MUSIC);
+            }
+        }
     }
 
     endRoom()
@@ -274,6 +307,8 @@ class Player
         socket.playerData.isReceivable = false;
         room.aliveCount--;
 
+        room.checkPhase(Date.now());
+
         if (this.lastAttacks.length > 0)
         {
             this.lastAttack = this.lastAttacks[this.lastAttacks.length - 1];
@@ -288,7 +323,7 @@ class Player
         }
 
         room.announceToRoom('defeat', this);
-        console.log('[' + this.id + '] defeated, rank: ' + this.rank);
+        console.log('[' + this.id + '] defeated, rank: ' + this.rank + ', ' + room.currentPlayer.length + 'player left');
 
         if (socket.playerData.currentRoom.aliveCount === 1)
         {
