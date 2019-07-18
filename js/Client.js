@@ -5,10 +5,16 @@ socket.emit('idRequest');
 
 socket.on('alert', function(msg) // string errorcode
 {
-    let toAlert = 'null alert';
-    if (msg === 'errNicknameOverlaped') toAlert = '이미 사용중인 닉네임입니다.';
-    if (msg === 'gameWin') toAlert = '승리!';
-    alert(toAlert);
+    //let toAlert = 'null alert';
+    if (msg === 'errNicknameOverlaped') alert('이미 사용중인 닉네임입니다.');
+    if (msg === 'gameWin') 
+    {
+        //toAlert = '승리!';
+        ScenesData.gameScene.add.text(640, 360, '승리!!!!', {fontSize: '30pt'})
+        .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(11)
+        .setColor('#000000').setBackgroundColor('#ffffff');
+    }
+    //alert(toAlert);
 });
 
 socket.on('setId', function(msg) // {str, num playerNum}
@@ -113,10 +119,11 @@ socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 socket.on('attacked', function(msg) // object attackData
 {
     //console.log('attacked by ' + msg.attacker.nickname);
-    setTimeout(function()
+    var timeout = setTimeout(function()
     {
         WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong);
     }, 4000);
+    console.log(timeout);
 });
 socket.on('defeat', function(msg) // object player
 {

@@ -56,18 +56,24 @@ io.on('connection', function(socket)
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping
     {
-        socket.playerData.playingData.playerTyping = msg;
-        if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
+        try
         {
-            socket.playerData.currentRoom.maxTypingPlayer = socket.playerData.playingData;
+            socket.playerData.playingData.playerTyping = msg;
+            if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
+            {
+                socket.playerData.currentRoom.maxTypingPlayer = socket.playerData.playingData;
+            }
+            if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg)
+            {
+                socket.playerData.currentRoom.minTypingPlayer = socket.playerData.playingData;
+            }
+            let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
+            (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
+            socket.emit('setPlayerTypingRate', playerTypingRate);
         }
-        if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg)
+        catch (e)
         {
-            socket.playerData.currentRoom.minTypingPlayer = socket.playerData.playingData;
         }
-        let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
-        (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
-        socket.emit('setPlayerTypingRate', playerTypingRate);
     });
 
     socket.on('endCount', function()

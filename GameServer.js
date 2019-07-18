@@ -77,7 +77,7 @@ class GameRoom
     {
         this.roomId = GameServer.getRoomNumber();
         this.roomIndex = -1;
-        this.startCount = 4;
+        this.startCount = 2;
         this.maxPlayer = 100;
         this.nextRank = 100;
 

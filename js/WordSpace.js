@@ -34,55 +34,9 @@ WordSpace.delay =
     GameOver: 5000,
 }
 
-WordSpace.playerTypingCycle = null;
 WordSpace.NameSpawnReduce = 1000;
 
 WordSpace.gravityPoint = {x: 640, y: 280};
-
-class Cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
-{
-    constructor(_callback)
-    {
-        this.delay = 0;
-        this.currentCycle = null;
-        this.callbackFunction = _callback;
-    }
-    resetCycle(scene, _delay, _startAt, _loop)
-    {
-        this.delay = _delay;
-        var option = 
-        {
-            startAt: _startAt,
-            delay: _delay,
-            callback: this.callbackFunction,
-            callbackScope: scene,
-            loop: _loop
-        };
-        if (this.currentCycle != null) this.currentCycle = this.currentCycle.reset(option);
-        else this.currentCycle = scene.time.addEvent(option);
-    }
-}
-
-//단어 생성 사이클
-WordSpace.wordCycle = new Cycle(function()
-{
-    WordSpace.genWordByProb(this);
-});
-//게임 오버 사이클
-WordSpace.gameOverCycle = new Cycle(gameOver);
-//호패 생성 사이클
-WordSpace.nameCycle = new Cycle(function()
-{
-    WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-});
-//이건 뭐지
-WordSpace.varAdjustCycle = new Cycle(function()
-{
-    //나중에는 메세지 분석해서 Phase랑 playerTypingRate 받겠지만 일단 이렇게 해둠
-    //WordSpace.GetPhase();
-    //WordSpace.GetPlayerTypingRate();
-    WordSpace.AdjustVarByPhase(WordSpace.playerTypingRate, WordSpace.CurrentPhase);
-});
 
 WordSpace.getSpawnPoint = function(_lenRate)
 {
@@ -312,14 +266,14 @@ WordSpace.pushWord = function(scene, word, lenRate)
 
 function gameOver()
 {
-    WordSpace.wordCycle.currentCycle.remove();
-    WordSpace.nameCycle.currentCycle.remove();
-    WordSpace.varAdjustCycle.currentCycle.remove();
-    clearInterval(WordSpace.playerTypingCycle);
-    //To Do
+    WordSpace.pauseCycle(true);
+    
     socket.emit('defeated');
     console.log('defeat');
-    alert('defeat');
+    ScenesData.gameScene.add.text(640, 360, '패배', {fontSize: '30pt'})
+    .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(10)
+    .setColor('#000000').setBackgroundColor('#ffffff');
+    //alert('defeat');
 }
 
 //게임 오버 판정을 위한 타이머
