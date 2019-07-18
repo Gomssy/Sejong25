@@ -210,20 +210,27 @@ WordSpace.loadAnimation = function(scene)
         repeat: 0,
         hideOnComplete: false
     });
-    WordSpace.pyeongminAnims.push(scene.anims.create({
-        key: 'write',
+    WordSpace.pyeongminAnims[Enums.characterAnim.write] = scene.anims.create({
+        key: 'pyeongminWriteAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
         frameRate: 10,
         repeat: 0,
         hideOnComplete: false
-    }));
-    WordSpace.pyeongminAnims.push(scene.anims.create({
-        key: 'throw',
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite] = scene.anims.create({
+        key: 'pyeongminattackWriteAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
+        frameRate: 10,
+        repeat: -1,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.throw] = scene.anims.create({
+        key: 'pyeongminThrowAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminThrow'),
         frameRate: 10,
         repeat: 0,
         hideOnComplete: false
-    }));
+    });
 }
 
 WordSpace.generateWord = 
@@ -327,6 +334,8 @@ WordSpace.findWord = function(wordText)
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
+        BackGround.myCharacter.anims.msPerFrame /= (4 - WordSpace.attackGauge.getAttackOption().wordGrade);
     }
     else // 오타 체크
     {
@@ -371,8 +380,6 @@ WordSpace.setPlayerTyping =
     },
     initiate: function(scene)
     {
-        WordSpace.gameTimer = new Phaser.Time.Clock(scene);
-        WordSpace.gameTimer.start();
         this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
     }
 }
@@ -405,7 +412,7 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[1]);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;

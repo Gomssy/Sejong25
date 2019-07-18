@@ -109,6 +109,8 @@ var gameScene = new Phaser.Class(
     
     create: function()
     {
+        WordSpace.gameTimer = new Phaser.Time.Clock(this);
+        WordSpace.gameTimer.start();
         WordSpace.loadAnimation(this);
         CSVParsing.CSVParse(this);
         BackGround.drawBrain(this);
