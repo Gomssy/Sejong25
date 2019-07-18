@@ -138,15 +138,16 @@ class NormalWord extends WordObject
 
 class AttackWord extends WordObject
 {
-    constructor(text, _wordGrade, _playerData, isStrong)
+    constructor(text, _wordGrade, _playerData, _isStrong, _isCountable = true, lenRate)
     {
         super(text);
         this.wordGrade = _wordGrade;
-        this.wordWeight = this.isStrong ? WordReader.strongAttackWeight[3 - this.wordGrade] : WordReader.attackWeight[3 - this.wordGrade];
+        this.wordWeight = _isStrong ? WordReader.strongAttackWeight[3 - this.wordGrade] : WordReader.attackWeight[3 - this.wordGrade];
         if(WordReader.getWordTyping(_playerData.nickname) > 9)
             this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(_playerData.nickname) - 9);
         this.attacker = _playerData;
-        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
+        if(!_isCountable) this.counterTime = 0;
+        else this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
                             ((5 - _wordGrade) * 3 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
@@ -197,6 +198,17 @@ class AttackWord extends WordObject
             tempWord.physicsObj.setPosition(this.physicsObj.x, this.physicsObj.y);
             tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
             tempWord.destroy();
+            let attackData = 
+            {
+                roomNum: RoomData.roomId,
+                attacker: RoomData.myself,
+                target: this.attacker.id,
+                text: this.wordText,
+                grade: Math.min(3, this.wordGrade + 1),
+                isStrong: false,
+                isCountable: false
+            }
+            socket.emit('attack', attackData);
         }
         if(this.maskBackground != null) this.maskBackground.destroy();
         super.destroy();

@@ -287,9 +287,9 @@ WordSpace.generateWord =
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
-    Attack: function(scene, wordText, grade, attacker, isStrong, lenRate)
+    Attack: function(scene, wordText, grade, attacker, isStrong, isCountable, lenRate)
     {
-        word = new AttackWord(wordText, grade, attacker, isStrong);
+        word = new AttackWord(wordText, grade, attacker, isStrong, isCountable);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },

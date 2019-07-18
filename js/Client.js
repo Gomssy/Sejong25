@@ -115,7 +115,7 @@ socket.on('attacked', function(msg) // object attackData
     //console.log('attacked by ' + msg.attacker.nickname);
     setTimeout(function()
     {
-        WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong);
+        WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
     }, 4000);
 });
 socket.on('defeat', function(msg) // object player
