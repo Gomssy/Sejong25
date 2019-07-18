@@ -158,22 +158,15 @@ class AttackWord extends WordObject
         this.maskBackground = scene.physics.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
         .setTint(Phaser.Display.Color.GetColor(120, 120, 120)).setScale(this.scale);
         this.maskBackground.alpha = 0.5;
-        console.log('scale ' + this.scale);
-        console.log('this.physicsObj.width ' + this.physicsObj.width);
-        console.log('this.physicsObj.height ' + this.physicsObj.height);
-        console.log('this.physicsObj.body.width ' + this.physicsObj.body.width);
-        console.log('this.physicsObj.body.height ' + this.physicsObj.body.height);
 
         this.shape = scene.make.graphics();
-        var rect = new Phaser.Geom.Rectangle(0, 0, this.physicsObj.width, this.physicsObj.height);
-        console.log(rect);
-        console.log(this.shape);
+        var rect = new Phaser.Geom.Rectangle(0, 0, this.maskBackground.width * this.scale, this.maskBackground.height * this.scale);
         this.shape.fillStyle(0xffffff).fillRectShape(rect);
 
         this.mask = this.shape.createGeometryMask();
         this.maskBackground.setMask(this.mask);
         this.maskStart = this.physicsObj.x;
-        this.maskEnd = this.physicsObj.x - this.physicsObj.width;
+        this.maskEnd = this.physicsObj.x - this.physicsObj.width * this.scale;
     }
 
     attract()
@@ -183,8 +176,8 @@ class AttackWord extends WordObject
         {
             this.maskBackground.setPosition(this.physicsObj.x, this.physicsObj.y);
             this.shape.x = this.physicsObj.x + (this.maskEnd - this.maskStart) * 
-                            ((WordSpace.gameTimer.now - this.createdTime) / (this.counterTime - this.createdTime)) - this.physicsObj.width / 2;
-            this.shape.y = this.physicsObj.y - this.physicsObj.height / 2;
+                            ((WordSpace.gameTimer.now - this.createdTime) / (this.counterTime - this.createdTime)) - this.physicsObj.width * this.scale / 2;
+            this.shape.y = this.physicsObj.y - this.physicsObj.height * this.scale / 2;
         }
         else if(this.maskBackground != null) this.maskBackground.destroy();
     }
@@ -224,7 +217,8 @@ class NameWord extends WordObject
     attract()
     {
         if(this.isActive) super.attract();
-        else{
+        else
+        {
             this.path.getPoint(this.follower.t, this.follower.vec);
             this.physicsObj.setPosition(this.follower.vec.x, this.follower.vec.y);
             this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);

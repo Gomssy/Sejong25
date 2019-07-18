@@ -91,7 +91,7 @@ GameServer.enterRoom = function(roomIdx, playerData)
     {
         if (room.currentPhase === this.Phase.READY) // start count
         {
-            room.endTime = Date.now() + 15000; // 테스트로 15초로 남겨둠
+            room.endTime = Date.now() + 1000; // 테스트로 15초로 남겨둠
             this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: room.endTime});
             room.currentPhase = this.Phase.COUNT;
         }
