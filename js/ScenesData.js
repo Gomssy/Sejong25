@@ -72,7 +72,7 @@ var roomScene = new Phaser.Class(
                 //console.log('end Count');
                 setTimeout(() => {
                     socket.emit('endCount');
-                }, (2000 + Phaser.Math.Distance.Between(0, 0, 640, 800) * 2));
+                }, (Phaser.Math.Distance.Between(0, 0, 640, 800) * 3));
                 this.isCounting = false;
                 this.isCountEnd = true;
                 this.players.forEach(function(element){
@@ -81,12 +81,11 @@ var roomScene = new Phaser.Class(
                         element.sprite.x, element.sprite.y,
                         640, 800
                     ]);
-                    console.log(Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, 640, 800) * 2);
                     ScenesData.roomScene.tweens.add({
                         targets: element.follower,
                         t: 1,
                         ease: 'Linear',
-                        duration: 2000 + Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, 640, 800) * 2,
+                        duration: Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, 640, 800) * 3,
                         repeat: 0
                     });
                 });
