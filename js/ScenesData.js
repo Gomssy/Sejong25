@@ -42,28 +42,42 @@ var roomScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.roomScene = this;
+        BackGround.loadImage(this);
+        this.load.image('playerStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     },
 
     create: function()
     {
+        BackGround.drawRoom(this);
+
+        this.players = [];
+
         this.isCounting = false;
+        this.isCountEnd = false;
         this.endTime = 0;
         this.peopleCount = 1;
-        this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000');
-        this.peopleText = this.add.text(640, 100, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000');
+        this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10).setPadding(5,5,5,5);
+        this.peopleText = this.add.text(640, 80, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10);
     },
 
     update: function()
     {
         this.peopleText.setText(this.peopleCount + ' / 10');
+        
         if (this.isCounting)
         {
             this.countText.setText(((this.endTime - Date.now()) / 1000).toFixed(1));
-            if (this.endTime - Date.now() < 0) 
+            if (this.endTime < Date.now()) 
             {
+                //console.log('end Count');
                 socket.emit('endCount');
                 this.isCounting = false;
+                this.isCountEnd = true;
             }
+        }
+        else if (this.isCountEnd)
+        {
+            this.countText.setText('잠시만 기다려주세요...');
         }
         else
         {
@@ -121,14 +135,8 @@ var gameScene = new Phaser.Class(
 
         WordSpace.nameWordTextForTest = ScenesData.gameScene.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
-        RoomData.players.forEach(function(element)
-        {
-            if(element.nickname == PlayerData.nickname)
-            {
-                RoomData.myself = element;
-                return;
-            }
-        });
+
+        // for test
         WordSpace.attackGauge.add(11);
     },
 
