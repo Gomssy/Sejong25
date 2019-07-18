@@ -144,13 +144,7 @@ var gameScene = new Phaser.Class(
         WordSpace.spaceInitiate(this);
         WordSpace.attackGauge.resetCycle(this);
 
-        WordSpace.wordCycle.resetCycle(this, 3000, 0, true);
-        WordSpace.nameCycle.resetCycle(this, 3000, 0, true);
-        WordSpace.varAdjustCycle.resetCycle(this, 100, 0, true);
-        WordSpace.playerTypingCycle = setInterval(function()
-        {
-            socket.emit('setPlayerTyping', WordSpace.playerTyping);
-        }, 500);
+        WordSpace.startCycle(this);
         
         WordSpace.setPlayerTyping.initiate(this);
 
