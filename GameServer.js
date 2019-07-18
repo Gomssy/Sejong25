@@ -1,24 +1,23 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, COUNT: -1, START: 1, MAIN: 2, MUSIC: 3};
-GameServer.startCount = 2;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];
 
-GameServer.getPlayerNumber = function()
+GameServer.findRoom = function(roomId)
 {
-    do
+    for (let i = 0; i < GameServer.playingRoom.length; i++)
     {
-        var num = Math.floor(Math.random() * 1000 + 1);
-        if (!this.currentPlayer.includes(num)) return num;
-    } while (true)
+        if (GameServer.playingRoom[i].roomId === roomId) return GameServer.playingRoom[i];
+    }
+    console.log('[ERR] no room with num ' + roomId);
 }
-GameServer.findPlayer = function(playerId)
+GameServer.findPlayerSocket = function(playerId)
 {
     var idx = this.currentPlayer.findIndex(function(element)
     {
-        return element.id === playerId;
+        return element.playerData.id === playerId;
     });
     if (idx != -1) return this.currentPlayer[idx];
     else
@@ -27,191 +26,315 @@ GameServer.findPlayer = function(playerId)
         return null;
     }
 }
-GameServer.nextRoomNumber = 0;
-GameServer.makeRoom = function()
+GameServer.enterEmptyRoom = function(playerSocket)
 {
-    // 나중에 room 삭제시 생긴 null에 채워넣는식으로 만들것, 룸의 인덱스를 고정
-    var roomOption = 
-    {
-        roomNum: GameServer.nextRoomNumber++,
-        maxPlayer: 100,
-        nextRank: 100,
-        currentPlayer: [],
-        aliveCount: 0,
-        currentSocket: [],
-        currentPhase: GameServer.Phase.READY,
-        endTime: 0,
-
-        rateArrangePoint: 300,
-        maxTypingPlayer: null,
-        minTypingPlayer: null
-    }
-    this.playingRoom.push(roomOption);
-    console.log('[SERVER] new room #'+roomOption.roomNum+' made, roomCount: ' + this.playingRoom.length);
-    return this.playingRoom.length - 1;
-}
-GameServer.findRoomIndex = function(roomNum)
-{
-    return GameServer.playingRoom.findIndex(function(element)
-    {
-        return element.roomNum === roomNum;
-    });
-}
-GameServer.enterRoom = function(roomIdx, playerData)
-{
-    let room = this.playingRoom[roomIdx];
-    let nextIdx = -1;
-    for (let i = 0; i < room.currentPlayer.length; i++)
-    {
-        if (room.currentPlayer[i] === null)
-        {
-            nextIdx = i;
-            break
-        }
-    }
-    let player = new Player((nextIdx != -1 ? nextIdx : room.currentPlayer.length), playerData);
-
-    if (nextIdx != -1)
-    {
-        room.currentPlayer[nextIdx] = player;
-        room.currentSocket[nextIdx] = playerData;
-    }
-    else
-    {
-        room.currentPlayer.push(player);
-        room.currentSocket.push(playerData);
-    }
-    playerData.playingData = player;
-    playerData.currentRoom = room;
-    room.aliveCount++;
-
-    console.log('[' + playerData.id + '] entered to room #' + room.roomNum);
-    playerData.socketId.emit('enterRoom');
-    room.endTime = Date.now() + 6000; // 테스트로 6초로 남겨둠
-    if (room.currentPlayer.length >= this.startCount)
-    {
-        if (room.currentPhase === this.Phase.READY) // start count
-        {
-            this.announceToRoom(room.roomNum, 'setCount', {isEnable: true, endTime: room.endTime});
-        }
-        else if (room.currentPhase === this.Phase.COUNT) // countinue count
-        {
-            playerData.socketId.emit('setCount', {isEnable: true, endTime: room.endTime});
-        }
-    }
-    else // stop count
-    {
-        this.announceToRoom(room.roomNum, 'setCount', {isEnable: false, endTime: 0});
-    }
-    return room;
-}
-GameServer.enterEmptyRoom = function(playerData)
-{
-    var toEnter = -1;
+    let emptyRoomIndex = -1;
     for (let i = 0; i < this.playingRoom.length; i++)
     {
-        if (this.playingRoom[i].currentPlayer.length < this.playingRoom[i].maxPlayer && this.playingRoom[i].currentPhase == this.Phase.READY)
+        if ((this.playingRoom[i].currentPhase === this.Phase.READY || this.playingRoom[i].currentPhase === this.Phase.COUNT) && this.playingRoom[i].maxPlayer > this.playingRoom[i].currentPlayer.length)
         {
-            toEnter = i;
+            emptyRoomIndex = i;
             break;
         }
     }
-    if (toEnter === -1)
+    if (emptyRoomIndex != -1)
     {
-        toEnter = this.makeRoom();
+        this.playingRoom[emptyRoomIndex].enterRoom(playerSocket);
     }
-    return this.enterRoom(toEnter, playerData);
+    else
+    {
+        let newRoom = new GameRoom();
+        newRoom.enterRoom(playerSocket);
+    }
 }
-GameServer.startRoom = function(roomIdx)
+GameServer.getPlayerNumber = function()
 {
-    let room = this.playingRoom[roomIdx];
-    room.currentPhase = this.Phase.START;
-    room.nextRank = room.currentPlayer.length;
-    room.aliveCount = room.currentPlayer.length;
-    room.maxTypingPlayer = room.currentPlayer[0];
-    room.minTypingPlayer = room.currentPlayer[0];
-    room.currentSocket.forEach(function(element)
+    do
     {
-        element.isReceivable = true;
-    });
-
-    // sync roomData
-    let toSync =
-    {
-        roomNum: room.roomNum,
-        players: room.currentPlayer
-    };
-    //console.log(toSync);
-    this.announceToRoom(roomIdx, 'syncRoomData', toSync);
-
-    console.log('[ROOM#'+room.roomNum+'] Game Start with ' + room.currentPlayer.length + ' players');
-    this.announceToRoom(roomIdx, 'changePhase', this.Phase.START);
-    this.announceToRoom(roomIdx, 'startGame');
+        var num = Math.floor(Math.random() * 1000 + 1);
+        if (this.currentPlayer.findIndex(function(element)
+        {
+            return element.id === num;
+        }) === -1) return num;
+    } while (true)
 }
-GameServer.playerDefeat = function(playerData)
+GameServer.getRoomNumber = function()
 {
-    playerData.playingData.isAlive = false;
-    playerData.playingData.rank = playerData.currentRoom.nextRank--;
-    playerData.isReceivable = false;
-    playerData.currentRoom.aliveCount--;
-    if (playerData.playingData.lastAttacks.length > 0)
+    do
     {
-        playerData.playingData.lastAttack = playerData.playingData.lastAttacks[playerData.playingData.lastAttacks.length - 1];
-        if (Date.now() - playerData.playingData.lastAttack.time > 40000) playerData.playingData.lastAttack = null;
+        var num = Math.floor(Math.random() * 1000 + 1);
+        if (this.playingRoom.findIndex(function(element)
+        {
+            return element.roomId === num;
+        }) === -1) return num;
+    } while (true)
+}
+
+
+class GameRoom
+{
+    constructor()
+    {
+        this.roomId = GameServer.getRoomNumber();
+        this.roomIndex = -1;
+        this.startCount = 2;
+        this.maxPlayer = 100;
+        this.nextRank = 100;
+
+        this.startTime = 0;
+        this.currentPlayer = [];
+        this.aliveCount = 0;
+        this.currentSocket = [];
+        this.currentPhase = GameServer.Phase.READY;
+        
+        this.phaseChanger = -1;
+        this.countEndTime = 0;
+        this.rateArrangePoint = 300;
+        this.maxTypingPlayer = null;
+        this.minTypingPlayer = null;
+
+        for (let i = 0; i < GameServer.playingRoom.length; i++)
+        {
+            if (GameServer.playingRoom[i] === null)
+            {
+                this.roomIndex = i;
+                break;
+            }
+        }
+        if (this.roomIndex === -1)
+        {
+            this.roomIndex = GameServer.playingRoom.length;
+            GameServer.playingRoom.push(this);
+        }
         else
         {
-            playerData.playingData.lastAttacks.forEach(function(element)
+            GameServer.playingRoom[this.roomIndex] = this;
+        }
+        console.log('[LOG] new room #'+this.roomId+' made, roomCount: ' + GameServer.playingRoom.length);
+    }
+
+    enterRoom(playerSocket)
+    {
+        let playerInst = new Player(this, playerSocket.playerData);
+        
+        playerSocket.playerData.playingData = playerInst;
+        playerSocket.playerData.currentRoom = this;
+        playerSocket.playerData.isReceivable = true;
+
+        playerSocket.emit('enterRoom');
+        this.currentSocket.push(playerSocket);
+        this.announceToTarget(playerInst.id, 'syncRoomScene', this.currentPlayer);
+        this.currentPlayer.push(playerInst);
+
+        console.log('[' + playerInst.id + '] entered to room #' + this.roomId);
+
+        this.aliveCount++;
+        if (this.currentPlayer.length >= this.startCount)
+        {
+            if (this.currentPhase === GameServer.Phase.READY)
             {
-                if (Date.now() - element.time < 40000 && element.wordGrade > playerData.playingData.lastAttack.wordGrade) playerData.playingData.lastAttack = element;
-            }); 
+                this.endTime = Date.now() + 5000; // 테스트용 10초
+                this.announceToRoom('setRoomCount', 
+                {
+                    isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
+                    isEnter: true, player: playerInst // 나중에는 플레이어의 외양데이터도 보내야됨
+                });
+                this.currentPhase = GameServer.Phase.COUNT;
+            }
+            else if (this.currentPhase === GameServer.Phase.COUNT)
+            {
+                this.announceToRoom('setRoomCount', 
+                {
+                    isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
+                    isEnter: true, player: playerInst
+                });
+            }
+        }
+        else
+        {
+            this.announceToRoom('setRoomCount', 
+            {
+                isEnable: false, endTime: 0, playerCount: this.currentPlayer.length,
+                isEnter: true, player: playerInst
+            });
+            this.currentPhase = GameServer.Phase.READY;
         }
     }
 
-    GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'defeat', playerData.playingData);
-    console.log('['+playerData.id+']'+ ' defeated, rank: ' + playerData.playingData.rank);
-
-    if (playerData.currentRoom.aliveCount === 1)
+    exitRoom(playerId)
     {
-        let winner = playerData.currentRoom.currentPlayer.find(function(element)
+        for (let i = 0; i < this.currentPlayer.length; i++)
         {
-            return element.isAlive;
+            if (this.currentPlayer[i].id === playerId)
+            {
+                for (let j = i+1; j < this.currentPlayer.length; j++)
+                {
+                    this.currentPlayer[i].index--;
+                }
+                this.currentPlayer.splice(i, 1);
+                this.currentSocket.splice(i, 1);
+                this.aliveCount--;
+                return;
+            }
+        }
+        console.log('[ERR] No player who have ' + playerId);
+        return;
+    }
+    
+    startRoom()
+    {
+        this.currentPhase = GameServer.Phase.START;
+        this.maxTypingPlayer = this.currentPlayer[0];
+        this.minTypingPlayer = this.currentPlayer[0];
+        this.nextRank = this.currentPlayer.length;
+        this.aliveCount = this.currentPlayer.length;
+        this.currentSocket.forEach(function(element)
+        {
+            element.playerData.isReceivable = true;
         });
-        GameServer.announceToRoom(this.findRoomIndex(playerData.currentRoom.roomNum), 'gameEnd', winner);
-        GameServer.announceToTarget(this.findRoomIndex(playerData.currentRoom.roomNum), winner.id, 'alert', 'gameWin');
-        console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
+
+        let toSync =
+        {
+            roomId: this.roomId,
+            players: this.currentPlayer
+        };
+        this.announceToRoom('syncRoomData', toSync);
+
+        console.log('[ROOM#'+this.roomId+'] Game Start with ' + this.currentPlayer.length + ' players');
+        this.announceToRoom('changePhase', GameServer.Phase.START);
+        this.announceToRoom('startGame');
+        this.startTime = Date.now();
+    }
+
+    checkPhase(checkTime)
+    {
+        if (this.currentPhase === GameServer.Phase.START)
+        {
+            if (this.phaseChanger < 0 && checkTime - this.startTime > 60000)
+            {
+                this.currentPhase = GameServer.Phase.MAIN;
+                this.announceToRoom('changePhase', GameServer.Phase.MAIN);
+            }
+            else if (this.phaseChanger < 0)
+            {
+                this.phaseChanger = setTimeout(function(room)
+                {
+                    room.currentPhase = GameServer.Phase.MAIN;
+                    room.announceToRoom('changePhase', GameServer.Phase.MAIN);
+                    room.phaseChanger = -1;
+                }, 60000 - (checkTime - this.startTime), this);
+            }
+        }
+        else if (this.currentPhase === GameServer.Phase.MAIN)
+        {
+            let playerLimit = Math.max(this.currentPlayer.length / 10, 3);
+            if (this.aliveCount <= playerLimit)
+            {
+                this.currentPhase = GameServer.Phase.MUSIC;
+                this.announceToRoom('changePhase', GameServer.Phase.MUSIC);
+            }
+        }
+    }
+
+    endRoom()
+    {
+
+    }
+
+    destroyRoom()
+    {
+        if (this.aliveCount > 0)
+        {
+            console.log('[ERR] can not destroy room#' + this.roomId + ', cause player left');
+        }
+        else
+        {
+            let idx = GameServer.playingRoom.findIndex(function(element)
+            {
+                return element.roomId === this.roomId;
+            });
+            if (idx != -1)
+            {
+                GameServer.playingRoom[idx] = null;
+            }
+        }
+    }
+
+    announceToRoom(_message, _data = null)
+    {
+        this.currentSocket.forEach(function(element)
+        {
+            element.emit(_message, _data);
+        });
+    }
+
+    announceToTarget(targetId, _message, _data = null)
+    {
+        let targetSocketIndex = this.currentSocket.findIndex(function(element)
+        {
+            return element.playerData.id === targetId;
+        });
+        //console.log('send to ' + targetSocketIndex + ', receivable? ' + this.currentSocket[targetSocketIndex].playerData.isReceivable);
+        if (this.currentSocket[targetSocketIndex].playerData.isReceivable) this.currentSocket[targetSocketIndex].emit(_message, _data);
     }
 }
-GameServer.announceToRoom = function(roomIdx, _message, _data = null)
-{
-    this.playingRoom[roomIdx].currentSocket.forEach(function(element) 
-    {
-        element.socketId.emit(_message, _data);
-    });
-}
-GameServer.announceToTarget = function(roomIdx, targetNum, _message, _data = null)
-{
-    let targetSocket = this.playingRoom[roomIdx].currentSocket.find(function(element)
-    {
-        return element.id === targetNum;
-    });
-    if (targetSocket != undefined && targetSocket.isReceivable) targetSocket.socketId.emit(_message, _data);
-}
-// 데이터 동기화 함수 만들기
-// 동기화할것: 유저리스트(id - nickname 쌍)
 
 class Player
 {
-    constructor(index, playerData)
+    constructor(gameRoom, playerData)
     {
-        this.index = index;
         this.id = playerData.id;
+        this.gameRoomId = gameRoom.roomId;
+        this.index = gameRoom.currentPlayer.length;
         this.nickname = playerData.nickname;
+
         this.isAlive = true;
         this.rank = -1;
 
         this.playerTyping = 0;
         this.lastAttacks = []; // { attackerId, word, wordGrade, time }
         this.lastAttack = null;
+    }
+
+    defeat()
+    {
+        let player = this;
+        let room = GameServer.findRoom(this.gameRoomId);
+        let socket = GameServer.findPlayerSocket(this.id);
+
+        this.isAlive = false;
+        this.rank = room.nextRank--;
+        socket.playerData.isReceivable = false;
+        room.aliveCount--;
+
+        room.checkPhase(Date.now());
+
+        if (this.lastAttacks.length > 0)
+        {
+            this.lastAttack = this.lastAttacks[this.lastAttacks.length - 1];
+            if (Date.now() - this.lastAttack.time > 40000) this.lastAttack = null;
+            else
+            {
+                this.lastAttacks.forEach(function(element)
+                {
+                    if (Date.now() - element.time < 40000 && element.wordGrade > player.lastAttack.wordGrade) player.lastAttack = element;
+                });
+            }
+        }
+
+        room.announceToRoom('defeat', this);
+        console.log('[' + this.id + '] defeated, rank: ' + this.rank + ', ' + room.currentPlayer.length + 'player left');
+
+        if (socket.playerData.currentRoom.aliveCount === 1)
+        {
+            let winner = room.currentPlayer.find(function(element)
+            {
+                return element.isAlive;
+            });
+            room.announceToRoom('gameEnd', winner);
+            room.announceToTarget(winner.id, 'alert', 'gameWin');
+            console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
+        }
     }
 }
 

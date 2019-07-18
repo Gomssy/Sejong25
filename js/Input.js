@@ -1,7 +1,9 @@
 var Input = Input || {};
 
 Input.input = [];
+Input.converted = '';
 Input.convInput = ''; // converted input
+Input.finalInput = '';
 
 Input.isShifted = false;
 Input.isEntered = false;
@@ -16,19 +18,19 @@ Input.gameSceneEnterReaction = function()
 {
     if (!Input.isEntered)
     {
-        if (Input.attackMode) WordSpace.attack(Input.removeConVow(Input.convInput), Input.attackOption.wordGrade);
-        else WordSpace.findWord(Input.convInput);
+        if (Input.attackMode) WordSpace.attack(Input.removeConVow(Input.finalInput), Input.attackOption.wordGrade);
+        else WordSpace.findWord(Input.finalInput);
         Input.reset();
         Input.isEntered = true;
     }
 }
 Input.menuSceneEnterReaction = function()
 {
-    Input.convInput = Input.removeConVow(Input.convInput);
-    if (Input.convInput.length > 1)
+    Input.finalInput = Input.removeConVow(Input.finalInput);
+    if (Input.finalInput.length > 1)
     {
-        socket.emit('setNickname', Input.convInput);
-        PlayerData.nickname = Input.convInput;
+        socket.emit('setNickname', Input.finalInput);
+        PlayerData.nickname = Input.finalInput;
         Input.reset();
     }
     else 
@@ -41,11 +43,13 @@ Input.menuSceneEnterReaction = function()
 Input.reset = function()
 {
     Input.input = [];
-    Input.convInput = [];
-    Input.inputField.text.setText(Input.convInput);
+    Input.converted = '';
+    Input.convInput = '';
+    Input.finalInput = '';
+    Input.inputField.text.setText(Input.finalInput);
 }
 
-// convert input to convInput
+// convert input to finalInput
 Input.convert = function()
 {
     // input -> krInput with vowels
@@ -95,7 +99,7 @@ Input.convert = function()
     //console.log(vowels);
     //console.log(krInput);
 
-    this.convInput = "";
+    this.convInput = '';
     let vowelIdx = 0;
     if (vowelIdx === vowels.length) this.convInput = krInput; // 모음이 없을때
     else // 모음이 존재할때
@@ -193,6 +197,14 @@ Input.convert = function()
             }
         }
     }
+    if (this.convInput.length > 1)
+    {
+        if (this.convInput[1].charCodeAt(0) > '가'.charCodeAt(0)) Input.input.splice(0, this.input.length - 2);
+        else Input.input.splice(0, this.input.length - 1);
+        this.converted += this.convInput.slice(0, 1);
+        this.convInput = this.convInput.slice(1, 2);
+    }
+    Input.finalInput = Input.converted + Input.convInput;
     return true;
     //console.log('_____end_convert_____');    
 }
@@ -304,8 +316,8 @@ Input.inputField =
 {
     generate: function(scene, enterCallback)
     {
-        this.background = scene.add.sprite(640, 550, 'inputfield').setDepth(10);
-        this.text = scene.add.text(640, 550, "안녕하세요", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
+        this.background = scene.add.sprite(640, 500, 'inputfield').setDepth(10);
+        this.text = scene.add.text(640, 500, "", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
 
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
@@ -317,8 +329,15 @@ Input.inputField =
             {
                 Input.input.pop();
                 Input.convert();
-                Input.inputField.text.setText(Input.convInput);
+                Input.inputField.text.setText(Input.finalInput);
             }
+            else if (Input.converted.length > 0)
+            {
+                Input.converted = Input.converted.slice(0, Input.converted.length - 1);
+                Input.finalInput = Input.converted + Input.convInput;
+                Input.inputField.text.setText(Input.finalInput);
+            }
+            else Input.reset();
         });
         scene.input.keyboard.on('keydown-ENTER', enterCallback);
         scene.input.keyboard.on('keyup-ENTER', function(){Input.isEntered = false;})
@@ -381,11 +400,11 @@ Input.pushInput = function(inputKey)
         else output = inputKey.charCodeAt(0);
         this.input.push(output);
         //console.log(Input.input);
-        if (!this.convert() || this.convInput.length > this.maxInput) 
+        if (!this.convert() || this.finalInput.length > this.maxInput) 
         {
             this.input.pop();
             this.convert();
         }
-        this.inputField.text.setText(Input.convInput);
+        this.inputField.text.setText(Input.finalInput);
     }
 }

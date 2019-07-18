@@ -5,35 +5,99 @@ socket.emit('idRequest');
 
 socket.on('alert', function(msg) // string errorcode
 {
-    let toAlert = 'null alert';
-    if (msg === 'errNicknameOverlaped') toAlert = '이미 사용중인 닉네임입니다.';
-    if (msg === 'gameWin') toAlert = '승리!';
-    alert(toAlert);
+    //let toAlert = 'null alert';
+    if (msg === 'errNicknameOverlaped') alert('이미 사용중인 닉네임입니다.');
+    if (msg === 'gameWin') 
+    {
+        //toAlert = '승리!';
+        ScenesData.gameScene.add.text(640, 360, '승리!!!!', {fontSize: '30pt'})
+        .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(11)
+        .setColor('#000000').setBackgroundColor('#ffffff');
+    }
+    //alert(toAlert);
 });
 
 socket.on('setId', function(msg) // {str, num playerNum}
 {
     console.log(msg.str);
-    PlayerData.idNum = msg.num;
+    PlayerData.id = msg.num;
 });
 socket.on('enterRoom', function()
 {
+    Audio.killSound(ScenesData.menuScene, 'login');
     game.scene.remove('menuScene');
     game.scene.start('roomScene');
+    
 });
-socket.on('setCount', function(msg)
+socket.on('syncRoomScene', function(msg)
 {
-    ScenesData.roomScene.isCounting = msg.isEnable;
-    ScenesData.roomScene.endTime = msg.endTime;
+    setTimeout(function()
+    {
+        for (let i = 0; i < msg.length; i++)
+        {
+            let randX = Math.random() * 1120 + 80;
+            let randY = Math.random() * 380 + 100;
+            var playerSet = 
+            {
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg[i].nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                id: msg[i].id
+            }
+            ScenesData.roomScene.players.push(playerSet);
+        }
+    }, 100);
+});
+socket.on('setRoomCount', function(msg)
+{
+    setTimeout(function()
+    {
+        ScenesData.roomScene.isCounting = msg.isEnable;
+        ScenesData.roomScene.endTime = msg.endTime;
+        ScenesData.roomScene.peopleCount = msg.playerCount;
+
+        if (msg.isEnter) // generate charactor
+        {
+            let randX = Math.random() * 1120 + 80;
+            let randY = Math.random() * 380 + 100;
+            var playerSet = 
+            {
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg.player.nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                id: msg.player.id
+            }
+            ScenesData.roomScene.players.push(playerSet);
+        }
+        else // remove charactor
+        {
+            let idx = ScenesData.roomScene.players.findIndex(function(element)
+            {
+                return element.id === msg.player.id;
+            });
+            if (idx != -1)
+            {
+                ScenesData.roomScene.players[idx].sprite.destroy();
+                ScenesData.roomScene.players[idx].nickname.destroy();
+                ScenesData.roomScene.players.splice(idx, 1);
+            }
+        }
+    }, 200);
 });
 
 // init game
 socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
 {
-    console.log(msg);
-    RoomData.roomNum = msg.roomNum;
+    //console.log(msg);
+    RoomData.roomId = msg.roomId;
     RoomData.players = msg.players;
     RoomData.aliveCount = msg.players.length;
+    RoomData.players.forEach(function(element)
+    {
+        if(element.id === PlayerData.id)
+        {
+            RoomData.myself = element;
+            return;
+        }
+    });
 });
 socket.on('startGame', function()
 {
@@ -54,10 +118,12 @@ socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 });
 socket.on('attacked', function(msg) // object attackData
 {
-    setTimeout(function()
+    //console.log('attacked by ' + msg.attacker.nickname);
+    var timeout = setTimeout(function()
     {
-        WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong);
+        WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
     }, 4000);
+    console.log(timeout);
 });
 socket.on('defeat', function(msg) // object player
 {
@@ -81,6 +147,7 @@ socket.on('gameEnd', function(msg) // object player
 
 socket.on('attackSucceed', function(msg)
 {
+    console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, msg.victim);
     tempWord.destroy();
 });

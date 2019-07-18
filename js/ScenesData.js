@@ -24,6 +24,7 @@ var menuScene = new Phaser.Class(
         Audio.loopSound(this, 'login');
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         BackGround.drawMenu(this);
+
     }
 });
 
@@ -41,25 +42,63 @@ var roomScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.roomScene = this;
+        BackGround.loadImage(this);
+        this.load.image('playerStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     },
 
     create: function()
     {
+        BackGround.drawRoom(this);
+
+        this.players = [];
+
         this.isCounting = false;
+        this.isCountEnd = false;
         this.endTime = 0;
-        this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000');
+        this.peopleCount = 1;
+        this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10).setPadding(5,5,5,5);
+        this.peopleText = this.add.text(640, 80, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10);
     },
 
     update: function()
     {
+        this.peopleText.setText(this.peopleCount + ' / 10');
+        
         if (this.isCounting)
         {
-            this.countText.setText((this.endTime - Date.now()) / 1000);
-            if (this.endTime - Date.now() < 0) 
+            this.countText.setText(((this.endTime - Date.now()) / 1000).toFixed(1));
+            if (this.endTime < Date.now()) 
             {
-                socket.emit('endCount');
+                //console.log('end Count');
+                setTimeout(() => {
+                    socket.emit('endCount');
+                }, (Phaser.Math.Distance.Between(0, 0, 640, 800) * 3));
                 this.isCounting = false;
+                this.isCountEnd = true;
+                this.players.forEach(function(element){
+                    element.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+                    element.path = new Phaser.Curves.Line([
+                        element.sprite.x, element.sprite.y,
+                        640, 800
+                    ]);
+                    ScenesData.roomScene.tweens.add({
+                        targets: element.follower,
+                        t: 1,
+                        ease: 'Linear',
+                        duration: Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, 640, 800) * 3,
+                        repeat: 0
+                    });
+                });
             }
+        }
+        else if (this.isCountEnd)
+        {
+            this.players.forEach(function(element){
+                element.path.getPoint(element.follower.t, element.follower.vec);
+                element.sprite.setPosition(element.follower.vec.x, element.follower.vec.y);
+                element.nickname.setPosition(element.sprite.x - 10, element.sprite.y - 60);
+            });
+            this.countText.setText('잠시만 기다려주세요...');
         }
         else
         {
@@ -91,8 +130,12 @@ var gameScene = new Phaser.Class(
     
     create: function()
     {
+        WordSpace.gameTimer = new Phaser.Time.Clock(this);
+        WordSpace.gameTimer.start();
+        WordSpace.loadAnimation(this);
         CSVParsing.CSVParse(this);
         BackGround.drawBrain(this);
+        BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
         WordSpace.wordPhysicsGroup = this.physics.add.group();
 
@@ -101,28 +144,15 @@ var gameScene = new Phaser.Class(
         WordSpace.spaceInitiate(this);
         WordSpace.attackGauge.resetCycle(this);
 
-        WordSpace.wordCycle.resetCycle(this, 3000, 0, true);
-        WordSpace.nameCycle.resetCycle(this, 3000, 0, true);
-        WordSpace.varAdjustCycle.resetCycle(this, 100, 0, true);
-        WordSpace.playerTypingCycle = setInterval(function()
-        {
-            socket.emit('setPlayerTyping', WordSpace.playerTyping);
-        }, 500);
+        WordSpace.startCycle(this);
         
         WordSpace.setPlayerTyping.initiate(this);
 
         WordSpace.nameWordTextForTest = ScenesData.gameScene.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
-        RoomData.players.forEach(function(element)
-        {
-            if(element.nickname == PlayerData.nickname)
-            {
-                RoomData.myself = element;
-                return;
-            }
-        });
-        console.log(RoomData.myself);
-        WordSpace.test = WordSpace.generateWord.Name(this, false, null);
+
+        // for test
+        WordSpace.attackGauge.add(11);
     },
 
     update: function()
@@ -139,6 +169,7 @@ var gameScene = new Phaser.Class(
         let tempNames = '';
         WordSpace.nameGroup.forEach(function(element)
         {
+            //테스트용
             tempNames += element.wordText + (element.isStrong?' [강]':'') + '\n';
         });
         

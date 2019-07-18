@@ -1,7 +1,5 @@
 var WordSpace = WordSpace || {};
 
-WordSpace.test = null;
-
 // for test
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
@@ -14,6 +12,7 @@ WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
+WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
@@ -35,55 +34,9 @@ WordSpace.delay =
     GameOver: 5000,
 }
 
-WordSpace.playerTypingCycle = null;
 WordSpace.NameSpawnReduce = 1000;
 
 WordSpace.gravityPoint = {x: 640, y: 280};
-
-class Cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
-{
-    constructor(_callback)
-    {
-        this.delay = 0;
-        this.currentCycle = null;
-        this.callbackFunction = _callback;
-    }
-    resetCycle(scene, _delay, _startAt, _loop)
-    {
-        this.delay = _delay;
-        var option = 
-        {
-            startAt: _startAt,
-            delay: _delay,
-            callback: this.callbackFunction,
-            callbackScope: scene,
-            loop: _loop
-        };
-        if (this.currentCycle != null) this.currentCycle = this.currentCycle.reset(option);
-        else this.currentCycle = scene.time.addEvent(option);
-    }
-}
-
-//단어 생성 사이클
-WordSpace.wordCycle = new Cycle(function()
-{
-    WordSpace.genWordByProb(this);
-});
-//게임 오버 사이클
-WordSpace.gameOverCycle = new Cycle(gameOver);
-//호패 생성 사이클
-WordSpace.nameCycle = new Cycle(function()
-{
-    WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-});
-//이건 뭐지
-WordSpace.varAdjustCycle = new Cycle(function()
-{
-    //나중에는 메세지 분석해서 Phase랑 playerTypingRate 받겠지만 일단 이렇게 해둠
-    //WordSpace.GetPhase();
-    //WordSpace.GetPlayerTypingRate();
-    WordSpace.AdjustVarByPhase(WordSpace.playerTypingRate, WordSpace.CurrentPhase);
-});
 
 WordSpace.getSpawnPoint = function(_lenRate)
 {
@@ -159,7 +112,7 @@ WordSpace.attackGauge =
     setRect: function()
     {
         this.rectUI.setSize(20 * this.value, 11);
-        this.rectUI.setPosition(640 - 10 * this.value, 597);
+        this.rectUI.setPosition(640 - 10 * this.value, 547);
         let tmp = this.getAttackOption();
         this.rectUI.setFillStyle(Phaser.Display.Color.HexStringToColor(this.gradeColor[tmp.wordGrade + 1]).color);
     },
@@ -238,10 +191,46 @@ WordSpace.loadImage = function(scene)
     for (let i = 2; i < 7; i++)
     {
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
+        scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
     }
+    scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
+    scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 490, frameHeight: 423 });
+    scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 490, frameHeight: 423 });
 
-    WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / 100 (전체)').setDepth(10).setColor('#000000');
+    WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
     WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
+}
+
+WordSpace.loadAnimation = function(scene)
+{
+    scene.anims.create({
+        key: 'wordBreakAnim',
+        frames: scene.anims.generateFrameNumbers('wordBreak'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.write] = scene.anims.create({
+        key: 'pyeongminWriteAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite] = scene.anims.create({
+        key: 'pyeongminattackWriteAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
+        frameRate: 10,
+        repeat: -1,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.throw] = scene.anims.create({
+        key: 'pyeongminThrowAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminThrow'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    });
 }
 
 WordSpace.generateWord = 
@@ -252,9 +241,9 @@ WordSpace.generateWord =
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
-    Attack: function(scene, wordText, grade, attacker, isStrong, lenRate)
+    Attack: function(scene, wordText, grade, attacker, isStrong, isCountable, lenRate)
     {
-        word = new AttackWord(wordText, grade, attacker, isStrong);
+        word = new AttackWord(wordText, grade, attacker, isStrong, isCountable);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
@@ -284,14 +273,14 @@ WordSpace.pushWord = function(scene, word, lenRate)
 
 function gameOver()
 {
-    WordSpace.wordCycle.currentCycle.remove();
-    WordSpace.nameCycle.currentCycle.remove();
-    WordSpace.varAdjustCycle.currentCycle.remove();
-    clearInterval(WordSpace.playerTypingCycle);
-    //To Do
+    WordSpace.pauseCycle(true);
+    
     socket.emit('defeated');
     console.log('defeat');
-    alert('defeat');
+    ScenesData.gameScene.add.text(640, 360, '패배', {fontSize: '30pt'})
+    .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(10)
+    .setColor('#000000').setBackgroundColor('#ffffff');
+    //alert('defeat');
 }
 
 //게임 오버 판정을 위한 타이머
@@ -337,7 +326,7 @@ WordSpace.findWord = function(wordText)
         }
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else if (wordText === '공격' && WordSpace.attackGauge.value >= 3) // 공격모드 진입.
+    else if (wordText === '공격' && WordSpace.attackGauge.value >= 3 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
     {
         console.log('attack mode');
         Input.attackOption = this.attackGauge.getAttackOption();
@@ -345,6 +334,8 @@ WordSpace.findWord = function(wordText)
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
+        BackGround.myCharacter.anims.msPerFrame /= (4 - WordSpace.attackGauge.getAttackOption().wordGrade);
     }
     else // 오타 체크
     {
@@ -366,9 +357,9 @@ WordSpace.findWord = function(wordText)
                 console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
                 let victimData = 
                 {
-                    roomNum: RoomData.roomNum,
+                    roomNum: RoomData.roomId,
                     victim: RoomData.myself, 
-                    target: element.attacker.idNum
+                    target: element.attacker.id
                 }
                 socket.emit('defenseFailed', victimData);
                 return true;
@@ -389,8 +380,6 @@ WordSpace.setPlayerTyping =
     },
     initiate: function(scene)
     {
-        WordSpace.gameTimer = new Phaser.Time.Clock(scene);
-        WordSpace.gameTimer.start();
         this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
     }
 }
@@ -403,10 +392,11 @@ WordSpace.attack = function(wordText, grade)
         console.log('attack ' + wordText + ', grade: ' + grade);
         WordSpace.nameGroup.forEach(function(element)
         {
+            //console.log(RoomData.myself);
             let attackData = 
             {
-                roomNum: RoomData.roomNum,
-                attacker: PlayerData, 
+                roomNum: RoomData.roomId,
+                attacker: RoomData.myself, 
                 target: element.ownerId,
                 text: wordText, 
                 grade: grade, 
@@ -422,6 +412,7 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
@@ -434,8 +425,10 @@ WordSpace.nameQueue =
     queue: [],
     shuffle: function()
     {
-        let tempIdx, tempElement, tempLength;
-        let tempQueue = RoomData.players;
+        let tempIdx, tempElement, tempLength, tempQueue = [];
+        RoomData.players.forEach(function(element){
+            tempQueue.push(element.index)
+        })
         for(tempLength = tempQueue.length; tempLength; tempLength -= 1)
         {
             tempIdx = Math.floor(Math.random() * tempLength);
@@ -445,7 +438,7 @@ WordSpace.nameQueue =
         }
         tempQueue.forEach(function(element)
         {
-            if(element.id != PlayerData.idNum && element.isAlive)
+            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });
     },
@@ -453,7 +446,8 @@ WordSpace.nameQueue =
     {
         let tempElement = WordSpace.nameQueue.queue.shift();
         if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
-        return tempElement;
+        if(!RoomData.players[tempElement].isAlive) return WordSpace.nameQueue.pop();
+        else return RoomData.players[tempElement];
     },
     initiate: function()
     {
