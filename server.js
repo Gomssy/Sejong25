@@ -89,25 +89,28 @@ io.on('connection', function(socket)
     {
         socket.playerData.currentRoom.announceToTarget(msg.target, 'attacked', msg);
         //console.log('attack ' + msg.target + ' by ' + msg.attacker.id + ' with ' + msg.text);
-        let target = GameServer.findPlayerSocket(msg.target);
-        if (target != null)
+        setTimeout(function()
         {
-            let dataToPush = 
+            let target = GameServer.findPlayerSocket(msg.target);
+            if (target != null)
             {
-                attackerId: msg.attacker.id,
-                attacker: msg.attacker.nickname,
-                word: msg.text,
-                wordGrade: msg.grade,
-                time: Date.now()
-            }
+                let dataToPush = 
+                {
+                    attackerId: msg.attacker.id,
+                    attacker: msg.attacker.nickname,
+                    word: msg.text,
+                    wordGrade: msg.grade,
+                    time: Date.now()
+                }
 
-            if (target.playerData.playingData.lastAttacks.length < 5) target.playerData.playingData.lastAttacks.push(dataToPush);
-            else
-            {
-                target.playerData.playingData.lastAttacks.splice(0, 1);
-                target.playerData.playingData.lastAttacks.push(dataToPush);
+                if (target.playerData.playingData.lastAttacks.length < 5) target.playerData.playingData.lastAttacks.push(dataToPush);
+                else
+                {
+                    target.playerData.playingData.lastAttacks.splice(0, 1);
+                    target.playerData.playingData.lastAttacks.push(dataToPush);
+                }
             }
-        }
+        }, 4000);
     });
 
     socket.on('defeated', function()

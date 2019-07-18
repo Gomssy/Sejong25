@@ -199,7 +199,7 @@ Input.convert = function()
     }
     if (this.convInput.length > 1)
     {
-        if (this.convInput[1].charCodeAt(0) > '가'.charCodeAt(0)) Input.input.splice(0, this.input.length - 2);
+        if (this.convInput[1].charCodeAt(0) >= '가'.charCodeAt(0)) Input.input.splice(0, this.input.length - 2);
         else Input.input.splice(0, this.input.length - 1);
         this.converted += this.convInput.slice(0, 1);
         this.convInput = this.convInput.slice(1, 2);
