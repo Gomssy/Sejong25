@@ -6,7 +6,8 @@ BackGround.myCharacter = null;
 BackGround.loadImage = function(scene)
 {
     scene.load.image('brainGround', 'assets/image/background/background_brain.png');
-    scene.load.image('menuBackground', 'assets/placeholder/menuBackground.png')
+    scene.load.image('menuBackground', 'assets/placeholder/menuBackground.png');
+    scene.load.image('roomBackground', 'assets/placeholder/roomBackground.png');
 }
 
 BackGround.drawCharacter = function(scene)
@@ -22,4 +23,9 @@ BackGround.drawBrain = function(scene)
 BackGround.drawMenu = function(scene)
 {
     scene.add.sprite(640, 360, 'menuBackground').setDisplaySize(1282, 722).setDepth(1);
+}
+
+BackGround.drawRoom = function(scene)
+{
+    scene.add.sprite(640, 360, 'roomBackground').setDisplaySize(1282, 722).setDepth(1);
 }

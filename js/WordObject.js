@@ -1,12 +1,13 @@
 class WordObject
 {
+
     constructor(text, isNameWord = false)
     {
         this.generationCode = WordSpace.nextWordCode++;
         this.wordText = text;
         this.wordTyping = WordReader.getWordTyping(this.wordText);
         this.wordGrade = WordReader.getWordGrade(this.wordTyping);
-        this.wordWeight = WordReader.getWordWeight(this.wordGrade);
+        this.wordWeight = WordReader.normalWeight[3 - this.wordGrade];
         //console.log("wordTyping : " + this.wordTyping + '\n' + "wordGrade : " + this.wordGrade + '\n' + "wordWeight : " + this.wordWeight + '\n');
         this.wordSpeed = 0.5;
         this.isNameWord = isNameWord;
@@ -49,10 +50,11 @@ class WordObject
             {
                 fontSize: (this.scale * this.fontScale) +'pt',
                 fontFamily: '"궁서", 궁서체, serif',
-                fontStyle: (this.wordWeight > 5 ? 'bold' : '')
+                //fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             });
         if (!this.isNameWord) this.wordObj.setColor('#000000').setOrigin(0.5,0.5);
         else this.wordObj.setColor('#ffffff').setOrigin(0.45,0.5);
+        this.createdTime = WordSpace.gameTimer.now;
         WordSpace.totalWeight += this.wordWeight;
         WordSpace.totalWordNum += 1;
         WordSpace.setGameOverTimer();
@@ -79,7 +81,7 @@ class WordObject
             this.wordObj.destroy();
             this.physicsObj.destroy();
         }
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[0]);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
     }
     
     attract()
@@ -136,20 +138,50 @@ class NormalWord extends WordObject
 
 class AttackWord extends WordObject
 {
-    constructor(text, _wordGrade, _playerData, isStrong)
+    constructor(text, _wordGrade, _playerData, _isStrong, _isCountable = true, lenRate)
     {
         super(text);
         this.wordGrade = _wordGrade;
-        this.wordWeight = WordReader.getWordWeight(this.wordGrade);
+        this.wordWeight = _isStrong ? WordReader.strongAttackWeight[3 - this.wordGrade] : WordReader.attackWeight[3 - this.wordGrade];
         if(WordReader.getWordTyping(_playerData.nickname) > 9)
             this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(_playerData.nickname) - 9);
-        this.wordWeight *= isStrong ? 3 : 2;
         this.attacker = _playerData;
-        this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
+        if(!_isCountable) this.counterTime = 0;
+        else this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
                             ((5 - _wordGrade) * 3 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
     }
+    instantiate(scene, lenRate)
+    {
+        super.instantiate(scene, lenRate);
+        this.maskBackground = scene.physics.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
+        .setTint(Phaser.Display.Color.GetColor(120, 120, 120)).setScale(this.scale);
+        this.maskBackground.alpha = 0.5;
+
+        this.shape = scene.make.graphics();
+        var rect = new Phaser.Geom.Rectangle(0, 0, this.maskBackground.width * this.scale, this.maskBackground.height * this.scale);
+        this.shape.fillStyle(0xffffff).fillRectShape(rect);
+
+        this.mask = this.shape.createGeometryMask();
+        this.maskBackground.setMask(this.mask);
+        this.maskStart = this.physicsObj.x;
+        this.maskEnd = this.physicsObj.x - this.physicsObj.width * this.scale;
+    }
+
+    attract()
+    {
+        super.attract();
+        if(WordSpace.gameTimer.now < this.counterTime)
+        {
+            this.maskBackground.setPosition(this.physicsObj.x, this.physicsObj.y);
+            this.shape.x = this.physicsObj.x + (this.maskEnd - this.maskStart) * 
+                            ((WordSpace.gameTimer.now - this.createdTime) / (this.counterTime - this.createdTime)) - this.physicsObj.width * this.scale / 2;
+            this.shape.y = this.physicsObj.y - this.physicsObj.height * this.scale / 2;
+        }
+        else if(this.maskBackground != null) this.maskBackground.destroy();
+    }
+
     destroy()
     {
         switch(this.wordGrade)
@@ -162,11 +194,23 @@ class AttackWord extends WordObject
         }
         if(WordSpace.gameTimer.now < this.counterTime)
         {
-            console.log(this.attacker);
             let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, this.attacker);
+            tempWord.physicsObj.setPosition(this.physicsObj.x, this.physicsObj.y);
+            tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
             tempWord.destroy();
+            let attackData = 
+            {
+                roomNum: RoomData.roomId,
+                attacker: RoomData.myself,
+                target: this.attacker.id,
+                text: this.wordText,
+                grade: Math.min(3, this.wordGrade + 1),
+                isStrong: false,
+                isCountable: false
+            }
+            socket.emit('attack', attackData);
         }
-        //WordSpace.nameGroup.push(new NameWord(this.attacker, true));
+        if(this.maskBackground != null) this.maskBackground.destroy();
         super.destroy();
     }
 }
@@ -185,7 +229,8 @@ class NameWord extends WordObject
     attract()
     {
         if(this.isActive) super.attract();
-        else{
+        else
+        {
             this.path.getPoint(this.follower.t, this.follower.vec);
             this.physicsObj.setPosition(this.follower.vec.x, this.follower.vec.y);
             this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);

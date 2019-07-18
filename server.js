@@ -25,12 +25,11 @@ io.on('connection', function(socket)
         {
             id: GameServer.getPlayerNumber(),
             nickname: '게스트',
-            socketId: socket,
             currentRoom: null,
             playingData: null,
             isReceivable: false
         };
-        GameServer.currentPlayer.push(socket.playerData);
+        GameServer.currentPlayer.push(socket);
         console.log('['+socket.playerData.id+'] client request');
         socket.emit('setId', 
         {
@@ -44,14 +43,14 @@ io.on('connection', function(socket)
         let isAlreadyHave = false;
         GameServer.currentPlayer.forEach(function(element)
         {
-            if (element.nickname === msg) isAlreadyHave = true;
+            if (element.playerData.nickname === msg) isAlreadyHave = true;
         });
         if (isAlreadyHave) socket.emit('alert' ,'errNicknameOverlaped');
         else
         {
             socket.playerData.nickname = msg;
             console.log('['+socket.playerData.id+'] nickname set to ' + msg);
-            GameServer.enterEmptyRoom(socket.playerData);
+            GameServer.enterEmptyRoom(socket);
         }
     });
 
@@ -76,15 +75,15 @@ io.on('connection', function(socket)
         socket.playerData.currentRoom.aliveCount--;
         if (socket.playerData.currentRoom.aliveCount === 0)
         {
-            GameServer.startRoom(GameServer.findRoomIndex(socket.playerData.currentRoom.roomNum));
+            socket.playerData.currentRoom.startRoom();
         }
     });
 
     socket.on('attack', function(msg)
     {
-        GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attacked', msg);
-        //console.log('find ' + msg.target + ' by ' + msg.attacker.idNum + ' with ' + msg.text);
-        let target = GameServer.findPlayer(msg.target);
+        socket.playerData.currentRoom.announceToTarget(msg.target, 'attacked', msg);
+        //console.log('attack ' + msg.target + ' by ' + msg.attacker.id + ' with ' + msg.text);
+        let target = GameServer.findPlayerSocket(msg.target);
         if (target != null)
         {
             let dataToPush = 
@@ -96,23 +95,23 @@ io.on('connection', function(socket)
                 time: Date.now()
             }
 
-            if (target.playingData.lastAttacks.length < 5) target.playingData.lastAttacks.push(dataToPush);
+            if (target.playerData.playingData.lastAttacks.length < 5) target.playerData.playingData.lastAttacks.push(dataToPush);
             else
             {
-                target.playingData.lastAttacks.splice(0, 1);
-                target.playingData.lastAttacks.push(dataToPush);
+                target.playerData.playingData.lastAttacks.splice(0, 1);
+                target.playerData.playingData.lastAttacks.push(dataToPush);
             }
         }
     });
 
     socket.on('defeated', function()
     {
-        GameServer.playerDefeat(socket.playerData);
+        socket.playerData.playingData.defeat();
     });
 
     socket.on('defenseFailed', function(msg)
     {
-        GameServer.announceToTarget(GameServer.findRoomIndex(msg.roomNum), msg.target, 'attackSucceed', msg);
+        socket.playerData.currentRoom.announceToTarget(msg.target, 'attackSucceed', msg);
     });
 
     socket.on('disconnect', function(reason)
@@ -128,31 +127,38 @@ io.on('connection', function(socket)
             console.log('['+ data.id +'] client disconnected, reason: ' + reason);
             let idxToDel = GameServer.currentPlayer.findIndex(function(element)
             {
-                return element.id === data.id;
+                return element.playerData.id === data.id;
             });
             if (idxToDel != -1) 
             {
-                GameServer.currentPlayer.splice(idxToDel, 1);
                 // 룸에서도 제거
                 if (data.currentRoom != null)
                 {
                     if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
                     {
-                        data.currentRoom.currentPlayer[data.playingData.index] = null;
-                        data.currentRoom.currentSocket[data.playingData.index] = null;
-                        data.currentRoom.aliveCount--;
-                        if (data.currentRoom.aliveCount < GameServer.startCount)
+                        data.currentRoom.exitRoom(data.id);
+                        if (data.currentRoom.aliveCount < data.currentRoom.startCount)
                         {
-                            GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'setCount', {isEnable: false, endTime: 0});
+                            data.currentRoom.announceToRoom('setRoomCount', 
+                            {
+                                isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length,
+                                isEnter: false, player: data.playingData
+                            });
                             data.currentRoom.currentPhase = GameServer.Phase.READY;
                         }
+                        else data.currentRoom.announceToRoom('setRoomCount', 
+                            {
+                                isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length,
+                                isEnter: false, player: data.playingData
+                            });
                     }
                     else if (data.playingData.isAlive)
                     {
-                        GameServer.playerDefeat(socket.playerData);
-                        GameServer.announceToRoom(GameServer.findRoomIndex(data.currentRoom.roomNum), 'userDisconnect', data.playingData);
+                        data.playingData.defeat();
+                        data.currentRoom.announceToRoom('userDisconnect', data.playingData);
                     }
                 }
+                GameServer.currentPlayer.splice(idxToDel, 1);
             }
             console.log('['+ data.id +'] disconnect complete');
         }

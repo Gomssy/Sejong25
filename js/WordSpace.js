@@ -256,20 +256,27 @@ WordSpace.loadAnimation = function(scene)
         repeat: 0,
         hideOnComplete: false
     });
-    WordSpace.pyeongminAnims.push(scene.anims.create({
-        key: 'write',
+    WordSpace.pyeongminAnims[Enums.characterAnim.write] = scene.anims.create({
+        key: 'pyeongminWriteAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
         frameRate: 10,
         repeat: 0,
         hideOnComplete: false
-    }));
-    WordSpace.pyeongminAnims.push(scene.anims.create({
-        key: 'throw',
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite] = scene.anims.create({
+        key: 'pyeongminattackWriteAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
+        frameRate: 10,
+        repeat: -1,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.throw] = scene.anims.create({
+        key: 'pyeongminThrowAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminThrow'),
         frameRate: 10,
         repeat: 0,
         hideOnComplete: false
-    }));
+    });
 }
 
 WordSpace.generateWord = 
@@ -280,9 +287,9 @@ WordSpace.generateWord =
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
-    Attack: function(scene, wordText, grade, attacker, isStrong, lenRate)
+    Attack: function(scene, wordText, grade, attacker, isStrong, isCountable, lenRate)
     {
-        word = new AttackWord(wordText, grade, attacker, isStrong);
+        word = new AttackWord(wordText, grade, attacker, isStrong, isCountable);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
@@ -373,6 +380,8 @@ WordSpace.findWord = function(wordText)
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
+        BackGround.myCharacter.anims.msPerFrame /= (4 - WordSpace.attackGauge.getAttackOption().wordGrade);
     }
     else // 오타 체크
     {
@@ -394,7 +403,7 @@ WordSpace.findWord = function(wordText)
                 console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
                 let victimData = 
                 {
-                    roomNum: RoomData.roomNum,
+                    roomNum: RoomData.roomId,
                     victim: RoomData.myself, 
                     target: element.attacker.id
                 }
@@ -417,8 +426,6 @@ WordSpace.setPlayerTyping =
     },
     initiate: function(scene)
     {
-        WordSpace.gameTimer = new Phaser.Time.Clock(scene);
-        WordSpace.gameTimer.start();
         this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
     }
 }
@@ -431,9 +438,10 @@ WordSpace.attack = function(wordText, grade)
         console.log('attack ' + wordText + ', grade: ' + grade);
         WordSpace.nameGroup.forEach(function(element)
         {
+            //console.log(RoomData.myself);
             let attackData = 
             {
-                roomNum: RoomData.roomNum,
+                roomNum: RoomData.roomId,
                 attacker: RoomData.myself, 
                 target: element.ownerId,
                 text: wordText, 
@@ -450,7 +458,7 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[1]);
+        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
@@ -463,8 +471,10 @@ WordSpace.nameQueue =
     queue: [],
     shuffle: function()
     {
-        let tempIdx, tempElement, tempLength;
-        let tempQueue = RoomData.players;
+        let tempIdx, tempElement, tempLength, tempQueue = [];
+        RoomData.players.forEach(function(element){
+            tempQueue.push(element.index)
+        })
         for(tempLength = tempQueue.length; tempLength; tempLength -= 1)
         {
             tempIdx = Math.floor(Math.random() * tempLength);
@@ -474,7 +484,7 @@ WordSpace.nameQueue =
         }
         tempQueue.forEach(function(element)
         {
-            if(element.id != PlayerData.idNum && element.isAlive)
+            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive)
                 WordSpace.nameQueue.queue.push(element);
         });
     },
@@ -482,7 +492,8 @@ WordSpace.nameQueue =
     {
         let tempElement = WordSpace.nameQueue.queue.shift();
         if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
-        return tempElement;
+        if(!RoomData.players[tempElement].isAlive) return WordSpace.nameQueue.pop();
+        else return RoomData.players[tempElement];
     },
     initiate: function()
     {

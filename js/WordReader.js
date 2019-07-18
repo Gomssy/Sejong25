@@ -54,9 +54,6 @@ WordReader.getWordGrade = function(_wordTyping)
           17 <= _wordTyping && _wordTyping < 26 ? 0 : -1;
 }
 
-WordReader.getWordWeight = function(_wordGrade)
-{
-    return _wordGrade == 3 ? 3 : 
-        _wordGrade == 2 ? 5 : 
-        _wordGrade == 1 ? 7 : 10;
-}
+WordReader.normalWeight = [3, 5, 7, 10];
+WordReader.attackWeight = [6, 8, 12, 15];
+WordReader.strongAttackWeight = [10, 13, 16, 20];
