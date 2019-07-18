@@ -70,13 +70,35 @@ var roomScene = new Phaser.Class(
             if (this.endTime < Date.now()) 
             {
                 //console.log('end Count');
-                socket.emit('endCount');
+                setTimeout(() => {
+                    socket.emit('endCount');
+                }, (2000 + Phaser.Math.Distance.Between(0, 0, 640, 800) * 2));
                 this.isCounting = false;
                 this.isCountEnd = true;
+                this.players.forEach(function(element){
+                    element.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+                    element.path = new Phaser.Curves.Line([
+                        element.sprite.x, element.sprite.y,
+                        640, 800
+                    ]);
+                    console.log(Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, 640, 800) * 2);
+                    ScenesData.roomScene.tweens.add({
+                        targets: element.follower,
+                        t: 1,
+                        ease: 'Linear',
+                        duration: 2000 + Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, 640, 800) * 2,
+                        repeat: 0
+                    });
+                });
             }
         }
         else if (this.isCountEnd)
         {
+            this.players.forEach(function(element){
+                element.path.getPoint(element.follower.t, element.follower.vec);
+                element.sprite.setPosition(element.follower.vec.x, element.follower.vec.y);
+                element.nickname.setPosition(element.sprite.x - 10, element.sprite.y - 60);
+            });
             this.countText.setText('잠시만 기다려주세요...');
         }
         else
