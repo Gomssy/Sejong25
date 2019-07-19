@@ -1,6 +1,5 @@
 class WordObject
 {
-
     constructor(text, isNameWord = false)
     {
         this.generationCode = WordSpace.nextWordCode++;
@@ -267,8 +266,8 @@ class NameWord extends WordObject
         this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
         this.path = new Phaser.Curves.Spline([
             this.physicsObj.x, this.physicsObj.y,
-            (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 15) / 2, this.physicsObj.y - 50,
-            500 + WordSpace.nameGroup.length * 15, 680 + this.wordText.length * 10 + (Math.random() * 20 - 10)
+            (this.physicsObj.x + game.config.width * (500 + WordSpace.nameGroup.length * 15) / 1280) / 2, this.physicsObj.y - game.config.height * 5 / 72,
+            game.config.width * (500 + WordSpace.nameGroup.length * 15) / 1280, game.config.height * (680 + this.wordText.length * 10 + (Math.random() * 20 - 10)) / 720
         ]);
         ScenesData.gameScene.tweens.add({
             targets: this.follower,

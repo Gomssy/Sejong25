@@ -36,7 +36,7 @@ WordSpace.delay =
 
 WordSpace.NameSpawnReduce = 1000;
 
-WordSpace.gravityPoint = {x: 640, y: 280};
+WordSpace.gravityPoint = {x: 960, y: 420};
 
 WordSpace.getSpawnPoint = function(_lenRate)
 {
@@ -111,15 +111,15 @@ WordSpace.attackGauge =
     gradeColor: ['#111124','#EBB435','#A42FFF','#1D22EB','#83947F'],
     setRect: function()
     {
-        this.rectUI.setSize(20 * this.value, 11);
-        this.rectUI.setPosition(640 - 10 * this.value, 547);
+        this.rectUI.setSize(game.config.width / 64 * this.value, game.config.height * 11 / 720);
+        this.rectUI.setPosition(game.config.width * (640 - 10 * this.value) / 1280, game.config.height * 547 / 720);
         let tmp = this.getAttackOption();
         this.rectUI.setFillStyle(Phaser.Display.Color.HexStringToColor(this.gradeColor[tmp.wordGrade + 1]).color);
     },
     generate: function(scene)
     {
         //console.log("created");
-        this.rectUI = scene.add.rectangle(640,600,0,11).setDepth(11);
+        this.rectUI = scene.add.rectangle(game.config.width / 2, game.config.height * 5 / 6, 0, game.config.height * 11 / 720).setDepth(11);
     },
     add: function(plus)
     {

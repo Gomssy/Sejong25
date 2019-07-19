@@ -316,8 +316,8 @@ Input.inputField =
 {
     generate: function(scene, enterCallback)
     {
-        this.background = scene.add.sprite(640, 500, 'inputfield').setDepth(10);
-        this.text = scene.add.text(640, 500, "", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
+        this.background = scene.add.sprite(game.config.width / 2, game.config.height * 25 / 36, 'inputfield').setDepth(10);
+        this.text = scene.add.text(game.config.width / 2, game.config.height * 25 / 36, "", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
 
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});

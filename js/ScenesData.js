@@ -57,7 +57,7 @@ var roomScene = new Phaser.Class(
         this.endTime = 0;
         this.peopleCount = 1;
         this.countText = this.add.text(game.config.width / 2, game.config.height / 2, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10).setPadding(5,5,5,5);
-        this.peopleText = this.add.text(640, 80, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10);
+        this.peopleText = this.add.text(game.config.width / 2, game.config.height / 9, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10);
     },
 
     update: function()
@@ -72,20 +72,20 @@ var roomScene = new Phaser.Class(
                 //console.log('end Count');
                 setTimeout(() => {
                     socket.emit('endCount');
-                }, (Phaser.Math.Distance.Between(0, 0, 640, 800) * 3));
+                }, (Phaser.Math.Distance.Between(0, 0, game.config.width / 2, game.config.height * 10 / 9) * 3));
                 this.isCounting = false;
                 this.isCountEnd = true;
                 this.players.forEach(function(element){
                     element.follower = { t: 0, vec: new Phaser.Math.Vector2() };
                     element.path = new Phaser.Curves.Line([
                         element.sprite.x, element.sprite.y,
-                        640, 800
+                        game.config.width / 2, game.config.height * 10 / 9
                     ]);
                     ScenesData.roomScene.tweens.add({
                         targets: element.follower,
                         t: 1,
                         ease: 'Linear',
-                        duration: Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, 640, 800) * 3,
+                        duration: Phaser.Math.Distance.Between(element.sprite.x, element.sprite.y, game.config.width / 2, game.config.height * 10 / 9) * 3,
                         repeat: 0
                     });
                 });
@@ -96,7 +96,7 @@ var roomScene = new Phaser.Class(
             this.players.forEach(function(element){
                 element.path.getPoint(element.follower.t, element.follower.vec);
                 element.sprite.setPosition(element.follower.vec.x, element.follower.vec.y);
-                element.nickname.setPosition(element.sprite.x - 10, element.sprite.y - 60);
+                element.nickname.setPosition(element.sprite.x - game.config.width / 128, element.sprite.y - game.config.height / 12);
             });
             this.countText.setText('잠시만 기다려주세요...');
         }
