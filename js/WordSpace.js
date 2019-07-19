@@ -277,7 +277,7 @@ function gameOver()
     
     socket.emit('defeated');
     console.log('defeat');
-    ScenesData.gameScene.add.text(640, 360, '패배', {fontSize: '30pt'})
+    ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '패배', {fontSize: '30pt'})
     .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(10)
     .setColor('#000000').setBackgroundColor('#ffffff');
     //alert('defeat');

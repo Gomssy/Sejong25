@@ -12,20 +12,20 @@ BackGround.loadImage = function(scene)
 
 BackGround.drawCharacter = function(scene)
 {
-    BackGround.myCharacter = scene.add.sprite(640, 615, 'pyeongminWrite').setScale(0.45).setDepth(2);
+    BackGround.myCharacter = scene.add.sprite(game.config.width / 2, game.config.height * 41 / 48, 'pyeongminWrite').setScale(0.45).setDepth(2);
 }
 
 BackGround.drawBrain = function(scene)
 {
-    brains = scene.add.sprite(640, 360, 'brainGround').setDisplaySize(1282, 722).setDepth(1);
+    brains = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'brainGround').setDisplaySize(game.config.width, game.config.height).setDepth(1);
 }
 
 BackGround.drawMenu = function(scene)
 {
-    scene.add.sprite(640, 360, 'menuBackground').setDisplaySize(1282, 722).setDepth(1);
+    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'menuBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);
 }
 
 BackGround.drawRoom = function(scene)
 {
-    scene.add.sprite(640, 360, 'roomBackground').setDisplaySize(1282, 722).setDepth(1);
+    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'roomBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);
 }

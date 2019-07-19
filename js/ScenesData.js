@@ -56,7 +56,7 @@ var roomScene = new Phaser.Class(
         this.isCountEnd = false;
         this.endTime = 0;
         this.peopleCount = 1;
-        this.countText = this.add.text(640, 360, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10).setPadding(5,5,5,5);
+        this.countText = this.add.text(game.config.width / 2, game.config.height / 2, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10).setPadding(5,5,5,5);
         this.peopleText = this.add.text(640, 80, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10);
     },
 
