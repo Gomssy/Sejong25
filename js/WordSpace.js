@@ -21,7 +21,7 @@ WordSpace.wordPhysicsGroup = null;
 
 WordSpace.GradeProb = [0.35, 0.6, 0.8];
 WordSpace.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-WordSpace.CurrentPhase = WordSpace.Phase.READY;
+WordSpace.CurrentPhase = WordSpace.Phase.START;
 WordSpace.playerTyping = 0;
 WordSpace.playerTypingRate = 0;
 
@@ -372,11 +372,13 @@ WordSpace.findWord = function(wordText)
 WordSpace.setPlayerTyping = 
 {
     totalTyping: 0,
+    writeWord: false,
     add: function(wordText)
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
         WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 60 * 1000;
         this.text.setText('현재 타수 : ' + WordSpace.playerTyping.toFixed(1));
+        this.writeWord = wordText != '' ? true : false;
     },
     initiate: function(scene)
     {

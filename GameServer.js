@@ -201,7 +201,6 @@ class GameRoom
         this.announceToRoom('syncRoomData', toSync);
 
         console.log('[ROOM#'+this.roomId+'] Game Start with ' + this.currentPlayer.length + ' players');
-        this.announceToRoom('changePhase', GameServer.Phase.START);
         this.announceToRoom('startGame');
         this.startTime = Date.now();
     }
@@ -323,7 +322,7 @@ class Player
         }
 
         room.announceToRoom('defeat', this);
-        console.log('[' + this.id + '] defeated, rank: ' + this.rank + ', ' + room.currentPlayer.length + 'player left');
+        console.log('[' + this.id + '] defeated, rank: ' + this.rank + ', ' + room.aliveCount + ' player left');
 
         if (socket.playerData.currentRoom.aliveCount === 1)
         {

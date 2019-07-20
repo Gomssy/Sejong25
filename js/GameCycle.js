@@ -3,10 +3,7 @@ WordSpace.startCycle = function(scene)
     WordSpace.wordCycle.resetCycle(scene, 3000, 0, true);
     WordSpace.nameCycle.resetCycle(scene, 3000, 0, true);
     WordSpace.varAdjustCycle.resetCycle(scene, 100, 0, true);
-    WordSpace.playerTypingCycle = setInterval(function()
-    {
-        socket.emit('setPlayerTyping', WordSpace.playerTyping);
-    }, 500);
+    WordSpace.playerTypingCycle.resetCycle(scene, 500, 500, true);
 }
 
 WordSpace.pauseCycle = function(isPause)
@@ -15,11 +12,7 @@ WordSpace.pauseCycle = function(isPause)
     WordSpace.nameCycle.currentCycle.paused = isPause;
     WordSpace.varAdjustCycle.currentCycle.paused = isPause;
     WordSpace.attackGauge.pauseCycle(isPause);
-    if (isPause) clearInterval(WordSpace.playerTypingCycle);
-    else WordSpace.playerTypingCycle = setInterval(function()
-    {
-        socket.emit('setPlayerTyping', WordSpace.playerTyping);
-    }, 500);
+    WordSpace.playerTypingCycle.currentCycle.paused = isPause;
 }
 
 class Cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
@@ -65,4 +58,10 @@ WordSpace.varAdjustCycle = new Cycle(function()
     //WordSpace.GetPhase();
     //WordSpace.GetPlayerTypingRate();
     WordSpace.AdjustVarByPhase(WordSpace.playerTypingRate, WordSpace.CurrentPhase);
+});
+// playerTypingRate 갱신용 사이클
+WordSpace.playerTypingCycle = new Cycle(function()
+{
+    socket.emit('setPlayerTyping', {playerTyping: WordSpace.playerTyping, isWord: WordSpace.setPlayerTyping.writeWord, isAttackMode: Input.attackMode} );
+    WordSpace.setPlayerTyping.writeWord = false;
 });
