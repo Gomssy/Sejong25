@@ -425,17 +425,11 @@ WordSpace.nameQueue =
     queue: [],
     shuffle: function()
     {
-        let tempIdx, tempElement, tempLength, tempQueue = [];
+        let tempQueue = [];
         RoomData.players.forEach(function(element){
             tempQueue.push(element.index)
         })
-        for(tempLength = tempQueue.length; tempLength; tempLength -= 1)
-        {
-            tempIdx = Math.floor(Math.random() * tempLength);
-            tempElement = tempQueue[tempLength - 1];
-            tempQueue[tempLength - 1] = tempQueue[tempIdx];
-            tempQueue[tempIdx] = tempElement;
-        }
+        tempQueue.sort(function(){return 0.5-Math.random()});
         tempQueue.forEach(function(element)
         {
             if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive)

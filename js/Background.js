@@ -22,13 +22,15 @@ BackGround.loadImage = function(scene)
 BackGround.drawCharacter = function(scene)
 {
     BackGround.myCharacter = scene.add.sprite(game.config.width / 2, game.config.height * 41 / 48, 'pyeongminWrite').setScale(0.45).setDepth(2);
-    BackGround.characterPos = Phaser.Utils.Array.Shuffle(BackGround.characterPos);
+    BackGround.characterPos = BackGround.characterPos.sort(function(){return 0.5-Math.random()});
     RoomData.players.forEach(function(element){
         if(element.id != RoomData.myself.id)
         {
             element.position = BackGround.characterPos.pop();
             BackGround.otherCharacters.push(scene.add.sprite(element.position.x, element.position.y, 'pyeongminWrite').setScale(0.45).setDepth(1));
             BackGround.otherCharacters[BackGround.otherCharacters.length - 1].flipX = element.position.x < game.config.width / 2 ? true : false;
+            BackGround.otherCharacters[BackGround.otherCharacters.length - 1].nicknameText = scene.add.text(element.position.x, element.position.y - 90, element.nickname)
+                .setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(1);
         }
     });
 }
