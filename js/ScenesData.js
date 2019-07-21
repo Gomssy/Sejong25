@@ -153,6 +153,17 @@ var gameScene = new Phaser.Class(
 
         // for test
         WordSpace.attackGauge.add(11);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
     },
 
     update: function()
@@ -171,6 +182,9 @@ var gameScene = new Phaser.Class(
         {
             //테스트용
             tempNames += element.wordText + (element.isStrong?' [강]':'') + '\n';
+        });
+        WordSpace.attackPaperGroup.forEach(function(element){
+            element.moveObject(element);
         });
         
         WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);

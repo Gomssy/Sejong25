@@ -16,6 +16,7 @@ WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
+WordSpace.attackPaperGroup = [];
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
@@ -196,6 +197,7 @@ WordSpace.loadImage = function(scene)
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 490, frameHeight: 423 });
     scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 490, frameHeight: 423 });
+    scene.load.image('attackPapaer', 'assets/image/etc/paper_crumbled.png');
 
     WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
     WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
@@ -345,14 +347,14 @@ WordSpace.findWord = function(wordText)
         {
             if(element instanceof AttackWord)
             {
-                tempDist = WordSpace.getEditDistance(wordText, element.wordText);
+                tempDist = WordReader.getEditDistance(wordText, element.wordText);
                 attackWords.push(element);
                 if(tempDist <= minDist) minDist = tempDist;
             }
         });
         attackWords.some(function(element)
         {
-            if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
+            if(WordReader.getEditDistance(wordText, element.wordText) == minDist)
             {
                 console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
                 let victimData = 
@@ -405,6 +407,33 @@ WordSpace.attack = function(wordText, grade)
             socket.emit('attack', attackData);
             element.physicsObj.destroy();
             element.wordObj.destroy();
+            var attackPaper = ScenesData.gameScene.add.sprite(BackGround.myCharacter.x, BackGround.myCharacter.y, 'attackPapaer').setScale(0.5).setDepth(3);
+            attackPaper.throwTarget = RoomData.players.find(function(_element) {
+                return _element.id == element.ownerId;
+            }).playerImage;
+            attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+            attackPaper.path = new Phaser.Curves.Spline([
+                BackGround.myCharacter.x, BackGround.myCharacter.y,
+                (BackGround.myCharacter.x + attackPaper.throwTarget.x) / 2, Math.min(BackGround.myCharacter.y, attackPaper.throwTarget.y) - 100,
+                attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
+            ]);
+            ScenesData.gameScene.tweens.add({
+                targets: attackPaper.follower,
+                t: 1,
+                ease: 'Linear',
+                duration: 4000,
+                repeat: 0,
+                onComplete: function() { 
+                    attackPaper.destroy();
+                    WordSpace.attackPaperGroup = [];
+                }
+            });
+            attackPaper.moveObject = function(obj)
+            {
+                obj.path.getPoint(obj.follower.t, obj.follower.vec);
+                obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
+            }
+            WordSpace.attackPaperGroup.push(attackPaper);
         });
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
@@ -448,34 +477,4 @@ WordSpace.nameQueue =
         this.shuffle();
         this.shuffle();
     }
-}
-
-WordSpace.getEditDistance = function(input, check) {
-    var inputWords = [], checkWords = []
-    for(let i = 0; i < input.length; i++)
-    {
-        inputWords.push(parseInt(((input[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
-        inputWords.push(parseInt(((input[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
-        inputWords.push(parseInt((input[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
-    }
-    for(let i = 0; i < check.length; i++)
-    {
-        checkWords.push(parseInt(((check[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
-        checkWords.push(parseInt(((check[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
-        checkWords.push(parseInt((check[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
-    }  
-    var matrix = [];
-    var i, j;
-    for(i = 0; i <= checkWords.length; i++) // increment along the first column of each row
-        matrix[i] = [i];
-    for(j = 0; j <= inputWords.length; j++) // increment each column in the first row
-        matrix[0][j] = j;
-    for(i = 1; i <= checkWords.length; i++) // Fill in the rest of the matrix
-        for(j = 1; j <= inputWords.length; j++){
-            if(checkWords[i-1] == inputWords[j-1]) matrix[i][j] = matrix[i-1][j-1];
-            else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
-                                    Math.min(matrix[i][j-1] + 1, // insertion
-                                            matrix[i-1][j] + 1)); // deletion
-        }
-    return matrix[checkWords.length][inputWords.length];
 }

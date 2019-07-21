@@ -31,7 +31,7 @@ BackGround.drawCharacter = function(scene)
             element.playerImage.flipX = element.position.x < game.config.width / 2 ? true : false;
             element.nicknameText = scene.add.text(element.position.x, element.position.y - 90, element.nickname)
                 .setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(1);
-        }
+6        }
     });
 }
 
