@@ -177,12 +177,6 @@ var gameScene = new Phaser.Class(
         {
             element.attract();
         })
-        let tempNames = '';
-        WordSpace.nameGroup.forEach(function(element)
-        {
-            //테스트용
-            tempNames += element.wordText + (element.isStrong?' [강]':'') + '\n';
-        });
         WordSpace.attackPaperGroup.forEach(function(element){
             element.moveObject(element);
         });

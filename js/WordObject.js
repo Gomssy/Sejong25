@@ -276,9 +276,6 @@ class NameWord extends WordObject
             duration: 2000,
             repeat: 0
         });
-        /*setTimeout(() => {
-            WordSpace.movingObjects.pop();
-        }, 2000);*/
 
         //이동경로 디버그
         /*var graphics = ScenesData.gameScene.add.graphics();

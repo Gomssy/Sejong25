@@ -199,8 +199,8 @@ WordSpace.loadImage = function(scene)
     scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 490, frameHeight: 423 });
     scene.load.image('attackPapaer', 'assets/image/etc/paper_crumbled.png');
 
-    WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
-    WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
+    WordSpace.weightTextObjForTest = scene.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
+    WordSpace.killLogTextForTest = scene.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
 }
 
 WordSpace.loadAnimation = function(scene)
