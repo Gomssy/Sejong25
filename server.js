@@ -58,22 +58,29 @@ io.on('connection', function(socket)
     {
         try
         {
-            socket.playerData.playingData.playerTyping = msg;
-            if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
+            socket.playerData.playingData.playerTyping = msg.playerTyping;
+            if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg.playerTyping)
             {
                 socket.playerData.currentRoom.maxTypingPlayer = socket.playerData.playingData;
             }
-            if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg)
+            if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg.playerTyping)
             {
                 socket.playerData.currentRoom.minTypingPlayer = socket.playerData.playingData;
             }
-            let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
+            let playerTypingRate = (msg.playerTyping - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
             (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
             socket.emit('setPlayerTypingRate', playerTypingRate);
+
+            if (msg.isWord)
+            {
+                socket.playerData.currentRoom.announceToRoom('writeWord', socket.playerData.id);
+            }
+            if (msg.isAttackMode)
+            {
+                socket.playerData.currentRoom.announceToRoom('attackMode', socket.playerData.id);
+            }
         }
-        catch (e)
-        {
-        }
+        catch (e) {console.log('[ERR] error catched on setPlayerTyping')}
     });
 
     socket.on('endCount', function()
@@ -88,6 +95,7 @@ io.on('connection', function(socket)
     socket.on('attack', function(msg)
     {
         socket.playerData.currentRoom.announceToTarget(msg.target, 'attacked', msg);
+        socket.playerData.currentRoom.announceToRoom('attack', {attackerId: msg.attacker.id, targetId: msg.target});
         //console.log('attack ' + msg.target + ' by ' + msg.attacker.id + ' with ' + msg.text);
         setTimeout(function()
         {
@@ -98,16 +106,16 @@ io.on('connection', function(socket)
                 {
                     attackerId: msg.attacker.id,
                     attacker: msg.attacker.nickname,
+                    wrongCount: 0,
                     word: msg.text,
                     wordGrade: msg.grade,
                     time: Date.now()
                 }
 
-                if (target.playerData.playingData.lastAttacks.length < 5) target.playerData.playingData.lastAttacks.push(dataToPush);
-                else
+                target.playerData.playingData.lastAttacks.push(dataToPush);
+                while (target.playerData.playingData.lastAttacks[0].time + 20000 < Date.now())
                 {
                     target.playerData.playingData.lastAttacks.splice(0, 1);
-                    target.playerData.playingData.lastAttacks.push(dataToPush);
                 }
             }
         }, 4000);
@@ -121,6 +129,11 @@ io.on('connection', function(socket)
     socket.on('defenseFailed', function(msg)
     {
         socket.playerData.currentRoom.announceToTarget(msg.target, 'attackSucceed', msg);
+        let wrongCountIndex = socket.playerData.playingData.lastAttacks.findIndex(function(element)
+        {
+            return (element.word === msg.word) && (element.attackerId === msg.target);
+        });
+        if (wrongCountIndex !== -1) socket.playerData.playingData.lastAttacks[wrongCountIndex].wrongCount++;
     });
 
     socket.on('disconnect', function(reason)

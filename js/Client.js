@@ -13,6 +13,8 @@ socket.on('alert', function(msg) // string errorcode
         ScenesData.gameScene.add.text(640, 360, '승리!!!!', {fontSize: '30pt'})
         .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(11)
         .setColor('#000000').setBackgroundColor('#ffffff');
+
+        gameOver();
     }
     //alert(toAlert);
 });
@@ -22,6 +24,8 @@ socket.on('setId', function(msg) // {str, num playerNum}
     console.log(msg.str);
     PlayerData.id = msg.num;
 });
+
+// init game
 socket.on('enterRoom', function()
 {
     Audio.killSound(ScenesData.menuScene, 'login');
@@ -82,8 +86,6 @@ socket.on('setRoomCount', function(msg)
         }
     }, 200);
 });
-
-// init game
 socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
 {
     //console.log(msg);
@@ -110,20 +112,56 @@ socket.on('changePhase', function(msg) // number Phase
 {
     console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + msg);
     WordSpace.CurrentPhase = msg;
+
+    WordSpace.pauseCycle(true);
+    // 여기서 종이 드르륵 열면됨
+    ScenesData.gameScene.scene.pause('gameScene');
+    setTimeout(function()
+    {
+        ScenesData.gameScene.scene.resume('gameScene');
+        // 여기서 종이 닫으면됨
+        WordSpace.pauseCycle(false);
+        //console.log('start again');
+    }, 5000);
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {
     WordSpace.PlayerTypingRate = msg;
     //console.log('rate: ' + msg);
 });
+socket.on('writeWord', function(msg) // number playerId
+{
+    console.log(msg + ' write word');
+    // msg의 id를 가진 사람이 writeWord한다.
+});
+socket.on('attackMode', function(msg) // number playerId
+{
+    // if (msg's attackMode is false)
+    console.log(msg + ' is on attack Mode');
+    // msg의 id를 가진 사람이 attack Mode이다.
+});
+socket.on('attack', function(msg) // {number attackerId, number targetId}
+{
+    // 이때 위의 attack Mode인 사람(msg.attackerId)을 해제해주자.
+    console.log(msg.attackerId + ' attack to ' + msg.targetId);
+});
 socket.on('attacked', function(msg) // object attackData
 {
     //console.log('attacked by ' + msg.attacker.nickname);
-    var timeout = setTimeout(function()
+    let attackedEvent = new Cycle(function()
     {
-        WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
-    }, 4000);
-    console.log(timeout);
+        for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
+        attackedEvent.currentCycle.destroy();
+        WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element)
+        {
+            return element.cert === (msg.text + msg.attacker);
+        }), 1);
+    });
+    attackedEvent.cert = msg.text + msg.attacker;
+    attackedEvent.resetCycle(ScenesData.gameScene, 4000, 0, false);
+
+    WordSpace.attackedEvents.push(attackedEvent);
+    //console.log(timeout);
 });
 socket.on('defeat', function(msg) // object player
 {
@@ -144,10 +182,9 @@ socket.on('gameEnd', function(msg) // object player
 {
     console.log(msg.nickname + ' Win!!!!!!');
 });
-
 socket.on('attackSucceed', function(msg)
 {
-    console.log('client');
+    //console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, msg.victim);
     tempWord.destroy();
 });
@@ -155,7 +192,7 @@ socket.on('attackSucceed', function(msg)
 // out game
 socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
 {
-    console.log(msg.index + ' / ' + msg.id + ' / ' + msg.nickname + ' disconnected');
+    //console.log(msg.index + ' / ' + msg.id + ' / ' + msg.nickname + ' disconnected');
     RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
 });

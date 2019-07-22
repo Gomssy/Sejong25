@@ -21,7 +21,7 @@ WordSpace.wordPhysicsGroup = null;
 
 WordSpace.GradeProb = [0.35, 0.6, 0.8];
 WordSpace.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
-WordSpace.CurrentPhase = WordSpace.Phase.READY;
+WordSpace.CurrentPhase = WordSpace.Phase.START;
 WordSpace.playerTyping = 0;
 WordSpace.playerTypingRate = 0;
 
@@ -65,16 +65,7 @@ WordSpace.spaceInitiate = function(scene)
 
 WordSpace.AdjustVarByPhase = function(typingRate, phase)
 {
-    if(phase == WordSpace.Phase.READY)
-    {
-        WordSpace.delay.WordSpawn = 10000;
-        WordSpace.delay.NameSpawn = 10000;
-        WordSpace.NameSpawnReduce = 0;
-        WordSpace.GradeProb[0] = 1;
-        WordSpace.GradeProb[1] = 1;
-        WordSpace.GradeProb[2] = 1;
-    }
-    else if(phase == WordSpace.Phase.START)
+    if(phase == WordSpace.Phase.START)
     {
         WordSpace.delay.WordSpawn = 3000;
         WordSpace.delay.NameSpawn = 15000;
@@ -359,7 +350,8 @@ WordSpace.findWord = function(wordText)
                 {
                     roomNum: RoomData.roomId,
                     victim: RoomData.myself, 
-                    target: element.attacker.id
+                    target: element.attacker.id,
+                    word: element.wordText
                 }
                 socket.emit('defenseFailed', victimData);
                 return true;
@@ -372,11 +364,13 @@ WordSpace.findWord = function(wordText)
 WordSpace.setPlayerTyping = 
 {
     totalTyping: 0,
+    writeWord: false,
     add: function(wordText)
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
         WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 60 * 1000;
         this.text.setText('현재 타수 : ' + WordSpace.playerTyping.toFixed(1));
+        this.writeWord = wordText != '' ? true : false;
     },
     initiate: function(scene)
     {
@@ -390,22 +384,40 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
+        let toSend = [];
         WordSpace.nameGroup.forEach(function(element)
         {
-            //console.log(RoomData.myself);
-            let attackData = 
+            let targetId = element.ownerId;
+            let sendIdx = toSend.findIndex(function(element)
             {
-                roomNum: RoomData.roomId,
-                attacker: RoomData.myself, 
-                target: element.ownerId,
-                text: wordText, 
-                grade: grade, 
-                isStrong: element.isStrong
+                return element.target === targetId;
+            });
+            if (sendIdx !== -1)
+            {
+                toSend[sendIdx].multiple++;
             }
-            socket.emit('attack', attackData);
+            else
+            {
+                let attackData = 
+                {
+                    roomNum: RoomData.roomId,
+                    attacker: RoomData.myself, 
+                    target: element.ownerId,
+                    text: wordText, 
+                    grade: grade, 
+                    isStrong: element.isStrong,
+                    multiple: 1
+                }
+                toSend.push(attackData);
+            }
             element.physicsObj.destroy();
             element.wordObj.destroy();
         });
+        toSend.forEach(function(element)
+        {
+            socket.emit('attack', element);
+        });
+
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.nameGroup = [];
