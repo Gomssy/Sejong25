@@ -65,16 +65,7 @@ WordSpace.spaceInitiate = function(scene)
 
 WordSpace.AdjustVarByPhase = function(typingRate, phase)
 {
-    if(phase == WordSpace.Phase.READY)
-    {
-        WordSpace.delay.WordSpawn = 10000;
-        WordSpace.delay.NameSpawn = 10000;
-        WordSpace.NameSpawnReduce = 0;
-        WordSpace.GradeProb[0] = 1;
-        WordSpace.GradeProb[1] = 1;
-        WordSpace.GradeProb[2] = 1;
-    }
-    else if(phase == WordSpace.Phase.START)
+    if(phase == WordSpace.Phase.START)
     {
         WordSpace.delay.WordSpawn = 3000;
         WordSpace.delay.NameSpawn = 15000;

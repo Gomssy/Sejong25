@@ -212,6 +212,7 @@ class GameRoom
             if (this.phaseChanger < 0 && checkTime - this.startTime > 60000)
             {
                 this.currentPhase = GameServer.Phase.MAIN;
+                this.rateArrangePoint = 150;
                 this.announceToRoom('changePhase', GameServer.Phase.MAIN);
             }
             else if (this.phaseChanger < 0)
@@ -219,6 +220,7 @@ class GameRoom
                 this.phaseChanger = setTimeout(function(room)
                 {
                     room.currentPhase = GameServer.Phase.MAIN;
+                    room.rateArrangePoint = 150;
                     room.announceToRoom('changePhase', GameServer.Phase.MAIN);
                     room.phaseChanger = -1;
                 }, 60000 - (checkTime - this.startTime), this);
@@ -226,10 +228,11 @@ class GameRoom
         }
         else if (this.currentPhase === GameServer.Phase.MAIN)
         {
-            let playerLimit = Math.max(this.currentPlayer.length / 10, 3);
+            let playerLimit = Math.min(Math.round(this.currentPlayer.length / 5), 3);
             if (this.aliveCount <= playerLimit)
             {
                 this.currentPhase = GameServer.Phase.MUSIC;
+                this.rateArrangePoint = 50;
                 this.announceToRoom('changePhase', GameServer.Phase.MUSIC);
             }
         }
@@ -291,7 +294,7 @@ class Player
         this.rank = -1;
 
         this.playerTyping = 0;
-        this.lastAttacks = []; // { attackerId, word, wordGrade, time }
+        this.lastAttacks = []; // { attackerId, attacker, wrongCount, word, wordGrade, time }
         this.lastAttack = null;
     }
 
@@ -311,12 +314,16 @@ class Player
         if (this.lastAttacks.length > 0)
         {
             this.lastAttack = this.lastAttacks[this.lastAttacks.length - 1];
-            if (Date.now() - this.lastAttack.time > 40000) this.lastAttack = null;
+            if (Date.now() - this.lastAttack.time > 20000) this.lastAttack = null;
             else
             {
                 this.lastAttacks.forEach(function(element)
                 {
-                    if (Date.now() - element.time < 40000 && element.wordGrade > player.lastAttack.wordGrade) player.lastAttack = element;
+                    if (Date.now() - element.time < 20000)
+                    {
+                        if (element.wrongCount > player.lastAttack.wrongCount) player.lastAttack = element;
+                        else if (element.wrongCount === player.lastAttack.wrongCount && element.wordGrade > player.lastAttack.wordGrade) player.lastAttack = element;
+                    } 
                 });
             }
         }

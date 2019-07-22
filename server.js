@@ -106,16 +106,16 @@ io.on('connection', function(socket)
                 {
                     attackerId: msg.attacker.id,
                     attacker: msg.attacker.nickname,
+                    wrongCount: 0,
                     word: msg.text,
                     wordGrade: msg.grade,
                     time: Date.now()
                 }
 
-                if (target.playerData.playingData.lastAttacks.length < 5) target.playerData.playingData.lastAttacks.push(dataToPush);
-                else
+                target.playerData.playingData.lastAttacks.push(dataToPush);
+                while (target.playerData.playingData.lastAttacks[0].time + 20000 < Date.now())
                 {
                     target.playerData.playingData.lastAttacks.splice(0, 1);
-                    target.playerData.playingData.lastAttacks.push(dataToPush);
                 }
             }
         }, 4000);
@@ -129,6 +129,10 @@ io.on('connection', function(socket)
     socket.on('defenseFailed', function(msg)
     {
         socket.playerData.currentRoom.announceToTarget(msg.target, 'attackSucceed', msg);
+        //let socket.playerData.playingData.lastAttacks.findIndex(function(element)
+        //{
+
+        //})
     });
 
     socket.on('disconnect', function(reason)
