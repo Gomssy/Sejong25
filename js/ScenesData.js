@@ -180,6 +180,12 @@ var gameScene = new Phaser.Class(
         WordSpace.attackPaperGroup.forEach(function(element){
             element.moveObject(element);
         });
+        let tempNames = '';
+        WordSpace.nameGroup.forEach(function(element)
+        {
+            //테스트용
+            tempNames += element.wordText + (element.isStrong?' [강]':'') + '\n';
+        });
         
         WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);
         WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
