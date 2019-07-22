@@ -13,6 +13,7 @@ WordSpace.pauseCycle = function(isPause)
     WordSpace.varAdjustCycle.currentCycle.paused = isPause;
     WordSpace.attackGauge.pauseCycle(isPause);
     WordSpace.playerTypingCycle.currentCycle.paused = isPause;
+    WordSpace.attackedEvents.forEach(function(element) {element.currentCycle.paused = isPause});
 }
 
 class Cycle //앞으로 cycle은 이 클래스를 사용해서 구현할 것
@@ -65,3 +66,5 @@ WordSpace.playerTypingCycle = new Cycle(function()
     socket.emit('setPlayerTyping', {playerTyping: WordSpace.playerTyping, isWord: WordSpace.setPlayerTyping.writeWord, isAttackMode: Input.attackMode} );
     WordSpace.setPlayerTyping.writeWord = false;
 });
+// 공격받을때의 일회용 이벤트들
+WordSpace.attackedEvents = [];

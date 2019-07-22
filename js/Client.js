@@ -112,7 +112,17 @@ socket.on('changePhase', function(msg) // number Phase
 {
     console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + msg);
     WordSpace.CurrentPhase = msg;
-    // 이때 시간 3초 지연시키기
+
+    WordSpace.pauseCycle(true);
+    // 여기서 종이 드르륵 열면됨
+    ScenesData.gameScene.scene.pause('gameScene');
+    setTimeout(function()
+    {
+        ScenesData.gameScene.scene.resume('gameScene');
+        // 여기서 종이 닫으면됨
+        WordSpace.pauseCycle(false);
+        //console.log('start again');
+    }, 5000);
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {
@@ -138,10 +148,19 @@ socket.on('attack', function(msg) // {number attackerId, number targetId}
 socket.on('attacked', function(msg) // object attackData
 {
     //console.log('attacked by ' + msg.attacker.nickname);
-    var timeout = setTimeout(function()
+    let attackedEvent = new Cycle(function()
     {
         for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
-    }, 4000);
+        attackedEvent.currentCycle.destroy();
+        WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element)
+        {
+            return element.cert === (msg.text + msg.attacker);
+        }), 1);
+    });
+    attackedEvent.cert = msg.text + msg.attacker;
+    attackedEvent.resetCycle(ScenesData.gameScene, 4000, 0, false);
+
+    WordSpace.attackedEvents.push(attackedEvent);
     //console.log(timeout);
 });
 socket.on('defeat', function(msg) // object player
