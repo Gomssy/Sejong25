@@ -10,7 +10,7 @@ socket.on('alert', function(msg) // string errorcode
     if (msg === 'gameWin') 
     {
         //toAlert = '승리!';
-        ScenesData.gameScene.add.text(640, 360, '승리!!!!', {fontSize: '30pt'})
+        ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '승리!!!!', {fontSize: '30pt'})
         .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(11)
         .setColor('#000000').setBackgroundColor('#ffffff');
 

@@ -16,6 +16,7 @@ WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
+WordSpace.attackPaperGroup = [];
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
@@ -36,7 +37,7 @@ WordSpace.delay =
 
 WordSpace.NameSpawnReduce = 1000;
 
-WordSpace.gravityPoint = {x: 640, y: 280};
+WordSpace.gravityPoint = {x: 960, y: 420};
 
 WordSpace.getSpawnPoint = function(_lenRate)
 {
@@ -102,15 +103,15 @@ WordSpace.attackGauge =
     gradeColor: ['#111124','#EBB435','#A42FFF','#1D22EB','#83947F'],
     setRect: function()
     {
-        this.rectUI.setSize(20 * this.value, 11);
-        this.rectUI.setPosition(640 - 10 * this.value, 547);
+        this.rectUI.setSize(game.config.width / 64 * this.value, game.config.height * 11 / 720);
+        this.rectUI.setPosition(game.config.width * (640 - 10 * this.value) / 1280, game.config.height * 547 / 720);
         let tmp = this.getAttackOption();
         this.rectUI.setFillStyle(Phaser.Display.Color.HexStringToColor(this.gradeColor[tmp.wordGrade + 1]).color);
     },
     generate: function(scene)
     {
         //console.log("created");
-        this.rectUI = scene.add.rectangle(640,600,0,11).setDepth(11);
+        this.rectUI = scene.add.rectangle(game.config.width / 2, game.config.height * 5 / 6, 0, game.config.height * 11 / 720).setDepth(11);
     },
     add: function(plus)
     {
@@ -187,9 +188,10 @@ WordSpace.loadImage = function(scene)
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 490, frameHeight: 423 });
     scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 490, frameHeight: 423 });
+    scene.load.image('attackPapaer', 'assets/image/etc/paper_crumbled.png');
 
-    WordSpace.weightTextObjForTest = scene.add.text(100, 75, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
-    WordSpace.killLogTextForTest = scene.add.text(1000, 50, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
+    WordSpace.weightTextObjForTest = scene.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
+    WordSpace.killLogTextForTest = scene.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
 }
 
 WordSpace.loadAnimation = function(scene)
@@ -268,7 +270,7 @@ function gameOver()
     
     socket.emit('defeated');
     console.log('defeat');
-    ScenesData.gameScene.add.text(640, 360, '패배', {fontSize: '30pt'})
+    ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '패배', {fontSize: '30pt'})
     .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(10)
     .setColor('#000000').setBackgroundColor('#ffffff');
     //alert('defeat');
@@ -336,14 +338,14 @@ WordSpace.findWord = function(wordText)
         {
             if(element instanceof AttackWord)
             {
-                tempDist = WordSpace.getEditDistance(wordText, element.wordText);
+                tempDist = WordReader.getEditDistance(wordText, element.wordText);
                 attackWords.push(element);
                 if(tempDist <= minDist) minDist = tempDist;
             }
         });
         attackWords.some(function(element)
         {
-            if(WordSpace.getEditDistance(wordText, element.wordText) == minDist)
+            if(WordReader.getEditDistance(wordText, element.wordText) == minDist)
             {
                 console.log('Attack word : ' + element.wordText + ' of ' + element.attacker.nickname + ' 오타임');
                 let victimData = 
@@ -412,6 +414,33 @@ WordSpace.attack = function(wordText, grade)
             }
             element.physicsObj.destroy();
             element.wordObj.destroy();
+            var attackPaper = ScenesData.gameScene.add.sprite(BackGround.myCharacter.x, BackGround.myCharacter.y, 'attackPapaer').setScale(0.5).setDepth(3);
+            attackPaper.throwTarget = RoomData.players.find(function(_element) {
+                return _element.id == element.ownerId;
+            }).playerImage;
+            attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+            attackPaper.path = new Phaser.Curves.Spline([
+                BackGround.myCharacter.x, BackGround.myCharacter.y,
+                (BackGround.myCharacter.x + attackPaper.throwTarget.x) / 2, Math.min(BackGround.myCharacter.y, attackPaper.throwTarget.y) - 100,
+                attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
+            ]);
+            ScenesData.gameScene.tweens.add({
+                targets: attackPaper.follower,
+                t: 1,
+                ease: 'Linear',
+                duration: 4000,
+                repeat: 0,
+                onComplete: function() { 
+                    attackPaper.destroy();
+                    WordSpace.attackPaperGroup = [];
+                }
+            });
+            attackPaper.moveObject = function(obj)
+            {
+                obj.path.getPoint(obj.follower.t, obj.follower.vec);
+                obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
+            }
+            WordSpace.attackPaperGroup.push(attackPaper);
         });
         toSend.forEach(function(element)
         {
@@ -437,17 +466,11 @@ WordSpace.nameQueue =
     queue: [],
     shuffle: function()
     {
-        let tempIdx, tempElement, tempLength, tempQueue = [];
+        let tempQueue = [];
         RoomData.players.forEach(function(element){
             tempQueue.push(element.index)
         })
-        for(tempLength = tempQueue.length; tempLength; tempLength -= 1)
-        {
-            tempIdx = Math.floor(Math.random() * tempLength);
-            tempElement = tempQueue[tempLength - 1];
-            tempQueue[tempLength - 1] = tempQueue[tempIdx];
-            tempQueue[tempIdx] = tempElement;
-        }
+        tempQueue.sort(function(){return 0.5-Math.random()});
         tempQueue.forEach(function(element)
         {
             if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive)
@@ -466,34 +489,4 @@ WordSpace.nameQueue =
         this.shuffle();
         this.shuffle();
     }
-}
-
-WordSpace.getEditDistance = function(input, check) {
-    var inputWords = [], checkWords = []
-    for(let i = 0; i < input.length; i++)
-    {
-        inputWords.push(parseInt(((input[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
-        inputWords.push(parseInt(((input[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
-        inputWords.push(parseInt((input[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
-    }
-    for(let i = 0; i < check.length; i++)
-    {
-        checkWords.push(parseInt(((check[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
-        checkWords.push(parseInt(((check[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
-        checkWords.push(parseInt((check[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
-    }  
-    var matrix = [];
-    var i, j;
-    for(i = 0; i <= checkWords.length; i++) // increment along the first column of each row
-        matrix[i] = [i];
-    for(j = 0; j <= inputWords.length; j++) // increment each column in the first row
-        matrix[0][j] = j;
-    for(i = 1; i <= checkWords.length; i++) // Fill in the rest of the matrix
-        for(j = 1; j <= inputWords.length; j++){
-            if(checkWords[i-1] == inputWords[j-1]) matrix[i][j] = matrix[i-1][j-1];
-            else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
-                                    Math.min(matrix[i][j-1] + 1, // insertion
-                                            matrix[i-1][j] + 1)); // deletion
-        }
-    return matrix[checkWords.length][inputWords.length];
 }

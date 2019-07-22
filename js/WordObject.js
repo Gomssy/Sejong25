@@ -1,6 +1,5 @@
 class WordObject
 {
-
     constructor(text, isNameWord = false)
     {
         this.generationCode = WordSpace.nextWordCode++;
@@ -15,7 +14,7 @@ class WordObject
 
     instantiate(scene, lenRate)
     {
-        let p = [{x : 3, y : 0.7}, {x : 20, y : 1.2}];
+        let p = [{x : 3, y : 1.05}, {x : 20, y : 1.85}];
         this.scale = ((p[1].y - p[0].y) / (p[1].x - p[0].x)) * (this.wordWeight - p[0].x) + p[0].y;
         this.fontScale = 25;
         var random = WordSpace.getSpawnPoint(lenRate);
@@ -267,8 +266,8 @@ class NameWord extends WordObject
         this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
         this.path = new Phaser.Curves.Spline([
             this.physicsObj.x, this.physicsObj.y,
-            (this.physicsObj.x + 500 + WordSpace.nameGroup.length * 15) / 2, this.physicsObj.y - 50,
-            500 + WordSpace.nameGroup.length * 15, 680 + this.wordText.length * 10 + (Math.random() * 20 - 10)
+            (this.physicsObj.x + game.config.width * (500 + WordSpace.nameGroup.length * 15) / 1280) / 2, this.physicsObj.y - game.config.height * 5 / 72,
+            game.config.width * (500 + WordSpace.nameGroup.length * 15) / 1280, game.config.height * (680 + this.wordText.length * 10 + (Math.random() * 20 - 10)) / 720
         ]);
         ScenesData.gameScene.tweens.add({
             targets: this.follower,

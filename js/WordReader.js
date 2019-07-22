@@ -1,5 +1,9 @@
 var WordReader = WordReader || {};
 
+WordReader.normalWeight = [3, 5, 7, 10];
+WordReader.attackWeight = [6, 8, 12, 15];
+WordReader.strongAttackWeight = [10, 13, 16, 20];
+
 //초성의 타수를 반환함
 WordReader.firstSound = function(charText)
 {
@@ -54,6 +58,32 @@ WordReader.getWordGrade = function(_wordTyping)
           17 <= _wordTyping && _wordTyping < 26 ? 0 : -1;
 }
 
-WordReader.normalWeight = [3, 5, 7, 10];
-WordReader.attackWeight = [6, 8, 12, 15];
-WordReader.strongAttackWeight = [10, 13, 16, 20];
+WordReader.getEditDistance = function(input, check) {
+    var inputWords = [], checkWords = []
+    for(let i = 0; i < input.length; i++)
+    {
+        inputWords.push(parseInt(((input[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
+        inputWords.push(parseInt(((input[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
+        inputWords.push(parseInt((input[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
+    }
+    for(let i = 0; i < check.length; i++)
+    {
+        checkWords.push(parseInt(((check[i].charCodeAt(0) - parseInt('0xac00',16)) /28) / 21) + parseInt('0x1100',16));
+        checkWords.push(parseInt(((check[i].charCodeAt(0)- parseInt('0xac00',16)) / 28) % 21) + parseInt('0x1161',16));
+        checkWords.push(parseInt((check[i].charCodeAt(0) - parseInt('0xac00',16)) % 28) + parseInt('0x11A8') -1);
+    }  
+    var matrix = [];
+    var i, j;
+    for(i = 0; i <= checkWords.length; i++) // increment along the first column of each row
+        matrix[i] = [i];
+    for(j = 0; j <= inputWords.length; j++) // increment each column in the first row
+        matrix[0][j] = j;
+    for(i = 1; i <= checkWords.length; i++) // Fill in the rest of the matrix
+        for(j = 1; j <= inputWords.length; j++){
+            if(checkWords[i-1] == inputWords[j-1]) matrix[i][j] = matrix[i-1][j-1];
+            else matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
+                                    Math.min(matrix[i][j-1] + 1, // insertion
+                                            matrix[i-1][j] + 1)); // deletion
+        }
+    return matrix[checkWords.length][inputWords.length];
+}
