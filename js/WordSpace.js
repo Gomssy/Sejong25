@@ -350,7 +350,8 @@ WordSpace.findWord = function(wordText)
                 {
                     roomNum: RoomData.roomId,
                     victim: RoomData.myself, 
-                    target: element.attacker.id
+                    target: element.attacker.id,
+                    word: element.wordText
                 }
                 socket.emit('defenseFailed', victimData);
                 return true;
@@ -383,22 +384,40 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
+        let toSend = [];
         WordSpace.nameGroup.forEach(function(element)
         {
-            //console.log(RoomData.myself);
-            let attackData = 
+            let targetId = element.ownerId;
+            let sendIdx = toSend.findIndex(function(element)
             {
-                roomNum: RoomData.roomId,
-                attacker: RoomData.myself, 
-                target: element.ownerId,
-                text: wordText, 
-                grade: grade, 
-                isStrong: element.isStrong
+                return element.target === targetId;
+            });
+            if (sendIdx !== -1)
+            {
+                toSend[sendIdx].multiple++;
             }
-            socket.emit('attack', attackData);
+            else
+            {
+                let attackData = 
+                {
+                    roomNum: RoomData.roomId,
+                    attacker: RoomData.myself, 
+                    target: element.ownerId,
+                    text: wordText, 
+                    grade: grade, 
+                    isStrong: element.isStrong,
+                    multiple: 1
+                }
+                toSend.push(attackData);
+            }
             element.physicsObj.destroy();
             element.wordObj.destroy();
         });
+        toSend.forEach(function(element)
+        {
+            socket.emit('attack', element);
+        });
+
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.nameGroup = [];

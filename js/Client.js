@@ -13,6 +13,8 @@ socket.on('alert', function(msg) // string errorcode
         ScenesData.gameScene.add.text(640, 360, '승리!!!!', {fontSize: '30pt'})
         .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(11)
         .setColor('#000000').setBackgroundColor('#ffffff');
+
+        gameOver();
     }
     //alert(toAlert);
 });
@@ -138,7 +140,7 @@ socket.on('attacked', function(msg) // object attackData
     //console.log('attacked by ' + msg.attacker.nickname);
     var timeout = setTimeout(function()
     {
-        WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
+        for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
     }, 4000);
     //console.log(timeout);
 });

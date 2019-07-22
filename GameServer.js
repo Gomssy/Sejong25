@@ -70,7 +70,6 @@ GameServer.getRoomNumber = function()
     } while (true)
 }
 
-
 class GameRoom
 {
     constructor()

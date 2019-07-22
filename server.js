@@ -129,10 +129,11 @@ io.on('connection', function(socket)
     socket.on('defenseFailed', function(msg)
     {
         socket.playerData.currentRoom.announceToTarget(msg.target, 'attackSucceed', msg);
-        //let socket.playerData.playingData.lastAttacks.findIndex(function(element)
-        //{
-
-        //})
+        let wrongCountIndex = socket.playerData.playingData.lastAttacks.findIndex(function(element)
+        {
+            return (element.word === msg.word) && (element.attackerId === msg.target);
+        });
+        if (wrongCountIndex !== -1) socket.playerData.playingData.lastAttacks[wrongCountIndex].wrongCount++;
     });
 
     socket.on('disconnect', function(reason)
