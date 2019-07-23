@@ -163,7 +163,9 @@ socket.on('attacked', function(msg) // object attackData
     WordSpace.attackedEvents.push(attackedEvent);
     console.log(msg.attacker);
     console.log(msg.victim);
-    WordSpace.makeAttackPaper(ScenesData.gameScene, msg.victim.position, msg.attacker.position);
+    let victimPos = RoomData.players.find(function(element){ return element.id == msg.victim.id; });
+    let attackerPos = RoomData.players.find(function(element){ return element.id == msg.attacker.id; });
+    WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos.position, victimPos.position);
     //console.log(timeout);
 });
 socket.on('defeat', function(msg) // object player
