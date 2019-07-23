@@ -140,10 +140,13 @@ socket.on('attackMode', function(msg) // number playerId
     console.log(msg + ' is on attack Mode');
     // msg의 id를 가진 사람이 attack Mode이다.
 });
-socket.on('attack', function(msg) // {number attackerId, number targetId}
+socket.on('someoneAttacked', function(msg) // {number attackerId, number targetId}
 {
     // 이때 위의 attack Mode인 사람(msg.attackerId)을 해제해주자.
-    console.log(msg.attackerId + ' attack to ' + msg.targetId);
+    console.log(msg.attackerId + ' attacked ' + msg.targetId);
+    let attackerPos = RoomData.players.find(function(element){ return element.id == msg.attackerId; });
+    let victimPos = RoomData.players.find(function(element){ return element.id == msg.victimId; });
+    WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos.position, victimPos.position);
 });
 socket.on('attacked', function(msg) // object attackData
 {
@@ -161,11 +164,6 @@ socket.on('attacked', function(msg) // object attackData
     attackedEvent.resetCycle(ScenesData.gameScene, 4000, 0, false);
 
     WordSpace.attackedEvents.push(attackedEvent);
-    console.log(msg.attacker);
-    console.log(msg.victim);
-    let victimPos = RoomData.players.find(function(element){ return element.id == msg.victim.id; });
-    let attackerPos = RoomData.players.find(function(element){ return element.id == msg.attacker.id; });
-    WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos.position, victimPos.position);
     //console.log(timeout);
 });
 socket.on('defeat', function(msg) // object player
