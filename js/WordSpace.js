@@ -330,8 +330,8 @@ WordSpace.findWord = function(wordText)
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
-        BackGround.myCharacter.anims.msPerFrame /= (4 - WordSpace.attackGauge.getAttackOption().wordGrade);
+        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
+        RoomData.myself.playerImage.anims.msPerFrame /= (4 - WordSpace.attackGauge.getAttackOption().wordGrade);
     }
     else // 오타 체크
     {
@@ -403,47 +403,24 @@ WordSpace.attack = function(wordText, grade)
             }
             else
             {
+                let target = RoomData.players.find(function(_element) {
+                    return _element.id == element.ownerId;
+                });
                 let attackData = 
                 {
                     roomNum: RoomData.roomId,
                     attacker: RoomData.myself, 
-                    target: element.ownerId,
+                    victim: target,
                     text: wordText, 
                     grade: grade, 
                     isStrong: element.isStrong,
                     multiple: 1
                 }
+                WordSpace.makeAttackPaper(ScenesData.gameScene, RoomData.myself.position, target.position);
                 toSend.push(attackData);
             }
             element.physicsObj.destroy();
             element.wordObj.destroy();
-            var attackPaper = ScenesData.gameScene.add.sprite(BackGround.myCharacter.x, BackGround.myCharacter.y, 'attackPapaer').setScale(0.5).setDepth(3);
-            attackPaper.throwTarget = RoomData.players.find(function(_element) {
-                return _element.id == element.ownerId;
-            }).playerImage;
-            attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
-            attackPaper.path = new Phaser.Curves.Spline([
-                BackGround.myCharacter.x, BackGround.myCharacter.y,
-                (BackGround.myCharacter.x + attackPaper.throwTarget.x) / 2, Math.min(BackGround.myCharacter.y, attackPaper.throwTarget.y) - 100,
-                attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
-            ]);
-            ScenesData.gameScene.tweens.add({
-                targets: attackPaper.follower,
-                t: 1,
-                ease: 'Linear',
-                duration: 4000,
-                repeat: 0,
-                onComplete: function() { 
-                    attackPaper.destroy();
-                    WordSpace.attackPaperGroup = [];
-                }
-            });
-            attackPaper.moveObject = function(obj)
-            {
-                obj.path.getPoint(obj.follower.t, obj.follower.vec);
-                obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
-            }
-            WordSpace.attackPaperGroup.push(attackPaper);
         });
         toSend.forEach(function(element)
         {
@@ -456,12 +433,43 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
+        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
+}
+
+WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo)
+{
+    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPapaer').setScale(0.5).setDepth(3);
+    attackPaper.throwTarget = attackTo;
+    console.log(attackTo);
+    attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+    attackPaper.path = new Phaser.Curves.Spline([
+        attackFrom.x, attackFrom.y,
+        (attackFrom.x + attackPaper.throwTarget.x) / 2, Math.min(attackFrom.y, attackPaper.throwTarget.y) - 100,
+        attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
+    ]);
+    scene.tweens.add({
+        targets: attackPaper.follower,
+        t: 1,
+        ease: 'Linear',
+        duration: 4000,
+        repeat: 0,
+        onComplete: function() { 
+            attackPaper.destroy();
+            WordSpace.attackPaperGroup = [];
+        }
+    });
+    attackPaper.moveObject = function(obj)
+    {
+        obj.path.getPoint(obj.follower.t, obj.follower.vec);
+        obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
+        obj.angle = 720 * obj.follower.t;
+    }
+    WordSpace.attackPaperGroup.push(attackPaper);
 }
 
 WordSpace.nameQueue = 

@@ -161,6 +161,9 @@ socket.on('attacked', function(msg) // object attackData
     attackedEvent.resetCycle(ScenesData.gameScene, 4000, 0, false);
 
     WordSpace.attackedEvents.push(attackedEvent);
+    console.log(msg.attacker);
+    console.log(msg.victim);
+    WordSpace.makeAttackPaper(ScenesData.gameScene, msg.victim.position, msg.attacker.position);
     //console.log(timeout);
 });
 socket.on('defeat', function(msg) // object player

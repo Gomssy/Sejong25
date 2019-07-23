@@ -80,7 +80,7 @@ class WordObject
             this.wordObj.destroy();
             this.physicsObj.destroy();
         }
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
+        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
     }
     
     attract()
