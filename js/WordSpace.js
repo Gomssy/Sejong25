@@ -386,6 +386,7 @@ WordSpace.attack = function(wordText, grade)
     if (wordText != '')
     {
         console.log('attack ' + wordText + ', grade: ' + grade);
+        Audio.playSound(ScenesData.gameScene, 'attack');
         let toSend = [];
         WordSpace.nameGroup.forEach(function(element)
         {
