@@ -242,9 +242,12 @@ WordSpace.generateWord =
     },
     Name: function(scene, isStrong, newPlayerData, lenRate)
     {
-        if(newPlayerData == null) word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        if(newPlayerData == null)
+        {
+            if(WordSpace.nameQueue.queue.length == 1) return null;
+            word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        }
         else word = new NameWord(newPlayerData, isStrong);
-        //word = new NameWord(RoomData.myself, false);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     }
@@ -473,7 +476,7 @@ WordSpace.nameQueue =
         tempQueue.sort(function(){return 0.5-Math.random()});
         tempQueue.forEach(function(element)
         {
-            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive)
+            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive && WordSpace.nameQueue.getCount(element) < 3)
                 WordSpace.nameQueue.queue.push(element);
         });
     },
@@ -481,8 +484,19 @@ WordSpace.nameQueue =
     {
         let tempElement = WordSpace.nameQueue.queue.shift();
         if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
-        if(!RoomData.players[tempElement].isAlive) return WordSpace.nameQueue.pop();
-        else return RoomData.players[tempElement];
+        if(this.queue.length > 0)
+        {
+            if(!RoomData.players[tempElement].isAlive && WordSpace.nameQueue.getCount(tempElement) < 3) WordSpace.nameQueue.pop();
+            else return RoomData.players[tempElement];
+        }
+    },
+    getCount: function(player)
+    {
+        let i = 0;
+        WordSpace.nameGroup.forEach(function(element){
+            if(element.id == player.id) i++;
+        })
+        return i;
     },
     initiate: function()
     {
