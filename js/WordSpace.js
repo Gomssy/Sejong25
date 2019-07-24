@@ -250,6 +250,12 @@ WordSpace.generateWord =
         else word = new NameWord(newPlayerData, isStrong);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
+    },
+    Item: function(scene, itemType, lenRate)
+    {
+        word = new ItemWord(itemType);
+        WordSpace.pushWord(scene, word, lenRate);
+        return word;
     }
 }
 
@@ -478,9 +484,9 @@ WordSpace.nameQueue =
     {
         let tempQueue = [];
         RoomData.players.forEach(function(element){
-            tempQueue.push(element.index)
+            tempQueue.push(element.index);
         })
-        tempQueue.sort(function(){return 0.5-Math.random()});
+        Phaser.Utils.Array.Shuffle(tempQueue);
         tempQueue.forEach(function(element)
         {
             if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive && WordSpace.nameQueue.getCount(element) < 3)

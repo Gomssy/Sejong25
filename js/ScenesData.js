@@ -150,9 +150,11 @@ var gameScene = new Phaser.Class(
 
         WordSpace.nameWordTextForTest = ScenesData.gameScene.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.nameList);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.nameList);
 
         // for test
-        WordSpace.attackGauge.add(11);
+        /*WordSpace.attackGauge.add(11);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
@@ -163,7 +165,7 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);*/
     },
 
     update: function()

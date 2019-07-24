@@ -233,7 +233,7 @@ class NameWord extends WordObject
             this.path.getPoint(this.follower.t, this.follower.vec);
             this.physicsObj.setPosition(this.follower.vec.x, this.follower.vec.y);
             this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y);
-            this.physicsObj.angle = 90 * this.follower.t;
+            this.physicsObj.angle = (this.isStrong ? 450 : 90) * this.follower.t
             this.wordObj.angle = this.physicsObj.angle;
             if(this.isStrong)
             {
@@ -276,10 +276,56 @@ class NameWord extends WordObject
             duration: 2000,
             repeat: 0
         });
-
         //이동경로 디버그
         /*var graphics = ScenesData.gameScene.add.graphics();
         graphics.lineStyle(2, 0xffffff, 1);
         this.path.draw(graphics);*/
+    }
+}
+
+class ItemWord extends WordObject
+{
+    constructor(_itemType)
+    {
+        super(_itemType, false);
+        this.wordWeight = 2;
+        this.itemType = _itemType
+        //console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
+    }
+    destroy()
+    {
+        WordSpace.attackGauge.add(0.5);
+        switch(this.itemType)
+        {
+            case Enums.item.invincible:
+                break;
+            case Enums.item.nameList:
+                let tempNames = [];
+                RoomData.players.forEach(function(element){
+                    if(element.id != RoomData.myself.id && element.isAlive) tempNames.push(element.index)
+                });
+                let length = Math.min(tempNames.length, 8);
+                tempNames = Phaser.Utils.Array.Shuffle(tempNames);
+                for(let i = 0; i < length; i++)
+                {
+                    let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.players[tempNames[i]]);
+                    tempWord.physicsObj.setPosition(this.physicsObj.x, this.physicsObj.y);
+                    tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
+                    tempWord.destroy();
+                }
+                break;
+            case Enums.item.charge:
+                break;
+            case Enums.item.clean:
+                break;
+            case Enums.item.heavy:
+                break;
+            case Enums.item.dark:
+                break;
+            default:
+                console.log("Item type is inappropriate. Item type : " + this.itemType);
+                break;
+        }
+        super.destroy();
     }
 }

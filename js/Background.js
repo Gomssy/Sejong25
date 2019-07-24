@@ -27,7 +27,7 @@ BackGround.drawCharacter = function(scene)
         if(element.id != RoomData.myself.id)
         {
             element.position = BackGround.characterPos.pop();
-            element.playerImage = scene.add.sprite(element.position.x, element.position.y, 'pyeongminWrite').setScale(0.45).setDepth(1);
+            element.playerImage = scene.add.sprite(element.position.x, element.position.y, 'pyeongminWrite').setScale(0.315).setDepth(1);
             element.playerImage.flipX = element.position.x < game.config.width / 2 ? true : false;
             element.nicknameText = scene.add.text(element.position.x, element.position.y - 90, element.nickname)
                 .setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(1);

@@ -59,7 +59,7 @@ socket.on('setRoomCount', function(msg)
         ScenesData.roomScene.endTime = msg.endTime;
         ScenesData.roomScene.peopleCount = msg.playerCount;
 
-        if (msg.isEnter) // generate charactor
+        if (msg.isEnter) // generate character
         {
             let randX = Math.random() * 1120 + 80;
             let randY = Math.random() * 380 + 100;
@@ -71,7 +71,7 @@ socket.on('setRoomCount', function(msg)
             }
             ScenesData.roomScene.players.push(playerSet);
         }
-        else // remove charactor
+        else // remove character
         {
             let idx = ScenesData.roomScene.players.findIndex(function(element)
             {
@@ -140,12 +140,12 @@ socket.on('attackMode', function(msg) // number playerId
     console.log(msg + ' is on attack Mode');
     // msg의 id를 가진 사람이 attack Mode이다.
 });
-socket.on('someoneAttacked', function(msg) // {number attackerId, number targetId}
+socket.on('someoneAttacked', function(msg) // {Player attacker, Player victim}
 {
     // 이때 위의 attack Mode인 사람(msg.attackerId)을 해제해주자.
-    console.log(msg.attackerId + ' attacked ' + msg.targetId);
-    let attackerPos = RoomData.players.find(function(element){ return element.id == msg.attackerId; });
-    let victimPos = RoomData.players.find(function(element){ return element.id == msg.victimId; });
+    console.log(msg.attacker.id + ' attacked ' + msg.victim.id);
+    let attackerPos = RoomData.findPlayer(msg.victim).position;
+    let victimPos = RoomData.findPlayer(msg.victim).position;
     WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos.position, victimPos.position);
 });
 socket.on('attacked', function(msg) // object attackData
@@ -155,8 +155,7 @@ socket.on('attacked', function(msg) // object attackData
     {
         for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
         attackedEvent.currentCycle.destroy();
-        WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element)
-        {
+        WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element) {
             return element.cert === (msg.text + msg.attacker);
         }), 1);
     });
@@ -189,6 +188,9 @@ socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, msg.victim);
+    let victimPos = RoomData.findPlayer(msg.victim).position;
+    tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
+    tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
     tempWord.destroy();
 });
 
