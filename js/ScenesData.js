@@ -160,7 +160,7 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
 
         // for test
-        /*WordSpace.attackGauge.add(11);
+        WordSpace.attackGauge.add(11);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
@@ -171,7 +171,7 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);*/
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
     },
 
     update: function()

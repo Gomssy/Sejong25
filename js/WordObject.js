@@ -319,6 +319,7 @@ class ItemWord extends WordObject
                 }
                 break;
             case Enums.item.charge:
+                WordSpace.attackGauge.add(11);
                 break;
             case Enums.item.clean:
                 break;
