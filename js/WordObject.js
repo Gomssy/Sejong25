@@ -298,6 +298,10 @@ class ItemWord extends WordObject
         switch(this.itemType)
         {
             case Enums.item.invincible:
+                WordSpace.isInvincible = true;
+                setTimeout(() => {
+                    WordSpace.isInvincible = false;
+                }, 5000);
                 break;
             case Enums.item.nameList:
                 let tempNames = [];

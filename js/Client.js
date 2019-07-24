@@ -144,16 +144,17 @@ socket.on('someoneAttacked', function(msg) // {Player attacker, Player victim}
 {
     // 이때 위의 attack Mode인 사람(msg.attackerId)을 해제해주자.
     console.log(msg.attacker.id + ' attacked ' + msg.victim.id);
-    let attackerPos = RoomData.findPlayer(msg.victim).position;
+    let attackerPos = RoomData.findPlayer(msg.attacker).position;
     let victimPos = RoomData.findPlayer(msg.victim).position;
-    WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos.position, victimPos.position);
+    WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos);
 });
 socket.on('attacked', function(msg) // object attackData
 {
     //console.log('attacked by ' + msg.attacker.nickname);
     let attackedEvent = new Cycle(function()
     {
-        for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
+        if(!WordSpace.isInvincible)
+            for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
         attackedEvent.currentCycle.destroy();
         WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element) {
             return element.cert === (msg.text + msg.attacker);

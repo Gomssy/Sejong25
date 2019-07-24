@@ -12,6 +12,7 @@ WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
+WordSpace.isInvincible = false;
 WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];

@@ -152,6 +152,12 @@ var gameScene = new Phaser.Class(
         WordSpace.nameQueue.initiate();
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.nameList);
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.nameList);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
 
         // for test
         /*WordSpace.attackGauge.add(11);
