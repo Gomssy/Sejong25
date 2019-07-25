@@ -154,7 +154,7 @@ socket.on('attacked', function(msg) // object attackData
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
-            for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable);
+            for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.isStrong, msg.isCountable, msg.isHeavy);
         attackedEvent.currentCycle.destroy();
         WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element) {
             return element.cert === (msg.text + msg.attacker);

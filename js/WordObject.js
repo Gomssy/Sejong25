@@ -137,13 +137,14 @@ class NormalWord extends WordObject
 
 class AttackWord extends WordObject
 {
-    constructor(text, _wordGrade, _playerData, _isStrong, _isCountable = true, lenRate)
+    constructor(text, _wordGrade, _playerData, _isStrong, _isCountable = true, _isHeavy = false, lenRate)
     {
         super(text);
         this.wordGrade = _wordGrade;
         this.wordWeight = _isStrong ? WordReader.strongAttackWeight[3 - this.wordGrade] : WordReader.attackWeight[3 - this.wordGrade];
         if(WordReader.getWordTyping(_playerData.nickname) > 9)
             this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(_playerData.nickname) - 9);
+        if(_isHeavy) this.wordWeight *= 2;
         this.attacker = _playerData;
         if(!_isCountable) this.counterTime = 0;
         else this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
@@ -295,6 +296,7 @@ class ItemWord extends WordObject
     destroy()
     {
         WordSpace.attackGauge.add(0.5);
+        super.destroy();
         switch(this.itemType)
         {
             case Enums.item.invincible:
@@ -322,8 +324,11 @@ class ItemWord extends WordObject
                 WordSpace.attackGauge.add(11);
                 break;
             case Enums.item.clean:
+                let tempLenth = WordSpace.wordGroup.length * 0.3;
+                for(let i = 0; i < tempLenth; i++) WordSpace.wordGroup[i].destroy();
                 break;
             case Enums.item.heavy:
+                WordSpace.isHeavy = true;
                 break;
             case Enums.item.dark:
                 break;
@@ -331,6 +336,5 @@ class ItemWord extends WordObject
                 console.log("Item type is inappropriate. Item type : " + this.itemType);
                 break;
         }
-        super.destroy();
     }
 }

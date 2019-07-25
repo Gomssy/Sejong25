@@ -154,13 +154,16 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.nameList);
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.charge);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.charge);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.clean);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.clean);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.heavy);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.heavy);
 
         // for test
         WordSpace.attackGauge.add(11);
+        /*WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
@@ -170,8 +173,7 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);*/
     },
 
     update: function()

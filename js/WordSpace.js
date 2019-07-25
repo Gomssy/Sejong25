@@ -13,6 +13,7 @@ WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
 WordSpace.isInvincible = false;
+WordSpace.isHeavy = false;
 WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
@@ -235,9 +236,9 @@ WordSpace.generateWord =
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
-    Attack: function(scene, wordText, grade, attacker, isStrong, isCountable, lenRate)
+    Attack: function(scene, wordText, grade, attacker, isStrong, isCountable, isHeavy, lenRate)
     {
-        word = new AttackWord(wordText, grade, attacker, isStrong, isCountable);
+        word = new AttackWord(wordText, grade, attacker, isStrong, isCountable, isHeavy);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
@@ -421,6 +422,7 @@ WordSpace.attack = function(wordText, grade)
                     text: wordText, 
                     grade: grade, 
                     isStrong: element.isStrong,
+                    isHeavy: WordSpace.isHeavy,
                     multiple: 1
                 }
                 WordSpace.makeAttackPaper(ScenesData.gameScene, RoomData.myself.position, target.position);
@@ -441,6 +443,7 @@ WordSpace.attack = function(wordText, grade)
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
         RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
+        WordSpace.isHeavy = false;
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
