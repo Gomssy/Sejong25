@@ -137,18 +137,19 @@ class NormalWord extends WordObject
 
 class AttackWord extends WordObject
 {
-    constructor(text, _wordGrade, _playerData, _isStrong, _isCountable = true, _isHeavy = false, lenRate)
+    constructor(text, _wordGrade, _playerData, _attackOption, lenRate)
     {
         super(text);
         this.wordGrade = _wordGrade;
-        this.wordWeight = _isStrong ? WordReader.strongAttackWeight[3 - this.wordGrade] : WordReader.attackWeight[3 - this.wordGrade];
+        this.wordWeight = _attackOption.isStrong ? WordReader.strongAttackWeight[3 - this.wordGrade] : WordReader.attackWeight[3 - this.wordGrade];
         if(WordReader.getWordTyping(_playerData.nickname) > 9)
             this.wordWeight += this.wordWeight * 0.2 * (WordReader.getWordTyping(_playerData.nickname) - 9);
-        if(_isHeavy) this.wordWeight *= 2;
+        if(_attackOption.isHeavy) this.wordWeight *= 2;
         this.attacker = _playerData;
-        if(!_isCountable) this.counterTime = 0;
+        if(!_attackOption.isCountable) this.counterTime = 0;
         else this.counterTime = WordSpace.gameTimer.now + 1000 * (this.wordTyping <= (5 - _wordGrade) * 2.5 ? this.wordTyping / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5 :
                             ((5 - _wordGrade) * 3 + (this.wordTyping - (5 - _wordGrade) * 2.5) * 2.5) / (Math.max(200, WordSpace.playerTyping) / 60) * 1.5);
+        this.isDark = _attackOption.isDark;
         console.log('Attack text : ' + text + ', Attacker : ' + this.attacker.nickname + ', Weight : ' + this.wordWeight);
         console.log('Counter time : ' + this.counterTime);
     }
@@ -157,16 +158,22 @@ class AttackWord extends WordObject
         super.instantiate(scene, lenRate);
         this.maskBackground = scene.physics.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
         .setTint(Phaser.Display.Color.GetColor(120, 120, 120)).setScale(this.scale);
-        this.maskBackground.alpha = 0.5;
-
+        this.maskBackground.alpha = this.isDark ? 1 : 0.5;
         this.shape = scene.make.graphics();
         var rect = new Phaser.Geom.Rectangle(0, 0, this.maskBackground.width * this.scale, this.maskBackground.height * this.scale);
         this.shape.fillStyle(0xffffff).fillRectShape(rect);
 
         this.mask = this.shape.createGeometryMask();
-        this.maskBackground.setMask(this.mask);
         this.maskStart = this.physicsObj.x;
         this.maskEnd = this.physicsObj.x - this.physicsObj.width * this.scale;
+
+        if(this.isDark)
+        {
+            setTimeout(() => {
+                if(this.maskBackground != null && this.mask != null) this.maskBackground.setMask(this.mask);
+            }, 4000);
+        }
+        else this.maskBackground.setMask(this.mask);
     }
 
     attract()
@@ -205,8 +212,12 @@ class AttackWord extends WordObject
                 target: this.attacker.id,
                 text: this.wordText,
                 grade: Math.min(3, this.wordGrade + 1),
-                isStrong: false,
-                isCountable: false
+                attackOption: {
+                    isStrong: false,
+                    isCountable: false,
+                    isHeavy: false,
+                    isDark: false
+                },
             }
             socket.emit('attack', attackData);
         }
@@ -328,9 +339,10 @@ class ItemWord extends WordObject
                 for(let i = 0; i < tempLenth; i++) WordSpace.wordGroup[i].destroy();
                 break;
             case Enums.item.heavy:
-                WordSpace.isHeavy = true;
+                Input.attackOption.isHeavy = true;
                 break;
             case Enums.item.dark:
+                Input.attackOption.isDark = true;
                 break;
             default:
                 console.log("Item type is inappropriate. Item type : " + this.itemType);

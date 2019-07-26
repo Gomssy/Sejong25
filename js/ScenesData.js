@@ -160,6 +160,8 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.clean);
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.heavy);
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.heavy);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.dark);
+        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.dark);
 
         // for test
         WordSpace.attackGauge.add(11);

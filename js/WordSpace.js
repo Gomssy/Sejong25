@@ -13,7 +13,6 @@ WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
 WordSpace.isInvincible = false;
-WordSpace.isHeavy = false;
 WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
@@ -236,9 +235,9 @@ WordSpace.generateWord =
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
-    Attack: function(scene, wordText, grade, attacker, isStrong, isCountable, isHeavy, lenRate)
+    Attack: function(scene, wordText, grade, attacker, attackOption, lenRate)
     {
-        word = new AttackWord(wordText, grade, attacker, isStrong, isCountable, isHeavy);
+        word = new AttackWord(wordText, grade, attacker, attackOption);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
@@ -333,13 +332,15 @@ WordSpace.findWord = function(wordText)
     else if (wordText === '공격' && WordSpace.attackGauge.value >= 3 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
     {
         console.log('attack mode');
-        Input.attackOption = this.attackGauge.getAttackOption();
+        let tempAttackOption = this.attackGauge.getAttackOption();
+        Input.attackOption.wordCount = tempAttackOption.wordCount;
+        Input.attackOption.wordGrade = tempAttackOption.wordGrade;
         Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
         RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
-        RoomData.myself.playerImage.anims.msPerFrame /= (4 - WordSpace.attackGauge.getAttackOption().wordGrade);
+        RoomData.myself.playerImage.anims.msPerFrame /= (4 - Input.attackOption.wordGrade);
     }
     else // 오타 체크
     {
@@ -420,9 +421,13 @@ WordSpace.attack = function(wordText, grade)
                     attacker: RoomData.myself, 
                     victim: target,
                     text: wordText, 
-                    grade: grade, 
-                    isStrong: element.isStrong,
-                    isHeavy: WordSpace.isHeavy,
+                    grade: grade,
+                    attackOption: {
+                        isStrong: element.isStrong,
+                        isCountable: true,
+                        isHeavy: Input.attackOption.isHeavy,
+                        isDark: Input.attackOption.isDark
+                    },
                     multiple: 1
                 }
                 WordSpace.makeAttackPaper(ScenesData.gameScene, RoomData.myself.position, target.position);
@@ -443,7 +448,8 @@ WordSpace.attack = function(wordText, grade)
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
         RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
-        WordSpace.isHeavy = false;
+        Input.attackOption.isHeavy = false;
+        Input.attackOption.isDark = false;
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
