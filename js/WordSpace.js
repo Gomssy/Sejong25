@@ -181,6 +181,10 @@ WordSpace.loadImage = function(scene)
     {
         scene.load.image('attackAlert' + i, 'assets/placeholder/attackalert' + (i+1) + '.png');
     }
+    for (let i = 0; i < 6; i++)
+    {
+        scene.load.image('item' + i, 'assets/placeholder/item' + i + '.png');
+    }
     for (let i = 2; i < 7; i++)
     {
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
