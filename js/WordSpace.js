@@ -44,8 +44,8 @@ WordSpace.getSpawnPoint = function(_lenRate)
 {
     let lenRate = 1;
     if(typeof _lenRate == 'number') lenRate  = _lenRate;
-    let xLen = 550 * lenRate;
-    let yLen = 350 * lenRate;
+    let xLen = 650 * lenRate;
+    let yLen = 500 * lenRate;
     const angle = Math.random() * Math.PI * 2;
     let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
     let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
@@ -250,7 +250,8 @@ WordSpace.generateWord =
         if(newPlayerData == null)
         {
             if(WordSpace.nameQueue.queue.length == 1) return null;
-            word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+            let temp = WordSpace.nameQueue.pop();
+            word = new NameWord(temp, isStrong);
         }
         else word = new NameWord(newPlayerData, isStrong);
         WordSpace.pushWord(scene, word, lenRate);
@@ -511,11 +512,8 @@ WordSpace.nameQueue =
     {
         let tempElement = WordSpace.nameQueue.queue.shift();
         if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
-        if(this.queue.length > 0)
-        {
-            if(!RoomData.players[tempElement].isAlive && WordSpace.nameQueue.getCount(tempElement) < 3) WordSpace.nameQueue.pop();
-            else return RoomData.players[tempElement];
-        }
+        if(!RoomData.players[tempElement].isAlive && WordSpace.nameQueue.getCount(tempElement) < 3) return WordSpace.nameQueue.pop();
+        else return RoomData.players[tempElement];
     },
     getCount: function(player)
     {

@@ -118,9 +118,9 @@ class NormalWord extends WordObject
                 case 3: WordSpace.attackGauge.add(0.5); break;
                 default: console.log('[ERR] wrong grade of word'); break;
             }
-            this.wordObj.destroy();
-            this.physicsObj.destroy();
         }
+        this.wordObj.destroy();
+        this.physicsObj.destroy();
     }
 }
 
@@ -161,7 +161,11 @@ class AttackWord extends WordObject
         if(this.isDark)
         {
             setTimeout(() => {
-                if(this.maskBackground != null && this.mask != null) this.maskBackground.setMask(this.mask);
+                if(this.maskBackground != null && this.mask != null) 
+                {
+                    this.maskBackground.setMask(this.mask);
+                    this.maskBackground.alpha = 0.5;
+                }
             }, 4000);
         }
         else this.maskBackground.setMask(this.mask);

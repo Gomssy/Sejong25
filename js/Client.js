@@ -174,6 +174,11 @@ socket.on('defeat', function(msg) // object player
     {
         console.log(RoomData.players[msg.index].nickname + ' defeated by ' + msg.lastAttack.attacker + ', with ' + msg.lastAttack.word);
         WordSpace.killLogForTest += ('\n' + msg.lastAttack.attacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.players[msg.index].nickname);
+        if(msg.lastAttack.attackerId == RoomData.myself.id)
+        {
+            var keys = Object.keys(Enums.item);
+            WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
+        }
     }
     else 
     {
