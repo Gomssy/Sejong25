@@ -465,6 +465,7 @@ WordSpace.attack = function(wordText, grade)
 WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo)
 {
     var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPapaer').setScale(0.5).setDepth(3);
+    attackPaper.mask = new Phaser.Display.Masks.BitmapMask(scene, BackGround.gameBackground);
     attackPaper.throwTarget = attackTo;
     attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
     attackPaper.path = new Phaser.Curves.Spline([
