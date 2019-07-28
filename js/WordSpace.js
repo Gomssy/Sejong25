@@ -12,6 +12,7 @@ WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
 WordSpace.isTimerOn = false;
+WordSpace.isInvincible = false;
 WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
@@ -43,8 +44,8 @@ WordSpace.getSpawnPoint = function(_lenRate)
 {
     let lenRate = 1;
     if(typeof _lenRate == 'number') lenRate  = _lenRate;
-    let xLen = 550 * lenRate;
-    let yLen = 350 * lenRate;
+    let xLen = 650 * lenRate;
+    let yLen = 500 * lenRate;
     const angle = Math.random() * Math.PI * 2;
     let _x = xLen * Math.cos(angle) + this.gravityPoint.x;
     let _y = yLen * Math.sin(angle) + this.gravityPoint.y;
@@ -180,6 +181,10 @@ WordSpace.loadImage = function(scene)
     {
         scene.load.image('attackAlert' + i, 'assets/placeholder/attackalert' + (i+1) + '.png');
     }
+    for (let i = 0; i < 6; i++)
+    {
+        scene.load.image('item' + i, 'assets/placeholder/item' + i + '.png');
+    }
     for (let i = 2; i < 7; i++)
     {
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
@@ -234,17 +239,27 @@ WordSpace.generateWord =
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
-    Attack: function(scene, wordText, grade, attacker, isStrong, isCountable, lenRate)
+    Attack: function(scene, wordText, grade, attacker, attackOption, lenRate)
     {
-        word = new AttackWord(wordText, grade, attacker, isStrong, isCountable);
+        word = new AttackWord(wordText, grade, attacker, attackOption);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     },
     Name: function(scene, isStrong, newPlayerData, lenRate)
     {
-        if(newPlayerData == null) word = new NameWord(WordSpace.nameQueue.pop(), isStrong);
+        if(newPlayerData == null)
+        {
+            if(WordSpace.nameQueue.queue.length == 1) return null;
+            let temp = WordSpace.nameQueue.pop();
+            word = new NameWord(temp, isStrong);
+        }
         else word = new NameWord(newPlayerData, isStrong);
-        //word = new NameWord(RoomData.myself, false);
+        WordSpace.pushWord(scene, word, lenRate);
+        return word;
+    },
+    Item: function(scene, itemType, lenRate)
+    {
+        word = new ItemWord(itemType);
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     }
@@ -322,13 +337,15 @@ WordSpace.findWord = function(wordText)
     else if (wordText === '공격' && WordSpace.attackGauge.value >= 3 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
     {
         console.log('attack mode');
-        Input.attackOption = this.attackGauge.getAttackOption();
+        let tempAttackOption = this.attackGauge.getAttackOption();
+        Input.attackOption.wordCount = tempAttackOption.wordCount;
+        Input.attackOption.wordGrade = tempAttackOption.wordGrade;
         Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
-        BackGround.myCharacter.anims.msPerFrame /= (4 - WordSpace.attackGauge.getAttackOption().wordGrade);
+        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
+        RoomData.myself.playerImage.anims.msPerFrame /= (4 - Input.attackOption.wordGrade);
     }
     else // 오타 체크
     {
@@ -400,47 +417,29 @@ WordSpace.attack = function(wordText, grade)
             }
             else
             {
+                let target = RoomData.players.find(function(_element) {
+                    return _element.id == element.ownerId;
+                });
                 let attackData = 
                 {
                     roomNum: RoomData.roomId,
                     attacker: RoomData.myself, 
-                    target: element.ownerId,
+                    victim: target,
                     text: wordText, 
-                    grade: grade, 
-                    isStrong: element.isStrong,
+                    grade: grade,
+                    attackOption: {
+                        isStrong: element.isStrong,
+                        isCountable: true,
+                        isHeavy: Input.attackOption.isHeavy,
+                        isDark: Input.attackOption.isDark
+                    },
                     multiple: 1
                 }
+                WordSpace.makeAttackPaper(ScenesData.gameScene, RoomData.myself.position, target.position);
                 toSend.push(attackData);
             }
             element.physicsObj.destroy();
             element.wordObj.destroy();
-            var attackPaper = ScenesData.gameScene.add.sprite(BackGround.myCharacter.x, BackGround.myCharacter.y, 'attackPapaer').setScale(0.5).setDepth(3);
-            attackPaper.throwTarget = RoomData.players.find(function(_element) {
-                return _element.id == element.ownerId;
-            }).playerImage;
-            attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
-            attackPaper.path = new Phaser.Curves.Spline([
-                BackGround.myCharacter.x, BackGround.myCharacter.y,
-                (BackGround.myCharacter.x + attackPaper.throwTarget.x) / 2, Math.min(BackGround.myCharacter.y, attackPaper.throwTarget.y) - 100,
-                attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
-            ]);
-            ScenesData.gameScene.tweens.add({
-                targets: attackPaper.follower,
-                t: 1,
-                ease: 'Linear',
-                duration: 4000,
-                repeat: 0,
-                onComplete: function() { 
-                    attackPaper.destroy();
-                    WordSpace.attackPaperGroup = [];
-                }
-            });
-            attackPaper.moveObject = function(obj)
-            {
-                obj.path.getPoint(obj.follower.t, obj.follower.vec);
-                obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
-            }
-            WordSpace.attackPaperGroup.push(attackPaper);
         });
         toSend.forEach(function(element)
         {
@@ -453,12 +452,44 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
-        BackGround.myCharacter.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
+        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
+        Input.attackOption.isHeavy = false;
+        Input.attackOption.isDark = false;
     }
     else WordSpace.attackGauge.cutValue(0.3);
     Input.maxInput = 6;
     Input.attackMode = false;
     WordSpace.attackGauge.pauseCycle(false);
+}
+
+WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo)
+{
+    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPapaer').setScale(0.5).setDepth(3);
+    attackPaper.throwTarget = attackTo;
+    attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+    attackPaper.path = new Phaser.Curves.Spline([
+        attackFrom.x, attackFrom.y,
+        (attackFrom.x + attackPaper.throwTarget.x) / 2, Math.min(attackFrom.y, attackPaper.throwTarget.y) - 100,
+        attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
+    ]);
+    scene.tweens.add({
+        targets: attackPaper.follower,
+        t: 1,
+        ease: 'Linear',
+        duration: 4000,
+        repeat: 0,
+        onComplete: function() { 
+            attackPaper.destroy();
+            WordSpace.attackPaperGroup = [];
+        }
+    });
+    attackPaper.moveObject = function(obj)
+    {
+        obj.path.getPoint(obj.follower.t, obj.follower.vec);
+        obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
+        obj.angle = 720 * obj.follower.t;
+    }
+    WordSpace.attackPaperGroup.push(attackPaper);
 }
 
 WordSpace.nameQueue = 
@@ -468,12 +499,12 @@ WordSpace.nameQueue =
     {
         let tempQueue = [];
         RoomData.players.forEach(function(element){
-            tempQueue.push(element.index)
+            tempQueue.push(element.index);
         })
-        tempQueue.sort(function(){return 0.5-Math.random()});
+        Phaser.Utils.Array.Shuffle(tempQueue);
         tempQueue.forEach(function(element)
         {
-            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive)
+            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive && WordSpace.nameQueue.getCount(element) < 3)
                 WordSpace.nameQueue.queue.push(element);
         });
     },
@@ -481,8 +512,16 @@ WordSpace.nameQueue =
     {
         let tempElement = WordSpace.nameQueue.queue.shift();
         if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
-        if(!RoomData.players[tempElement].isAlive) return WordSpace.nameQueue.pop();
+        if(!RoomData.players[tempElement].isAlive && WordSpace.nameQueue.getCount(tempElement) < 3) return WordSpace.nameQueue.pop();
         else return RoomData.players[tempElement];
+    },
+    getCount: function(player)
+    {
+        let i = 0;
+        WordSpace.nameGroup.forEach(function(element){
+            if(element.id == player.id) i++;
+        })
+        return i;
     },
     initiate: function()
     {

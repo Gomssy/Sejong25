@@ -76,7 +76,7 @@ class GameRoom
     {
         this.roomId = GameServer.getRoomNumber();
         this.roomIndex = -1;
-        this.startCount = 2;
+        this.startCount = 3;
         this.maxPlayer = 100;
         this.nextRank = 100;
 
@@ -288,6 +288,7 @@ class Player
         this.gameRoomId = gameRoom.roomId;
         this.index = gameRoom.currentPlayer.length;
         this.nickname = playerData.nickname;
+        this.playerImage = null;
         this.position = null;
 
         this.isAlive = true;

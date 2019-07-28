@@ -12,7 +12,12 @@ Input.justPressed = '';
 Input.maxInput = 6;
 
 Input.attackMode = false;
-Input.attackOption = null;
+Input.attackOption = {
+    wordCount: 0,
+    wordGrade: 0,
+    isHeavy: false,
+    isDark: false
+};
 
 Input.gameSceneEnterReaction = function()
 {
