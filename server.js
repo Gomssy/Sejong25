@@ -95,7 +95,7 @@ io.on('connection', function(socket)
     socket.on('attack', function(msg)
     {
         socket.playerData.currentRoom.announceToTarget(msg.victim.id, 'attacked', msg);
-        socket.playerData.currentRoom.announceToRoom('someoneAttacked', {attacker: msg.attacker, victim: msg.victim});
+        socket.playerData.currentRoom.announceToRoom('someoneAttacked', {attacker: msg.attacker, victim: msg.victim, multiple: msg.multiple});
         //console.log('attack ' + msg.target + ' by ' + msg.attacker.id + ' with ' + msg.text);
         setTimeout(function()
         {

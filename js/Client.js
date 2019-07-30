@@ -146,7 +146,7 @@ socket.on('someoneAttacked', function(msg) // {Player attacker, Player victim}
     console.log(msg.attacker.id + ' attacked ' + msg.victim.id);
     let attackerPos = RoomData.findPlayer(msg.attacker).position;
     let victimPos = RoomData.findPlayer(msg.victim).position;
-    WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos);
+    WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos, msg.multiple);
 });
 socket.on('attacked', function(msg) // object attackData
 {

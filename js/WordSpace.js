@@ -406,15 +406,12 @@ WordSpace.attack = function(wordText, grade)
         let toSend = [];
         WordSpace.nameGroup.forEach(function(element)
         {
-            let targetId = element.ownerId;
+            let victimId = element.ownerId;
             let sendIdx = toSend.findIndex(function(element)
             {
-                return element.target === targetId;
+                return element.victim.id === victimId;
             });
-            if (sendIdx !== -1)
-            {
-                toSend[sendIdx].multiple++;
-            }
+            if (sendIdx != -1) toSend[sendIdx].multiple++;
             else
             {
                 let target = RoomData.players.find(function(_element) {
@@ -435,7 +432,6 @@ WordSpace.attack = function(wordText, grade)
                     },
                     multiple: 1
                 }
-                WordSpace.makeAttackPaper(ScenesData.gameScene, RoomData.myself.position, target.position);
                 toSend.push(attackData);
             }
             element.physicsObj.destroy();
@@ -462,9 +458,10 @@ WordSpace.attack = function(wordText, grade)
     WordSpace.attackGauge.pauseCycle(false);
 }
 
-WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo)
+WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
 {
-    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPapaer').setScale(0.5).setDepth(3);
+    console.log(multiple);
+    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPapaer').setScale(0.5 * multiple).setDepth(3);
     attackPaper.throwTarget = attackTo;
     attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
     attackPaper.path = new Phaser.Curves.Spline([
