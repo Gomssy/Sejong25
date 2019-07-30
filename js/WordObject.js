@@ -383,8 +383,14 @@ class ItemWord extends WordObject
                     WordSpace.attackGauge.add(11);
                     break;
                 case Enums.item.clean:
-                    let tempLenth = WordSpace.wordGroup.length * 0.3;
-                    for(let i = 0; i < tempLenth; i++) WordSpace.wordGroup[i].destroy(false);
+                    let tempWords = [];
+                    WordSpace.wordGroup.forEach(function(element){
+                        tempWords.push(WordSpace.wordGroup.indexOf(element));
+                    });
+                    tempWords = Phaser.Utils.Array.Shuffle(tempWords);
+                    let tempLenth = tempWords.length * 0.3;
+                    for(let i = 0; i < tempLenth; i++)
+                        if(WordSpace.wordGroup[tempWords[i]] != null) WordSpace.wordGroup[tempWords[i]].destroy();
                     break;
                 case Enums.item.heavy:
                     Input.attackOption.isHeavy = true;
