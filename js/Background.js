@@ -13,7 +13,8 @@ BackGround.otherCharacters = [];
 
 BackGround.loadImage = function(scene)
 {
-    scene.load.image('brainGround', 'assets/image/background/background_brain.png');
+    scene.load.image('brain', 'assets/image/background/brain.png');
+    scene.load.image('gameBackground', 'assets/image/background/background_brain.png');
     scene.load.image('menuBackground', 'assets/placeholder/menuBackground.png');
     scene.load.image('roomBackground', 'assets/placeholder/roomBackground.png');
 }
@@ -35,9 +36,11 @@ BackGround.drawCharacter = function(scene)
     });
 }
 
+BackGround.gameBackground = null;
+
 BackGround.drawBrain = function(scene)
 {
-    brains = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'brainGround').setDisplaySize(game.config.width, game.config.height).setDepth(1);
+    BackGround.gameBackground = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'gameBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);
 }
 
 BackGround.drawMenu = function(scene)
