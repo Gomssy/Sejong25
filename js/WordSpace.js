@@ -368,8 +368,8 @@ WordSpace.findWord = function(wordText)
                 let victimData = 
                 {
                     roomNum: RoomData.roomId,
-                    victim: RoomData.myself, 
-                    target: element.attacker.id,
+                    attackerId: element.attacker.id,
+                    victimId: RoomData.myself.id,
                     word: element.wordText
                 }
                 socket.emit('defenseFailed', victimData);
@@ -410,7 +410,7 @@ WordSpace.attack = function(wordText, grade)
             let victimId = element.ownerId;
             let sendIdx = toSend.findIndex(function(element)
             {
-                return element.victim.id === victimId;
+                return element.victimId === victimId;
             });
             if (sendIdx != -1) toSend[sendIdx].multiple++;
             else
@@ -421,8 +421,8 @@ WordSpace.attack = function(wordText, grade)
                 let attackData = 
                 {
                     roomNum: RoomData.roomId,
-                    attacker: RoomData.myself, 
-                    victim: target,
+                    attackerId: RoomData.myself.id, 
+                    victimId: target.id,
                     text: wordText, 
                     grade: grade,
                     attackOption: {

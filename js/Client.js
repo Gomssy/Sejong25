@@ -141,12 +141,12 @@ socket.on('attackMode', function(msg) // number playerId
     console.log(msg + ' is on attack Mode');
     // msg의 id를 가진 사람이 attack Mode이다.
 });
-socket.on('someoneAttacked', function(msg) // {Player attacker, Player victim}
+socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
 {
     // 이때 위의 attack Mode인 사람(msg.attackerId)을 해제해주자.
-    console.log(msg.attacker.id + ' attacked ' + msg.victim.id);
-    let attackerPos = RoomData.findPlayer(msg.attacker).position;
-    let victimPos = RoomData.findPlayer(msg.victim).position;
+    console.log(msg.attackerId + ' attacked ' + msg.victimId);
+    let attackerPos = RoomData.findPlayer(msg.attackerId).position;
+    let victimPos = RoomData.findPlayer(msg.victimId).position;
     WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos, msg.multiple);
 });
 socket.on('attacked', function(msg) // object attackData
@@ -155,13 +155,13 @@ socket.on('attacked', function(msg) // object attackData
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
-            for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.attackOption);
+            for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, RoomData.findPlayer(msg.attackerId), msg.attackOption);
         attackedEvent.currentCycle.destroy();
         WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element) {
-            return element.cert === (msg.text + msg.attacker);
+            return element.cert === (msg.text + msg.attackerId);
         }), 1);
     });
-    attackedEvent.cert = msg.text + msg.attacker;
+    attackedEvent.cert = msg.text + msg.attackerId;
     attackedEvent.resetCycle(ScenesData.gameScene, 4000, 0, false);
 
     WordSpace.attackedEvents.push(attackedEvent);
@@ -173,8 +173,9 @@ socket.on('defeat', function(msg) // object player
     RoomData.aliveCount--;
     if (msg.lastAttack != null) 
     {
-        console.log(RoomData.players[msg.index].nickname + ' defeated by ' + msg.lastAttack.attacker + ', with ' + msg.lastAttack.word);
-        WordSpace.killLogForTest += ('\n' + msg.lastAttack.attacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.players[msg.index].nickname);
+        let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId).nickname;
+        console.log(RoomData.players[msg.index].nickname + ' defeated by ' + lastAttacker + ', with ' + msg.lastAttack.word);
+        WordSpace.killLogForTest += ('\n' + lastAttacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.players[msg.index].nickname);
         if(msg.lastAttack.attackerId == RoomData.myself.id)
         {
             var keys = Object.keys(Enums.item);
@@ -194,8 +195,8 @@ socket.on('gameEnd', function(msg) // object player
 socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
-    let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, msg.victim);
-    let victimPos = RoomData.findPlayer(msg.victim).position;
+    let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.findPlayer(msg.victimId));
+    let victimPos = RoomData.findPlayer(msg.victimId).position;
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
     tempWord.destroy();

@@ -206,8 +206,8 @@ class AttackWord extends WordObject
                 let attackData = 
                 {
                     roomNum: RoomData.roomId,
-                    attacker: RoomData.myself,
-                    target: this.attacker.id,
+                    attackerId: RoomData.myself.id,
+                    victimId: this.attacker.id,
                     text: this.wordText,
                     grade: Math.min(3, this.wordGrade + 1),
                     attackOption: {

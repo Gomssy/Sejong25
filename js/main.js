@@ -33,7 +33,7 @@ RoomData.roomId = -1;
 RoomData.myself = null;
 RoomData.players = null;
 RoomData.aliveCount = -1;
-RoomData.findPlayer = function(player)
+RoomData.findPlayer = function(playerId)
 {
-    return RoomData.players.find(function(element){ return element.id == player.id; });
+    return RoomData.players.find(function(element){ return element.id == playerId; });
 }
