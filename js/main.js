@@ -17,7 +17,7 @@ var config = {
     scene: [ menuScene, roomScene, gameScene ]
 };
 
-var game = new Phaser.Game(config)
+var game = null;
 
 //플레이어 정보, 서버 통신시 필요할 듯
 //테스트용이므로 차후 수정 요망
