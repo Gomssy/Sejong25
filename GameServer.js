@@ -288,6 +288,7 @@ class Player
         this.gameRoomId = gameRoom.roomId;
         this.index = gameRoom.currentPlayer.length;
         this.nickname = playerData.nickname;
+        this.playerImage = null;
         this.position = null;
 
         this.isAlive = true;
