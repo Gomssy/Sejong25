@@ -103,6 +103,7 @@ socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
 });
 socket.on('startGame', function()
 {
+    Audio.killSound(ScenesData.roomScene, 'inRoom');
     game.scene.remove('roomScene');
     game.scene.start('gameScene');
 });

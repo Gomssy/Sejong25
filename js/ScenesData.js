@@ -49,7 +49,7 @@ var roomScene = new Phaser.Class(
     create: function()
     {
         BackGround.drawRoom(this);
-
+        Audio.loopSound(this, 'inRoom');
         this.players = [];
 
         this.isCounting = false;
