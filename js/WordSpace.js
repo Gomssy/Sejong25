@@ -190,10 +190,13 @@ WordSpace.loadImage = function(scene)
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
         scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
     }
+
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
-    scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 490, frameHeight: 423 });
-    scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 490, frameHeight: 423 });
-    scene.load.image('attackPapaer', 'assets/image/etc/paper_crumbled.png');
+    scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('pyeongminBurningSmall', 'assets/image/character/pyeongmin/pyeong_burning_small.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('pyeongminBurningBig', 'assets/image/character/pyeongmin/pyeong_burning_big.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
 
     WordSpace.weightTextObjForTest = scene.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
     WordSpace.killLogTextForTest = scene.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
@@ -215,10 +218,24 @@ WordSpace.loadAnimation = function(scene)
         repeat: 0,
         hideOnComplete: false
     });
-    WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite] = scene.anims.create({
-        key: 'pyeongminattackWriteAnim',
+    WordSpace.pyeongminAnims[Enums.characterAnim.notBurning] = scene.anims.create({
+        key: 'pyeongminnotBurningAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
         frameRate: 10,
+        repeat: -1,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning] = scene.anims.create({
+        key: 'pyeongminsmallBurningAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminBurningSmall'),
+        frameRate: 20,
+        repeat: -1,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.bigBurning] = scene.anims.create({
+        key: 'pyeongminbigBurningAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminBurningBig'),
+        frameRate: 40,
         repeat: -1,
         hideOnComplete: false
     });
@@ -344,8 +361,25 @@ WordSpace.findWord = function(wordText)
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
-        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
-        RoomData.myself.playerImage.anims.msPerFrame /= (4 - Input.attackOption.wordGrade);
+        switch(tempAttackOption.wordCount)
+        {
+            case 2:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.notBurning]);
+                break;
+            case 3:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning]);
+                break;
+            case 4:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning]);
+                break;
+            case 5:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.bigBurning]);
+                break;
+            default:
+                console.log('Improper attack option.');
+                break;
+        }
+        //RoomData.myself.playerImage.anims.msPerFrame /= (4 - Input.attackOption.wordGrade);
     }
     else // 오타 체크
     {
@@ -461,7 +495,7 @@ WordSpace.attack = function(wordText, grade)
 
 WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
 {
-    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPapaer').setScale(0.5 * multiple).setDepth(3);
+    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPaper').setScale(0.5 * multiple).setDepth(3);
     attackPaper.mask = new Phaser.Display.Masks.BitmapMask(scene, BackGround.gameBackground);
     attackPaper.throwTarget = attackTo;
     attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
