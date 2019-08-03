@@ -59,6 +59,7 @@ class WordObject
             breakAnim.destroy();
         }, 200);
         RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
+        RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
     }
     
     attract()

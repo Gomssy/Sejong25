@@ -192,10 +192,11 @@ WordSpace.loadImage = function(scene)
     }
 
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
+    scene.load.spritesheet('pyeongminSit', 'assets/image/character/pyeongmin/pyeong_sit.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.spritesheet('pyeongminBurningSmall', 'assets/image/character/pyeongmin/pyeong_burning_small.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.spritesheet('pyeongminBurningBig', 'assets/image/character/pyeongmin/pyeong_burning_big.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('pyeongminBurningSmall', 'assets/image/character/pyeongmin/burning/pyeong_burning_small.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('pyeongminBurningBig', 'assets/image/character/pyeongmin/burning/pyeong_burning_big.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
 
     WordSpace.weightTextObjForTest = scene.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
@@ -207,6 +208,13 @@ WordSpace.loadAnimation = function(scene)
     scene.anims.create({
         key: 'wordBreakAnim',
         frames: scene.anims.generateFrameNumbers('wordBreak'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.sit] = scene.anims.create({
+        key: 'pyeongminSitAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminSit'),
         frameRate: 10,
         repeat: 0,
         hideOnComplete: false
@@ -228,14 +236,14 @@ WordSpace.loadAnimation = function(scene)
     WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning] = scene.anims.create({
         key: 'pyeongminsmallBurningAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminBurningSmall'),
-        frameRate: 20,
+        frameRate: 10,
         repeat: -1,
         hideOnComplete: false
     });
     WordSpace.pyeongminAnims[Enums.characterAnim.bigBurning] = scene.anims.create({
         key: 'pyeongminbigBurningAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminBurningBig'),
-        frameRate: 40,
+        frameRate: 10,
         repeat: -1,
         hideOnComplete: false
     });
@@ -379,7 +387,7 @@ WordSpace.findWord = function(wordText)
                 console.log('Improper attack option.');
                 break;
         }
-        //RoomData.myself.playerImage.anims.msPerFrame /= (4 - Input.attackOption.wordGrade);
+        RoomData.myself.playerImage.anims.msPerFrame /= (4 - Input.attackOption.wordGrade);
     }
     else // 오타 체크
     {
@@ -484,6 +492,7 @@ WordSpace.attack = function(wordText, grade)
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
         RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
+        RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
         Input.attackOption.isHeavy = false;
         Input.attackOption.isDark = false;
     }
