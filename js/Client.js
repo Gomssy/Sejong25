@@ -116,11 +116,13 @@ socket.on('changePhase', function(msg) // number Phase
 
     WordSpace.pauseCycle(true);
     // 여기서 종이 드르륵 열면됨
+    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phaseChangeBgr').setOrigin(0.5, 0.5).setDepth(10);
     ScenesData.gameScene.scene.pause('gameScene');
     setTimeout(function()
     {
         ScenesData.gameScene.scene.resume('gameScene');
         // 여기서 종이 닫으면됨
+        phaseChangeBgr.destroy();
         WordSpace.pauseCycle(false);
         //console.log('start again');
     }, 5000);

@@ -76,7 +76,7 @@ class GameRoom
     {
         this.roomId = GameServer.getRoomNumber();
         this.roomIndex = -1;
-        this.startCount = 2;
+        this.startCount = 3;
         this.maxPlayer = 100;
         this.nextRank = 100;
 
@@ -208,7 +208,7 @@ class GameRoom
     {
         if (this.currentPhase === GameServer.Phase.START)
         {
-            if (this.phaseChanger < 0 && checkTime - this.startTime > 60000)
+            if (this.phaseChanger < 0 && checkTime - this.startTime > 10000)
             {
                 this.currentPhase = GameServer.Phase.MAIN;
                 this.rateArrangePoint = 150;

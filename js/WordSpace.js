@@ -190,14 +190,15 @@ WordSpace.loadImage = function(scene)
         scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
         scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
     }
-
+    
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.spritesheet('pyeongminSit', 'assets/image/character/pyeongmin/pyeong_sit.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminBurningSmall', 'assets/image/character/pyeongmin/burning/pyeong_burning_small.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminBurningBig', 'assets/image/character/pyeongmin/burning/pyeong_burning_big.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
+    scene.load.spritesheet('pyeongminGameOver', 'assets/image/character/pyeongmin/burning/pyeong_balladang.png', { frameWidth: 720, frameHeight: 700 });
+    scene.load.image('phaseChangeBgr', 'assets/placeholder/phaseChange.png');
 
     WordSpace.weightTextObjForTest = scene.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
     WordSpace.killLogTextForTest = scene.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
@@ -250,6 +251,13 @@ WordSpace.loadAnimation = function(scene)
     WordSpace.pyeongminAnims[Enums.characterAnim.throw] = scene.anims.create({
         key: 'pyeongminThrowAnim',
         frames: scene.anims.generateFrameNumbers('pyeongminThrow'),
+        frameRate: 10,
+        repeat: 0,
+        hideOnComplete: false
+    });
+    WordSpace.pyeongminAnims[Enums.characterAnim.gameOver] = scene.anims.create({
+        key: 'pyeongminGameOverAnim',
+        frames: scene.anims.generateFrameNumbers('pyeongminGameOver'),
         frameRate: 10,
         repeat: 0,
         hideOnComplete: false
