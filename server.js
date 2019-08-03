@@ -94,18 +94,17 @@ io.on('connection', function(socket)
 
     socket.on('attack', function(msg)
     {
-        socket.playerData.currentRoom.announceToTarget(msg.victim.id, 'attacked', msg);
-        socket.playerData.currentRoom.announceToRoom('someoneAttacked', {attacker: msg.attacker, victim: msg.victim, multiple: msg.multiple});
-        //console.log('attack ' + msg.target + ' by ' + msg.attacker.id + ' with ' + msg.text);
+        socket.playerData.currentRoom.announceToTarget(msg.victimId, 'attacked', msg);
+        socket.playerData.currentRoom.announceToRoom('someoneAttacked', {attackerId: msg.attackerId, victimId: msg.victimId, multiple: msg.multiple});
+        //console.log('attack ' + msg.victimId + ' by ' + msg.attackerId + ' with ' + msg.text);
         setTimeout(function()
         {
-            let target = GameServer.findPlayerSocket(msg.victim.id);
+            let target = GameServer.findPlayerSocket(msg.victimId);
             if (target != null)
             {
                 let dataToPush = 
                 {
-                    attackerId: msg.attacker.id,
-                    attacker: msg.attacker.nickname,
+                    attackerId: msg.attackerId,
                     wrongCount: 0,
                     word: msg.text,
                     wordGrade: msg.grade,
@@ -128,10 +127,10 @@ io.on('connection', function(socket)
 
     socket.on('defenseFailed', function(msg)
     {
-        socket.playerData.currentRoom.announceToTarget(msg.target, 'attackSucceed', msg);
+        socket.playerData.currentRoom.announceToTarget(msg.attackerId, 'attackSucceed', msg);
         let wrongCountIndex = socket.playerData.playingData.lastAttacks.findIndex(function(element)
         {
-            return (element.word === msg.word) && (element.attackerId === msg.target);
+            return (element.word === msg.word) && (element.attackerId === msg.victimId);
         });
         if (wrongCountIndex !== -1) socket.playerData.playingData.lastAttacks[wrongCountIndex].wrongCount++;
     });
