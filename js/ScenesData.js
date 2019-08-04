@@ -14,8 +14,14 @@ var menuScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.menuScene = this;
+        /*Input.inputField.loadImage(this);
+        ResourceLoader.loadBackGround(this);
+        Audio.loadSound(this);*/
+        
+        ResourceLoader.loadBackGround(this);
+        ResourceLoader.loadImage(this);
         Input.inputField.loadImage(this);
-        BackGround.loadImage(this);
+        CSVParsing.loadText(this);
         Audio.loadSound(this);
     },
 
@@ -42,7 +48,7 @@ var roomScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.roomScene = this;
-        BackGround.loadImage(this);
+        //ResourceLoader.loadBackGround(this);
         this.load.image('playerStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     },
 
@@ -105,7 +111,7 @@ var roomScene = new Phaser.Class(
             this.countText.setText('사람들을 위해 대기중입니다...');
         }
     }
-})
+});
 
 var gameScene = new Phaser.Class(
 {
@@ -121,18 +127,21 @@ var gameScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.gameScene = this;
-        BackGround.loadImage(this);
-        WordSpace.loadImage(this);
+        /*ResourceLoader.loadBackGround(this);
+        ResourceLoader.loadImage(this);
         Input.inputField.loadImage(this);
         CSVParsing.loadText(this);
-        Audio.loadSound(this);
+        Audio.loadSound(this);*/
+        
+        WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
+        WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
     },
     
     create: function()
     {
         WordSpace.gameTimer = new Phaser.Time.Clock(this);
         WordSpace.gameTimer.start();
-        WordSpace.loadAnimation(this);
+        ResourceLoader.loadAnimation(this);
         CSVParsing.CSVParse(this);
         BackGround.drawBrain(this);
         BackGround.drawCharacter(this);
