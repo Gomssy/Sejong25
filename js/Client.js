@@ -194,6 +194,10 @@ socket.on('defeat', function(msg) // object player
         {
             var keys = Object.keys(Enums.item);
             WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
+            let itemBag = ScenesData.gameScene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'itemBag').setScale(1).setDepth(5);
+            setTimeout(function() {
+                itemBag.destroy();
+            }, 3000);
         }
     }
     else 

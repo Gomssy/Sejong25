@@ -31,7 +31,6 @@ ResourceLoader.loadImage = function(scene)
         scene.load.image('strongBgr' + i, 'assets/image/word/strong' + i + '.png');
     }
     
-    scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.spritesheet('pyeongminSit', 'assets/image/character/pyeongmin/pyeong_sit.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 521, frameHeight: 610 });
@@ -39,9 +38,11 @@ ResourceLoader.loadImage = function(scene)
     scene.load.spritesheet('pyeongminBurningBig', 'assets/image/character/pyeongmin/burning/pyeong_burning_big.png', { frameWidth: 521, frameHeight: 610 });
     scene.load.spritesheet('pyeongminGameOver', 'assets/image/character/pyeongmin/balladang/pyeong_balladang.png', { frameWidth: 720, frameHeight: 700 });
     scene.load.image('pyeongminStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
-
+    
+    scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.image('phaseChangeBgr', 'assets/placeholder/phaseChange.png');
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
+    scene.load.image('itemBag', 'assets/image/etc/itembag2.png');
 }
 
 ResourceLoader.loadAnimation = function(scene)
