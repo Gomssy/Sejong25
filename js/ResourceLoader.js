@@ -14,7 +14,7 @@ ResourceLoader.loadImage = function(scene)
     {
         for (let j = 2; j < 7; j++)
         {
-            scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
+            scene.load.image(('wordBgr' + i + '_' + j), ('assets/image/word/'+i + '_' + j + '.png'));
         }
     }
     for (let i = 0; i < 4; i++)
@@ -27,8 +27,8 @@ ResourceLoader.loadImage = function(scene)
     }
     for (let i = 2; i < 7; i++)
     {
-        scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
-        scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
+        scene.load.image('nameBgr' + i, 'assets/image/word/name' + i + '.png');
+        scene.load.image('strongBgr' + i, 'assets/image/word/strong' + i + '.png');
     }
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
