@@ -391,7 +391,7 @@ class ItemWord extends WordObject
                     tempWords = Phaser.Utils.Array.Shuffle(tempWords);
                     let tempLenth = tempWords.length * 0.3;
                     for(let i = 0; i < tempLenth; i++)
-                        if(WordSpace.wordGroup[tempWords[i]] != null) WordSpace.wordGroup[tempWords[i]].destroy();
+                        if(WordSpace.wordGroup[tempWords[i]] != null) WordSpace.wordGroup[tempWords[i]].destroy(false);
                     break;
                 case Enums.item.heavy:
                     Input.attackOption.isHeavy = true;

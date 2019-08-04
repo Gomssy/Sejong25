@@ -171,13 +171,25 @@ socket.on('attacked', function(msg) // object attackData
 });
 socket.on('defeat', function(msg) // object player
 {
+    //수정해야 함 코드 너무 복잡함
+    let playerImage = RoomData.findPlayer(msg.id).playerImage;
+    let position = RoomData.findPlayer(msg.id).position;
+    let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
     RoomData.players[msg.index] = msg;
+    RoomData.players[msg.index].playerImage = playerImage;
+    RoomData.players[msg.index].position = position;
+    RoomData.players[msg.index].nicknameText = nicknameText;
+
+    
     RoomData.aliveCount--;
+    console.log(msg.id);
+    console.log(RoomData.findPlayer(msg.id));
+    RoomData.findPlayer(msg.id).playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
     if (msg.lastAttack != null) 
     {
         let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId).nickname;
-        console.log(RoomData.players[msg.index].nickname + ' defeated by ' + lastAttacker + ', with ' + msg.lastAttack.word);
-        WordSpace.killLogForTest += ('\n' + lastAttacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.players[msg.index].nickname);
+        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated by ' + lastAttacker + ', with ' + msg.lastAttack.word);
+        WordSpace.killLogForTest += ('\n' + lastAttacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.findPlayer(msg.id).nickname);
         if(msg.lastAttack.attackerId == RoomData.myself.id)
         {
             var keys = Object.keys(Enums.item);
@@ -186,8 +198,8 @@ socket.on('defeat', function(msg) // object player
     }
     else 
     {
-        console.log(RoomData.players[msg.index].nickname + ' defeated');
-        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.players[msg.index].nickname);
+        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated');
+        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
     }
 });
 socket.on('gameEnd', function(msg) // object player
