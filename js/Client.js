@@ -28,9 +28,9 @@ socket.on('setId', function(msg) // {str, num playerNum}
 // init game
 socket.on('enterRoom', function()
 {
-    Audio.killSound(ScenesData.menuScene, 'login');
-    game.scene.remove('menuScene');
-    game.scene.start('roomScene');
+    Audio.killSound(ScenesData.logInScene, 'login');
+    game.scene.remove('logInScene');
+    game.scene.start('mainMenuScene');
     
 });
 socket.on('syncRoomScene', function(msg)

@@ -29,7 +29,7 @@ Input.gameSceneEnterReaction = function()
         Input.isEntered = true;
     }
 }
-Input.menuSceneEnterReaction = function()
+Input.logInSceneEnterReaction = function()
 {
     Input.finalInput = Input.removeConVow(Input.finalInput);
     if (Input.finalInput.length > 1)

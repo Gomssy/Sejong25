@@ -1,19 +1,19 @@
 var ScenesData = ScenesData || {};
 
-var menuScene = new Phaser.Class(
+var logInScene = new Phaser.Class(
 {
     Extends: Phaser.Scene,
 
     initialize: 
 
-    function menuScene ()
+    function logInScene ()
     {
-        Phaser.Scene.call(this, {key: 'menuScene'});
+        Phaser.Scene.call(this, {key: 'logInScene'});
     },
 
     preload: function()
     {
-        ScenesData.menuScene = this;
+        ScenesData.logInScene = this;
         /*Input.inputField.loadImage(this);
         ResourceLoader.loadBackGround(this);
         Audio.loadSound(this);*/
@@ -28,9 +28,32 @@ var menuScene = new Phaser.Class(
     create: function()
     {
         Audio.loopSound(this, 'login');
-        Input.inputField.generate(this, Input.menuSceneEnterReaction);
+        Input.inputField.generate(this, Input.logInSceneEnterReaction);
         BackGround.drawMenu(this);
 
+    }
+});
+
+var mainMenuScene = new Phaser.Class(
+{
+    Extends: Phaser.Scene,
+
+    initialize: 
+
+    function menuScene ()
+    {
+        Phaser.Scene.call(this, {key: 'mainMenuScene'});
+    },
+
+    preload: function()
+    {
+        ScenesData.mainMenuScene = this;
+        
+    },
+
+    create: function()
+    {
+        this.myCharacter = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setDepth(5);
     }
 });
 

@@ -14,7 +14,7 @@ var config = {
         }
     },
     backgroundColor: Phaser.Display.Color.HexStringToColor('#F0CB85').color,//GetColor(245,208,138),
-    scene: [ menuScene, roomScene, gameScene ]
+    scene: [ logInScene, roomScene, gameScene ]
 };
 
 var game = null;
