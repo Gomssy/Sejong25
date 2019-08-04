@@ -50,10 +50,29 @@ FirebaseClient.prototype.onAuthChange = function(user)
 FirebaseClient.prototype.setLogin = function()
 {
     this.database = firebase.database();
-    this.database.goOnline();
-    document.getElementById('mainTitle').style.display = 'none';
-    document.getElementById('titleImg').style.display = 'none';
-    game = new Phaser.Game(config);
+	this.database.goOnline();
+	
+	var userDataRef = this.database.ref('/user-data/' + this.auth.currentUser.uid);
+	userDataRef.once('value').then(function(snapshot)
+	{
+		if (snapshot.exists())
+		{
+			PlayerData.userData = snapshot.val();
+		}
+		else
+		{
+			let newUserData = new UserData();
+			PlayerData.userData = newUserData;
+			userDataRef.set(newUserData);
+		}
+	})
+	.then(function()
+	{
+		game = new Phaser.Game(config);
+	});
+	
+	document.getElementById('mainTitle').style.display = 'none';
+	document.getElementById('titleImg').style.display = 'none';
 }
 
 FirebaseClient.prototype.setLogOut = function()
@@ -177,8 +196,70 @@ FirebaseClient.prototype.signInWithPopup = function(provider)
 	});
 }
 
+FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = false)
+{
+	var beforeData = PlayerData.userData;
+	var updates = {};
+	switch(key)
+	{
+		case 'exp':
+			updates.exp = replace ? (valueChanged) : (beforeData.exp + valueChanged);
+			beforeData.exp = updates.exp;
+			break;
+		case 'money':
+			updates.money = replace ? (valueChanged) : (beforeData.money + valueChanged);
+			beforeData.money = updates.money;
+			break;
+		case 'hopae':
+			if (beforeData.hopae != null)
+			{
+				updates.hopae.push(valueChanged);
+				beforeData.hopae.push(valueChanged);
+			}
+			else
+			{
+				beforeData.hopae = [valueChanged];
+				updates.hopae = [valueChanged];
+			}
+			break;
+		case 'item':
+			if (beforeData.item != null)
+			{
+				updates.item.push(valueChanged);
+				beforeData.item.push(valueChanged);
+			}
+			else
+			{
+				beforeData.item = [valueChanged];
+				updates.item = [valueChanged];
+			}
+			break;
+		default:
+			console.log('[ERROR] database has no key for ' + key);
+			break;
+	}
+	return this.database.ref('/user-data/' + this.auth.currentUser.uid).update(updates);
+}
+
 document.addEventListener('DOMContentLoaded', function()
 {
     window.fbClient = new FirebaseClient();
     console.log('done load');
 });
+
+class UserData
+{
+    constructor()
+    {
+        this.userName = prompt("유저의 이름을 입력해주세요.");
+        this.exp = 0;
+        this.rank = -1;
+        this.hopae = 
+        [
+            {name: prompt("첫번째 호패의 닉네임을 입력해주세요."), type: 'wood'}
+        ];
+		this.title = [];
+		this.money = 0;
+		this.item = [];
+    }
+}
