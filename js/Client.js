@@ -7,7 +7,8 @@ socket.on('alert', function(msg) // string errorcode
 {
     //let toAlert = 'null alert';
     if (msg === 'errNicknameOverlaped') alert('이미 사용중인 닉네임입니다.');
-    if (msg === 'gameWin') 
+    else if (msg === 'errNicknameEmpty') alert('설정된 닉네임이 없습니다.');
+    else if (msg === 'gameWin') 
     {
         //toAlert = '승리!';
         ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '승리!!!!', {fontSize: '30pt'})
@@ -28,10 +29,9 @@ socket.on('setId', function(msg) // {str, num playerNum}
 // init game
 socket.on('enterRoom', function()
 {
-    Audio.killSound(ScenesData.logInScene, 'login');
-    game.scene.remove('logInScene');
-    game.scene.start('mainMenuScene');
-    
+    Audio.killSound(ScenesData.menuScene, 'login');
+    game.scene.stop('menuScene');
+    game.scene.start('roomScene');
 });
 socket.on('syncRoomScene', function(msg)
 {
@@ -104,7 +104,7 @@ socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
 socket.on('startGame', function()
 {
     Audio.killSound(ScenesData.roomScene, 'inRoom');
-    game.scene.remove('roomScene');
+    game.scene.stop('roomScene');
     game.scene.start('gameScene');
 });
 
@@ -171,7 +171,6 @@ socket.on('attacked', function(msg) // object attackData
 });
 socket.on('defeat', function(msg) // object player
 {
-    //수정해야 함 코드 너무 복잡함
     let playerImage = RoomData.findPlayer(msg.id).playerImage;
     let position = RoomData.findPlayer(msg.id).position;
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
@@ -180,7 +179,6 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index].position = position;
     RoomData.players[msg.index].nicknameText = nicknameText;
 
-    
     RoomData.aliveCount--;
     console.log(msg.id);
     console.log(RoomData.findPlayer(msg.id));

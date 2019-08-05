@@ -257,7 +257,8 @@ class UserData
         this.hopae = 
         [
             {name: prompt("첫번째 호패의 닉네임을 입력해주세요."), type: 'wood'}
-        ];
+		];
+		this.recentName = '';
 		this.title = [];
 		this.money = 0;
 		this.item = [];

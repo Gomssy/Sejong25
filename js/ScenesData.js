@@ -1,23 +1,20 @@
 var ScenesData = ScenesData || {};
+ScenesData.currentScene = null;
 
-var logInScene = new Phaser.Class(
+var menuScene = new Phaser.Class(
 {
     Extends: Phaser.Scene,
 
     initialize: 
 
-    function logInScene ()
+    function menuScene ()
     {
-        Phaser.Scene.call(this, {key: 'logInScene'});
+        Phaser.Scene.call(this, {key: 'menuScene'});
     },
 
     preload: function()
     {
-        ScenesData.logInScene = this;
-        /*Input.inputField.loadImage(this);
-        ResourceLoader.loadBackGround(this);
-        Audio.loadSound(this);*/
-        
+        ScenesData.menuScene = this;        
         ResourceLoader.loadBackGround(this);
         ResourceLoader.loadImage(this);
         Input.inputField.loadImage(this);
@@ -28,32 +25,23 @@ var logInScene = new Phaser.Class(
     create: function()
     {
         Audio.loopSound(this, 'login');
-        Input.inputField.generate(this, Input.logInSceneEnterReaction);
-        BackGround.drawMenu(this);
+        Input.inputField.generate(this, Input.menuSceneEnterReaction);
+        //BackGround.drawMenu(this);
+        this.myName = this.add.text(game.config.width / 2, 200, '이름을 입력해주세요.').setOrigin(0.5, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5);
+        this.myName.setFontSize(40);
 
-    }
-});
+        this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5);
 
-var mainMenuScene = new Phaser.Class(
-{
-    Extends: Phaser.Scene,
+        const actionOnClick = () => {
+            console.log('click');
+            socket.emit('enterRoom', PlayerData.nickname);
+        }
 
-    initialize: 
-
-    function menuScene ()
-    {
-        Phaser.Scene.call(this, {key: 'mainMenuScene'});
-    },
-
-    preload: function()
-    {
-        ScenesData.mainMenuScene = this;
-        
-    },
-
-    create: function()
-    {
-        this.myCharacter = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setDepth(5);
+        let btn1 = new Button(this, game.config.width / 2, 800, 'pyeongminWrite', actionOnClick, 2, 1, 0)
+        btn1.onInputOut = () => {
+            console.log('Btn1: onInputOut')
+        }
+        btn1.setScale(0.5).setDepth(10);
     }
 });
 
@@ -150,12 +138,6 @@ var gameScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.gameScene = this;
-        /*ResourceLoader.loadBackGround(this);
-        ResourceLoader.loadImage(this);
-        Input.inputField.loadImage(this);
-        CSVParsing.loadText(this);
-        Audio.loadSound(this);*/
-        
         WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
         WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
     },
@@ -180,34 +162,34 @@ var gameScene = new Phaser.Class(
         
         WordSpace.setPlayerTyping.initiate(this);
 
-        WordSpace.nameWordTextForTest = ScenesData.gameScene.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
+        WordSpace.nameWordTextForTest = this.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.nameList);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.nameList);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.charge);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.charge);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.clean);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.clean);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.heavy);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.heavy);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.dark);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.dark);
+        WordSpace.generateWord.Item(this, Enums.item.nameList);
+        WordSpace.generateWord.Item(this, Enums.item.nameList);
+        WordSpace.generateWord.Item(this, Enums.item.invincible);
+        WordSpace.generateWord.Item(this, Enums.item.invincible);
+        WordSpace.generateWord.Item(this, Enums.item.charge);
+        WordSpace.generateWord.Item(this, Enums.item.charge);
+        WordSpace.generateWord.Item(this, Enums.item.clean);
+        WordSpace.generateWord.Item(this, Enums.item.clean);
+        WordSpace.generateWord.Item(this, Enums.item.heavy);
+        WordSpace.generateWord.Item(this, Enums.item.heavy);
+        WordSpace.generateWord.Item(this, Enums.item.dark);
+        WordSpace.generateWord.Item(this, Enums.item.dark);
 
         // for test
         WordSpace.attackGauge.add(11);
-        /*WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);*/
+        /*WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);
+        WordSpace.generateWord.Name(this, false, null);*/
     },
 
     update: function()
@@ -237,3 +219,9 @@ var gameScene = new Phaser.Class(
         WordSpace.setPlayerTyping.add('');
     }
 });
+
+ScenesData.changeScene(scene)
+{
+    game.scene.stop();
+    game.scene.start(scene);
+}
