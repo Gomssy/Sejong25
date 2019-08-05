@@ -30,8 +30,9 @@ socket.on('setId', function(msg) // {str, num playerNum}
 socket.on('enterRoom', function()
 {
     Audio.killSound(ScenesData.menuScene, 'login');
-    game.scene.stop('menuScene');
-    game.scene.start('roomScene');
+    ScenesData.changeScene('roomScene');
+    /*game.scene.stop('menuScene');
+    game.scene.start('roomScene');*/
 });
 socket.on('syncRoomScene', function(msg)
 {
@@ -104,8 +105,9 @@ socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
 socket.on('startGame', function()
 {
     Audio.killSound(ScenesData.roomScene, 'inRoom');
-    game.scene.stop('roomScene');
-    game.scene.start('gameScene');
+    ScenesData.changeScene('gameScene');
+    /*game.scene.stop('roomScene');
+    game.scene.start('gameScene');*/
 });
 
 // in game

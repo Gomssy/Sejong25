@@ -14,7 +14,8 @@ var menuScene = new Phaser.Class(
 
     preload: function()
     {
-        ScenesData.menuScene = this;        
+        ScenesData.menuScene = this;
+        ScenesData.currentScene = this;  
         ResourceLoader.loadBackGround(this);
         ResourceLoader.loadImage(this);
         Input.inputField.loadImage(this);
@@ -220,8 +221,9 @@ var gameScene = new Phaser.Class(
     }
 });
 
-ScenesData.changeScene(scene)
+ScenesData.changeScene = function(scene)
 {
-    game.scene.stop();
+    game.scene.stop(ScenesData.currentScene);
+    ScenesData.currentScene = scene;
     game.scene.start(scene);
 }
