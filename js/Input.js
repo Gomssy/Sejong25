@@ -33,9 +33,9 @@ Input.menuSceneEnterReaction = function()
 {
     Input.finalInput = Input.removeConVow(Input.finalInput);
     if (Input.finalInput.length > 1)
-    {        
+    {
         PlayerData.nickname = Input.finalInput;
-        ScenesData.menuScene.myName.setText('내 이름 : ' + PlayerData.nickname);
+        ScenesData.menuScene.hopae.setText('내 호패 : ' + PlayerData.nickname);
         Input.reset();
     }
     else 

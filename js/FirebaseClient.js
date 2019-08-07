@@ -206,9 +206,9 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 			updates.exp = replace ? (valueChanged) : (beforeData.exp + valueChanged);
 			beforeData.exp = updates.exp;
 			break;
-		case 'money':
-			updates.money = replace ? (valueChanged) : (beforeData.money + valueChanged);
-			beforeData.money = updates.money;
+		case 'rank':
+			updates.rank = replace ? (valueChanged) : (beforeData.rank + valueChanged);
+			beforeData.rank = updates.rank;
 			break;
 		case 'hopae':
 			if (beforeData.hopae != null)
@@ -221,6 +221,26 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 				beforeData.hopae = [valueChanged];
 				updates.hopae = [valueChanged];
 			}
+			break;
+		case 'recentHopae':
+			updates.recentHopae = valueChanged;
+			beforeData.recentHopae = updates.recentHopae;
+			break;
+		case 'title':
+			if (beforeData.title != null)
+			{
+				updates.title.push(valueChanged);
+				beforeData.title.push(valueChanged);
+			}
+			else
+			{
+				beforeData.title = [valueChanged];
+				updates.title = [valueChanged];
+			}
+			break;
+		case 'money':
+			updates.money = replace ? (valueChanged) : (beforeData.money + valueChanged);
+			beforeData.money = updates.money;
 			break;
 		case 'item':
 			if (beforeData.item != null)
@@ -238,6 +258,8 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 			console.log('[ERROR] database has no key for ' + key);
 			break;
 	}
+	PlayerData.userData = beforeData;
+	console.log(updates.recentHopae);
 	return this.database.ref('/user-data/' + this.auth.currentUser.uid).update(updates);
 }
 
@@ -258,7 +280,7 @@ class UserData
         [
             {name: prompt("첫번째 호패의 닉네임을 입력해주세요."), type: 'wood'}
 		];
-		this.recentName = '';
+		this.recentHopae = '';
 		this.title = [];
 		this.money = 0;
 		this.item = [];

@@ -28,21 +28,20 @@ var menuScene = new Phaser.Class(
         Audio.loopSound(this, 'login');
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         //BackGround.drawMenu(this);
-        this.myName = this.add.text(game.config.width / 2, 200, '이름을 입력해주세요.').setOrigin(0.5, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5);
-        this.myName.setFontSize(40);
+        this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+        this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+        this.hopae = this.add.text(100, 300, '내 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
 
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5);
+        PlayerData.nickname = PlayerData.userData.recentHopae;
 
         const actionOnClick = () => {
             console.log('click');
             socket.emit('enterRoom', PlayerData.nickname);
         }
 
-        let btn1 = new Button(this, game.config.width / 2, 800, 'pyeongminWrite', actionOnClick, 2, 1, 0)
-        btn1.onInputOut = () => {
-            console.log('Btn1: onInputOut')
-        }
-        btn1.setScale(0.5).setDepth(10);
+        let gameStartBtn = new Button(this, game.config.width / 2, 800, 'pyeongminWrite', actionOnClick, 2, 1, 0)
+        gameStartBtn.setScale(0.5).setDepth(10);
     }
 });
 
