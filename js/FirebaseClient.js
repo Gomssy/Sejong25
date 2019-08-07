@@ -113,7 +113,7 @@ FirebaseClient.prototype.onEmailBtnClick = function()
 					}
 				});
 		}
-		this.auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+		this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
 			.then(cbSignInEmail.bind(this));
 	}
 }
@@ -165,7 +165,7 @@ FirebaseClient.prototype.createEmailUser = function()
 					}
 				});
 		}
-		this.auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+		this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
 			.then(cbAfterPersistence.bind(this))
 			.catch(function(error) {
 				console.error('인증 상태 설정 중 에러 발생' , error);
@@ -176,7 +176,7 @@ FirebaseClient.prototype.createEmailUser = function()
 FirebaseClient.prototype.onGoogleBtnClick = function()
 {
 	var googleProvider = new firebase.auth.GoogleAuthProvider();
-	this.auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+	this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
 	.then(this.signInWithPopup.bind(this, googleProvider))
 	.catch(function(error)
 	{

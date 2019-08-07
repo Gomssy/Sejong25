@@ -32,8 +32,6 @@ socket.on('enterRoom', function()
     fbClient.updateUserData('recentHopae', PlayerData.nickname);
     Audio.killSound(ScenesData.menuScene, 'login');
     ScenesData.changeScene('roomScene');
-    /*game.scene.stop('menuScene');
-    game.scene.start('roomScene');*/
 });
 socket.on('syncRoomScene', function(msg)
 {
@@ -107,8 +105,6 @@ socket.on('startGame', function()
 {
     Audio.killSound(ScenesData.roomScene, 'inRoom');
     ScenesData.changeScene('gameScene');
-    /*game.scene.stop('roomScene');
-    game.scene.start('gameScene');*/
 });
 
 // in game

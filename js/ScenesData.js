@@ -15,35 +15,167 @@ var menuScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.menuScene = this;
-        ScenesData.currentScene = this;  
+        ScenesData.currentScene = this;
         ResourceLoader.loadBackGround(this);
         ResourceLoader.loadImage(this);
         Input.inputField.loadImage(this);
         CSVParsing.loadText(this);
         Audio.loadSound(this);
+        this.load.scenePlugin({
+            key: 'rexuiplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
+            sceneKey: 'rexUI'
+        });
     },
 
     create: function()
     {
         Audio.loopSound(this, 'login');
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
-        //BackGround.drawMenu(this);
         this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.hopae = this.add.text(100, 300, '내 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
 
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5);
         PlayerData.nickname = PlayerData.userData.recentHopae;
+        
 
-        const actionOnClick = () => {
-            console.log('click');
+
+
+
+
+
+
+
+        this.dialog = this.rexUI.add.dialog({
+            x: 400,
+            y: 300,
+
+            background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x1565c0),
+
+            title: this.rexUI.add.label({
+                background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x003c8f),
+                text: this.add.text(0, 0, '제목', {
+                    fontSize: '24px',
+                    fontFamily: '"궁서", 궁서체, serif'
+                }),
+                space: {
+                    left: 15,
+                    right: 15,
+                    top: 10,
+                    bottom: 10
+                }
+            }),
+
+            content: this.add.text(0, 0, 'Do you want to build a snow man?', {
+                fontSize: '24px'
+            }),
+
+            actions: [
+                createLabel(this, 'Yes'),
+                createLabel(this, 'No')
+            ],
+
+            space: {
+                title: 25,
+                content: 25,
+                action: 15,
+
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20,
+            },
+
+            align: {
+                actions: 'left' // 'center'|'left'|'right'
+            },
+
+            expand: {
+                content: false, // Content is a pure text object
+            }
+        })
+            .layout()
+            // .drawBounds(this.add.graphics(), 0xff0000)
+            .popUp(1000);
+
+        this.print = this.add.text(0, 0, '');
+        this.dialog
+            .on('button.click', function (button, groupName, index) {
+                //this.print.text += index + ': ' + button.text + '\n';
+                if(index == 0) this.print.text += 'snow man\n';
+                else this.dialog.destroy();
+            }, this)
+            .on('button.over', function (button, groupName, index) {
+                button.getElement('background').setStrokeStyle(1, 0xffffff);
+            })
+            .on('button.out', function (button, groupName, index) {
+                button.getElement('background').setStrokeStyle();
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+        let gameStartBtn = new Button(this, game.config.width / 2, 800, 'pyeongminWrite', function(){
+            console.log('방 입장');
             socket.emit('enterRoom', PlayerData.nickname);
-        }
+        }, 1, 0, 2)
+        gameStartBtn.setScale(0.5).setDepth(5);
 
-        let gameStartBtn = new Button(this, game.config.width / 2, 800, 'pyeongminWrite', actionOnClick, 2, 1, 0)
-        gameStartBtn.setScale(0.5).setDepth(10);
+        let shopBtn = new Button(this, game.config.width - 100, 800, 'pyeongminThrow', function(){
+            console.log('상점 입장');
+            //상점 입장
+        }, 1, 0, 2)
+        shopBtn.setScale(0.5).setDepth(5);
     }
 });
+
+
+
+
+
+
+var createLabel = function (scene, text) {
+    return scene.rexUI.add.label({
+        // width: 40,
+        // height: 40,
+
+        background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x5e92f3),
+
+        text: scene.add.text(0, 0, text, {
+            fontSize: '24px'
+        }),
+
+        space: {
+            left: 10,
+            right: 10,
+            top: 10,
+            bottom: 10
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var roomScene = new Phaser.Class(
 {
