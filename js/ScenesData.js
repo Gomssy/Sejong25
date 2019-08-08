@@ -47,27 +47,13 @@ var menuScene = new Phaser.Class(
 
 
 
-        this.dialog = this.rexUI.add.dialog({
-            x: 400,
-            y: 300,
+        this.roomEnterDialog = this.rexUI.add.dialog({
+            x: game.config.width / 2,
+            y: game.config.height / 2,
 
-            background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x1565c0),
+            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
 
-            title: this.rexUI.add.label({
-                background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x003c8f),
-                text: this.add.text(0, 0, '제목', {
-                    fontSize: '24px',
-                    fontFamily: '"궁서", 궁서체, serif'
-                }),
-                space: {
-                    left: 15,
-                    right: 15,
-                    top: 10,
-                    bottom: 10
-                }
-            }),
-
-            content: this.add.text(0, 0, 'Do you want to build a snow man?', {
+            content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
                 fontSize: '24px'
             }),
 
@@ -79,7 +65,7 @@ var menuScene = new Phaser.Class(
             space: {
                 title: 25,
                 content: 25,
-                action: 15,
+                action: 100,
 
                 left: 20,
                 right: 20,
@@ -88,38 +74,31 @@ var menuScene = new Phaser.Class(
             },
 
             align: {
-                actions: 'left' // 'center'|'left'|'right'
+                actions: 'center' // 'center'|'left'|'right'
             },
 
             expand: {
                 content: false, // Content is a pure text object
-            }
-        })
-            .layout()
-            // .drawBounds(this.add.graphics(), 0xff0000)
-            .popUp(1000);
+            },
+
+            width: 1000,
+            height: 800,
+        }).layout().setDepth(10).setVisible(false);
+            //.drawBounds(this.add.graphics(), 0xff0000)
+            //.popUp(1000)
 
         this.print = this.add.text(0, 0, '');
-        this.dialog
+        this.roomEnterDialog
             .on('button.click', function (button, groupName, index) {
-                //this.print.text += index + ': ' + button.text + '\n';
-                if(index == 0) this.print.text += 'snow man\n';
-                else this.dialog.destroy();
+                if(index == 0) socket.emit('enterRoom', PlayerData.nickname);
+                else this.roomEnterDialog.setVisible(false);
             }, this)
             .on('button.over', function (button, groupName, index) {
-                button.getElement('background').setStrokeStyle(1, 0xffffff);
+                //console.log('button over');
             })
             .on('button.out', function (button, groupName, index) {
-                button.getElement('background').setStrokeStyle();
+                //console.log('button out');
         });
-
-
-
-
-
-
-
-
 
 
 
@@ -127,7 +106,8 @@ var menuScene = new Phaser.Class(
 
         let gameStartBtn = new Button(this, game.config.width / 2, 800, 'pyeongminWrite', function(){
             console.log('방 입장');
-            socket.emit('enterRoom', PlayerData.nickname);
+            ScenesData.menuScene.roomEnterDialog.setVisible(true).popUp(200);
+            //socket.emit('enterRoom', PlayerData.nickname);
         }, 1, 0, 2)
         gameStartBtn.setScale(0.5).setDepth(5);
 
@@ -139,17 +119,12 @@ var menuScene = new Phaser.Class(
     }
 });
 
-
-
-
-
-
 var createLabel = function (scene, text) {
     return scene.rexUI.add.label({
         // width: 40,
         // height: 40,
 
-        background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x5e92f3),
+        background: scene.add.sprite(0, 0, 'button').setOrigin(0.5, 0.5),
 
         text: scene.add.text(0, 0, text, {
             fontSize: '24px'
@@ -163,17 +138,6 @@ var createLabel = function (scene, text) {
         }
     });
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

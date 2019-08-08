@@ -43,6 +43,7 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('phaseChangeBgr', 'assets/placeholder/phaseChange.png');
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
     scene.load.image('panel', 'assets/placeholder/panel.png');
+    scene.load.image('button', 'assets/placeholder/button.png');
 }
 
 ResourceLoader.loadAnimation = function(scene)
