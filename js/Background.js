@@ -35,6 +35,11 @@ BackGround.drawBrain = function(scene)
     BackGround.gameBackground = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'gameBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);
 }
 
+BackGround.drawBackground = function(scene)
+{
+    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'baseBackground').setDisplaySize(game.config.width, game.config.height).setDepth(0);
+}
+
 BackGround.drawMenu = function(scene)
 {
     scene.add.sprite(game.config.width / 2, game.config.height / 2, 'menuBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);

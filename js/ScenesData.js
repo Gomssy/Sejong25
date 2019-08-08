@@ -26,24 +26,24 @@ var menuScene = new Phaser.Class(
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
             sceneKey: 'rexUI'
         });
+        this.load.scenePlugin({
+            key: 'rexbuttonplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexbuttonplugin.min.js',
+            sceneKey: 'button'
+        });
     },
 
     create: function()
     {
+        BackGround.drawBackground(this);
         Audio.loopSound(this, 'login');
         Input.inputField.generate(this, Input.menuSceneEnterReaction);
         this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
-        this.hopae = this.add.text(100, 300, '내 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+        this.hopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
 
-        this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5);
+        this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
         PlayerData.nickname = PlayerData.userData.recentHopae;
-        
-
-
-
-
-
 
 
 
@@ -53,13 +53,26 @@ var menuScene = new Phaser.Class(
 
             background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
 
+            title: this.rexUI.add.label({
+                background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x1b0000),
+                text: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
+                    fontSize: '24px'
+                }).setOrigin(0.5, 0.5),
+                space: {
+                    left: 15,
+                    right: 15,
+                    top: 10,
+                    bottom: 10
+                }
+            }),
+            
             content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
                 fontSize: '24px'
             }),
 
             actions: [
-                createLabel(this, 'Yes'),
-                createLabel(this, 'No')
+                createLabel(this, 'button', 0, 0, 'Yes'),
+                createLabel(this, 'button', 0, 0, 'No')
             ],
 
             space: {
@@ -79,19 +92,17 @@ var menuScene = new Phaser.Class(
 
             expand: {
                 content: false, // Content is a pure text object
-            },
-
-            width: 1000,
-            height: 800,
+            }
         }).layout().setDepth(10).setVisible(false);
-            //.drawBounds(this.add.graphics(), 0xff0000)
-            //.popUp(1000)
 
-        this.print = this.add.text(0, 0, '');
         this.roomEnterDialog
             .on('button.click', function (button, groupName, index) {
                 if(index == 0) socket.emit('enterRoom', PlayerData.nickname);
-                else this.roomEnterDialog.setVisible(false);
+                else
+                {
+                    this.roomEnterDialog.setVisible(false);
+                    this.gameStartBtn.setEnable(true);
+                }
             }, this)
             .on('button.over', function (button, groupName, index) {
                 //console.log('button over');
@@ -101,30 +112,31 @@ var menuScene = new Phaser.Class(
         });
 
 
-
-
-
-        let gameStartBtn = new Button(this, game.config.width / 2, 800, 'pyeongminWrite', function(){
+        this.gameStartBtn = this.button.add(new Button(this, game.config.width / 2, 900, 'pyeongminWrite', 1, 0, 2).setScale(0.5).setDepth(5),
+        {
+            enabled: true, mode: 0
+        }).on('click', function(button, gameObject, pointer){
             console.log('방 입장');
+            this.gameStartBtn.setEnable(false);
             ScenesData.menuScene.roomEnterDialog.setVisible(true).popUp(200);
-            //socket.emit('enterRoom', PlayerData.nickname);
-        }, 1, 0, 2)
-        gameStartBtn.setScale(0.5).setDepth(5);
+        }, this);
 
-        let shopBtn = new Button(this, game.config.width - 100, 800, 'pyeongminThrow', function(){
+        this.shopBtn = this.button.add(new Button(this, game.config.width - 100, 900, 'pyeongminThrow', 1, 0, 2).setScale(0.5).setDepth(5),
+        {
+            enabled: true, mode: 0
+        }).on('click', function(button, gameObject, pointer){
             console.log('상점 입장');
-            //상점 입장
-        }, 1, 0, 2)
-        shopBtn.setScale(0.5).setDepth(5);
+        }, this);
+        
     }
 });
 
-var createLabel = function (scene, text) {
+var createLabel = function (scene, image, width, height, text = '') {
     return scene.rexUI.add.label({
-        // width: 40,
-        // height: 40,
+        width: width,
+        height: height,
 
-        background: scene.add.sprite(0, 0, 'button').setOrigin(0.5, 0.5),
+        background: scene.add.sprite(0, 0, image).setOrigin(0.5, 0.5),
 
         text: scene.add.text(0, 0, text, {
             fontSize: '24px'
@@ -138,8 +150,6 @@ var createLabel = function (scene, text) {
         }
     });
 }
-
-
 
 var roomScene = new Phaser.Class(
 {
@@ -161,6 +171,7 @@ var roomScene = new Phaser.Class(
 
     create: function()
     {
+        BackGround.drawBackground(this);
         BackGround.drawRoom(this);
         Audio.loopSound(this, 'inRoom');
         this.players = [];
@@ -244,6 +255,7 @@ var gameScene = new Phaser.Class(
         WordSpace.gameTimer.start();
         ResourceLoader.loadAnimation(this);
         CSVParsing.CSVParse(this);
+        BackGround.drawBackground(this);
         BackGround.drawBrain(this);
         BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
@@ -272,20 +284,6 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Item(this, Enums.item.heavy);
         WordSpace.generateWord.Item(this, Enums.item.dark);
         WordSpace.generateWord.Item(this, Enums.item.dark);
-
-        // for test
-        WordSpace.attackGauge.add(11);
-        /*WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);
-        WordSpace.generateWord.Name(this, false, null);*/
     },
 
     update: function()
