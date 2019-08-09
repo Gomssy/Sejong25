@@ -43,7 +43,9 @@ var menuScene = new Phaser.Class(
         this.myHopae = [];
         for(let i = 0; i < PlayerData.userData.hopae.length; i++)
         {
-            this.myHopae.push(UIObject.createLabel(this, 300, 400 + 50 * i, 10, 'nameBgr6', 1, PlayerData.userData.hopae[i].name, 25, '#ffffff'));
+            let textLength = PlayerData.userData.hopae[i].name.length;
+            this.myHopae.push(UIObject.createLabel(this, 300, 400 + 50 * i, 10, 'nameBgr' + textLength, 1, PlayerData.userData.hopae[i].name, 25, '#ffffff')
+                .getElement('text').setOrigin(0.45,0.5));
         }
 
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
@@ -118,8 +120,7 @@ var menuScene = new Phaser.Class(
         {
             enabled: true, mode: 0
         }).on('click', function(button, gameObject, pointer){
-            console.log('방 입장');
-            this.gameStartBtn.setEnable(false);
+            gameObject.setEnable(false);
             ScenesData.menuScene.roomEnterDialog.setVisible(true).popUp(200);
         }, this);
 
@@ -134,7 +135,6 @@ var menuScene = new Phaser.Class(
         {
             enabled: true, mode: 0
         }).on('click', function(button, gameObject, pointer){
-            console.log('호패 입장');
             ScenesData.changeScene('hopaeScene');
         }, this);
     }
@@ -171,7 +171,7 @@ var hopaeScene = new Phaser.Class(
         BackGround.drawBackground(this);
         
         Input.inputField.generate(this, function(){}, 
-            UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, '', 50, '#ffffff').getElement('text'));
+            UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, '', 50, '#ffffff').getElement('text').setOrigin(0.45,0.5), true);
 
         this.checkDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
@@ -213,19 +213,39 @@ var hopaeScene = new Phaser.Class(
         .on('button.click', function (button, groupName, index) {
             if(index == 0)
             {
-                if(1 == 0)
+                if(PlayerData.userData.money > 0)
                 {
                     fbClient.updateUserData('hopae', {name: Input.inputField.text.text, type: 'wood'});
+                    fbClient.updateUserData('money', -1);
                     ScenesData.changeScene('menuScene');
                 }
                 else
                 {
                     this.checkDialog.setVisible(false);
-                    this.shopBtn = this.button.add(new Button(this, game.config.width / 2, game.config.height / 2, 'pyeongminThrow', 1, 0, 2).setScale(0.5).setDepth(10),
+                    this.shopBtn = this.button.add(
+                        this.rexUI.add.dialog({
+                            x: game.config.width / 2,
+                            y: game.config.height / 2,
+                
+                            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+                            
+                            content: this.add.text(0, 0, '엽전이 부족합니다.', {
+                                font: '50pt 궁서',
+                                color: '#000000'
+                            }),
+                
+                            space: {
+                                left: 20,
+                                right: 20,
+                                top: 20,
+                                bottom: 20,
+                            }
+                        }).layout().setDepth(10).popUp(200),
                     {
                         enabled: true, mode: 0
                     }).on('click', function(button, gameObject, pointer){
-                        
+                        gameObject.destroy();
+                        this.checkBtn.setEnable(true);
                     }, this);
                 }
             }
@@ -241,14 +261,28 @@ var hopaeScene = new Phaser.Class(
         .on('button.out', function (button, groupName, index) {
             //console.log('button out');
         });
+        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 + 100, 10, 'button', 1, 
+            '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다', 40, '#000000').setVisible(false).layout();
+        /*this.warningText = this.add.text(this, game.config.width / 2, game.config.height / 2 + 100, '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다')
+            .setOrigin(0, 0.5).setColor('#000000').setDepth(10).setFontSize(40);
+            this.warningText.visible = false;*/
 
         this.checkBtn = this.button.add(new Button(this, game.config.width / 2, 900, 'pyeongminWrite', 1, 0, 2).setScale(0.5).setDepth(5),
         {
             enabled: true, mode: 0
         }).on('click', function(button, gameObject, pointer){
-            console.log('호패 확인');
-            this.checkBtn.setEnable(false);
-            ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
+            if(Input.checkProperInput(Input.inputField.text.text))
+            {
+                this.checkBtn.setEnable(false);
+                ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
+            }
+        }, this).setEnable(false);
+
+        this.backBtn = this.button.add(new Button(this, 100, 900, 'pyeongminWrite', 1, 0, 2).setScale(0.5).setDepth(5),
+        {
+            enabled: true, mode: 0
+        }).on('click', function(button, gameObject, pointer){
+            ScenesData.changeScene('menuScene');
         }, this);
     }
 });
@@ -422,5 +456,10 @@ ScenesData.changeScene = function(scene)
 {
     game.scene.stop(ScenesData.currentScene);
     game.scene.start(scene);
+
+    Input.input = [];
+    Input.converted = '';
+    Input.convInput = '';
+    Input.finalInput = '';
     ScenesData.currentScene = scene;
 }

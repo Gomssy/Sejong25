@@ -4,6 +4,8 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', tex
     return scene.rexUI.add.label({
         /*width: width,
         height: height,*/
+        x: x,
+        y: y,
 
         background: scene.add.sprite(x, y, image).setScale(size).setOrigin(0.5, 0.5).setDepth(depth),
 

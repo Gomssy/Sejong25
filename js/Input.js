@@ -44,21 +44,6 @@ Input.menuSceneEnterReaction = function()
         Input.reset();
     }
 }
-/*Input.hopaeSceneEnterReaction = function()
-{
-    Input.finalInput = Input.removeConVow(Input.finalInput);
-    if (Input.finalInput.length > 1)
-    {
-        PlayerData.nickname = Input.finalInput;
-        ScenesData.menuScene.currentHopae.setText('현재 호패 : ' + PlayerData.nickname);
-        Input.reset();
-    }
-    else 
-    {
-        alert('정확한 가명을 입력해주세요.');
-        Input.reset();
-    }
-}*/
 
 Input.reset = function()
 {
@@ -334,12 +319,18 @@ Input.removeConVow = function(_wordText)
 
 Input.inputField = 
 {
-    generate: function(scene, enterCallback, text)
+    generate: function(scene, enterCallback, text, isHopaeScene = false)
     {
         this.text = text;
         //this.text = scene.add.text(background.x, background.y, "", {font: fontSize + 'pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
 
-        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; console.log(Input.finalInput);})
+        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; 
+            if(isHopaeScene)
+            {
+                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) ? true : false);
+                if(Input.finalInput.length > 4) ScenesData.hopaeScene.warningText.setVisible(true);
+                else ScenesData.hopaeScene.warningText.setVisible(false);
+            }})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});
         scene.input.keyboard.on('keydown-DELETE', function() {Input.reset()});
