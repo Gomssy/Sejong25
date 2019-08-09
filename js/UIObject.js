@@ -9,7 +9,7 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', tex
 
         text: scene.add.text(x, y, text, {
             fontSize: textSize + 'pt'
-        }).setDepth(depth).setOrigin(0.5, 0.5).setColor(textColor),
+        }).setDepth(depth).setOrigin(0.5, 0.5).setColor(textColor).setFontFamily('궁서'),
 
         space: {
             left: 10,

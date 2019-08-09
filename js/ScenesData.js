@@ -37,23 +37,17 @@ var menuScene = new Phaser.Class(
         BackGround.drawBackground(this);
         Audio.loopSound(this, 'login');
 
-        Input.inputField.generate(this, Input.menuSceneEnterReaction, 
-            UIObject.createLabel(this, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, '', 25, '#000000').getElement('text'));
-
-        //Input.inputField.generate(this, Input.menuSceneEnterReaction, this.add.sprite(game.config.width / 2, game.config.height * 25 / 36, 'inputfield').setDepth(10), 25);
-
-
         this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.currentHopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
-        this.allHopae = '';
-        PlayerData.userData.hopae.forEach(function(element) {this.allHopae += (element.name + ' ')});
-        this.hopae = this.add.text(100, 400, '내 호패들 : ' + allHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+        this.myHopae = [];
+        for(let i = 0; i < PlayerData.userData.hopae.length; i++)
+        {
+            this.myHopae.push(UIObject.createLabel(this, 300, 400 + 50 * i, 10, 'nameBgr6', 1, PlayerData.userData.hopae[i].name, 25, '#ffffff'));
+        }
 
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
         PlayerData.nickname = PlayerData.userData.recentHopae;
-
-
 
         this.roomEnterDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
@@ -64,7 +58,7 @@ var menuScene = new Phaser.Class(
             title: this.rexUI.add.label({
                 background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x1b0000),
                 text: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
-                    fontSize: '24px'
+                    font: '50pt 궁서'
                 }).setOrigin(0.5, 0.5),
                 space: {
                     left: 15,
@@ -75,12 +69,12 @@ var menuScene = new Phaser.Class(
             }),
             
             content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
-                fontSize: '24px'
+                font: '50pt 궁서'
             }),
 
             actions: [
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'Yes'),
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'No')
+                UIObject.createLabel(this, 0, 0, 0, 'button', 1, '예', 50),
+                UIObject.createLabel(this, 0, 0, 0, 'button', 1, '아니오', 50)
             ],
 
             space: {
@@ -135,6 +129,14 @@ var menuScene = new Phaser.Class(
         }).on('click', function(button, gameObject, pointer){
             console.log('상점 입장');
         }, this);
+
+        this.hopaeBtn = this.button.add(new Button(this, 100, 900, 'pyeongminThrow', 1, 0, 2).setScale(0.5).setDepth(5),
+        {
+            enabled: true, mode: 0
+        }).on('click', function(button, gameObject, pointer){
+            console.log('호패 입장');
+            ScenesData.changeScene('hopaeScene');
+        }, this);
     }
 });
 
@@ -170,7 +172,84 @@ var hopaeScene = new Phaser.Class(
         
         Input.inputField.generate(this, function(){}, 
             UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, '', 50, '#ffffff').getElement('text'));
-        
+
+        this.checkDialog = this.rexUI.add.dialog({
+            x: game.config.width / 2,
+            y: game.config.height / 2,
+
+            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+            
+            content: this.add.text(0, 0, '이 이름으로 하시겠습니까?\n변경에는 엽전이 소모됩니다.', {
+                font: '50pt 궁서',
+                color: '#000000'
+            }),
+
+            actions: [
+                UIObject.createLabel(this, 0, 0, 0, 'button', 1, '예', 50),
+                UIObject.createLabel(this, 0, 0, 0, 'button', 1, '아니오', 50)
+            ],
+
+            space: {
+                title: 25,
+                content: 25,
+                action: 100,
+
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20,
+            },
+
+            align: {
+                actions: 'center' // 'center'|'left'|'right'
+            },
+
+            expand: {
+                content: false, // Content is a pure text object
+            }
+        }).layout().setDepth(10).setVisible(false);
+
+        this.checkDialog
+        .on('button.click', function (button, groupName, index) {
+            if(index == 0)
+            {
+                if(1 == 0)
+                {
+                    fbClient.updateUserData('hopae', {name: Input.inputField.text.text, type: 'wood'});
+                    ScenesData.changeScene('menuScene');
+                }
+                else
+                {
+                    this.checkDialog.setVisible(false);
+                    this.shopBtn = this.button.add(new Button(this, game.config.width / 2, game.config.height / 2, 'pyeongminThrow', 1, 0, 2).setScale(0.5).setDepth(10),
+                    {
+                        enabled: true, mode: 0
+                    }).on('click', function(button, gameObject, pointer){
+                        
+                    }, this);
+                }
+            }
+            else
+            {
+                this.checkDialog.setVisible(false);
+                this.checkBtn.setEnable(true);
+            }
+        }, this)
+        .on('button.over', function (button, groupName, index) {
+            //console.log('button over');
+        })
+        .on('button.out', function (button, groupName, index) {
+            //console.log('button out');
+        });
+
+        this.checkBtn = this.button.add(new Button(this, game.config.width / 2, 900, 'pyeongminWrite', 1, 0, 2).setScale(0.5).setDepth(5),
+        {
+            enabled: true, mode: 0
+        }).on('click', function(button, gameObject, pointer){
+            console.log('호패 확인');
+            this.checkBtn.setEnable(false);
+            ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
+        }, this);
     }
 });
 
@@ -342,5 +421,6 @@ var gameScene = new Phaser.Class(
 ScenesData.changeScene = function(scene)
 {
     game.scene.stop(ScenesData.currentScene);
-    ScenesData.currentScene = game.scene.start(scene);
+    game.scene.start(scene);
+    ScenesData.currentScene = scene;
 }

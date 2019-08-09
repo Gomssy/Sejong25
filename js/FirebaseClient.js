@@ -199,68 +199,38 @@ FirebaseClient.prototype.signInWithPopup = function(provider)
 FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = false)
 {
 	var beforeData = PlayerData.userData;
-	var updates = {};
 	switch(key)
 	{
 		case 'exp':
-			updates.exp = replace ? (valueChanged) : (beforeData.exp + valueChanged);
-			beforeData.exp = updates.exp;
+			beforeData.exp = replace ? (valueChanged) : (beforeData.exp + valueChanged);
 			break;
 		case 'rank':
-			updates.rank = replace ? (valueChanged) : (beforeData.rank + valueChanged);
-			beforeData.rank = updates.rank;
+			beforeData.rank = replace ? (valueChanged) : (beforeData.rank + valueChanged);
 			break;
 		case 'hopae':
-			if (beforeData.hopae != null)
-			{
-				updates.hopae.push(valueChanged);
-				beforeData.hopae.push(valueChanged);
-			}
-			else
-			{
-				beforeData.hopae = [valueChanged];
-				updates.hopae = [valueChanged];
-			}
+			if (beforeData.hopae != null) beforeData.hopae.push(valueChanged);
+			else beforeData.hopae = [valueChanged];
 			break;
 		case 'recentHopae':
-			updates.recentHopae = valueChanged;
-			beforeData.recentHopae = updates.recentHopae;
+			beforeData.recentHopae = valueChanged;
 			break;
 		case 'title':
-			if (beforeData.title != null)
-			{
-				updates.title.push(valueChanged);
-				beforeData.title.push(valueChanged);
-			}
-			else
-			{
-				beforeData.title = [valueChanged];
-				updates.title = [valueChanged];
-			}
+			if (beforeData.title != null) beforeData.title.push(valueChanged);
+			else beforeData.title = [valueChanged];
 			break;
 		case 'money':
-			updates.money = replace ? (valueChanged) : (beforeData.money + valueChanged);
-			beforeData.money = updates.money;
+			beforeData.money = replace ? (valueChanged) : (beforeData.money + valueChanged);;
 			break;
 		case 'item':
-			if (beforeData.item != null)
-			{
-				updates.item.push(valueChanged);
-				beforeData.item.push(valueChanged);
-			}
-			else
-			{
-				beforeData.item = [valueChanged];
-				updates.item = [valueChanged];
-			}
+			if (beforeData.item != null) beforeData.item.push(valueChanged);
+			else beforeData.item = [valueChanged];
 			break;
 		default:
 			console.log('[ERROR] database has no key for ' + key);
 			break;
 	}
 	PlayerData.userData = beforeData;
-	console.log(updates.recentHopae);
-	return this.database.ref('/user-data/' + this.auth.currentUser.uid).update(updates);
+	return this.database.ref('/user-data/' + this.auth.currentUser.uid).update(beforeData);
 }
 
 document.addEventListener('DOMContentLoaded', function()
