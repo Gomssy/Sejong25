@@ -18,7 +18,6 @@ var menuScene = new Phaser.Class(
         ScenesData.currentScene = this;
         ResourceLoader.loadBackGround(this);
         ResourceLoader.loadImage(this);
-        Input.inputField.loadImage(this);
         CSVParsing.loadText(this);
         Audio.loadSound(this);
         this.load.scenePlugin({
@@ -32,17 +31,23 @@ var menuScene = new Phaser.Class(
             sceneKey: 'button'
         });
     },
-
+    
     create: function()
     {
         BackGround.drawBackground(this);
         Audio.loopSound(this, 'login');
-        Input.inputField.generate(this, Input.menuSceneEnterReaction);
+
+        Input.inputField.generate(this, Input.menuSceneEnterReaction, 
+            UIObject.createLabel(this, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, '', 25, '#000000').getElement('text'));
+
+        //Input.inputField.generate(this, Input.menuSceneEnterReaction, this.add.sprite(game.config.width / 2, game.config.height * 25 / 36, 'inputfield').setDepth(10), 25);
+
+
         this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
-        this.hopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+        this.currentHopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.allHopae = '';
-        PlayerData.userData.hopae.forEach(function(element) {this.allHopae += element.name + ' '});
+        PlayerData.userData.hopae.forEach(function(element) {this.allHopae += (element.name + ' ')});
         this.hopae = this.add.text(100, 400, '내 호패들 : ' + allHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
 
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
@@ -74,8 +79,8 @@ var menuScene = new Phaser.Class(
             }),
 
             actions: [
-                createLabel(this, 'button', 0, 0, 'Yes'),
-                createLabel(this, 'button', 0, 0, 'No')
+                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'Yes'),
+                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'No')
             ],
 
             space: {
@@ -130,29 +135,44 @@ var menuScene = new Phaser.Class(
         }).on('click', function(button, gameObject, pointer){
             console.log('상점 입장');
         }, this);
-        
     }
 });
 
-var createLabel = function (scene, image, width, height, text = '') {
-    return scene.rexUI.add.label({
-        width: width,
-        height: height,
+var hopaeScene = new Phaser.Class(
+{
+    Extends: Phaser.Scene,
 
-        background: scene.add.sprite(0, 0, image).setOrigin(0.5, 0.5),
+    initialize: 
 
-        text: scene.add.text(0, 0, text, {
-            fontSize: '24px'
-        }),
+    function hopaeScene ()
+    {
+        Phaser.Scene.call(this, {key: 'hopaeScene'});
+    },
 
-        space: {
-            left: 10,
-            right: 10,
-            top: 10,
-            bottom: 10
-        }
-    });
-}
+    preload: function()
+    {
+        ScenesData.hopaeScene = this;
+        this.load.scenePlugin({
+            key: 'rexuiplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
+            sceneKey: 'rexUI'
+        });
+        this.load.scenePlugin({
+            key: 'rexbuttonplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexbuttonplugin.min.js',
+            sceneKey: 'button'
+        });
+    },
+
+    create: function()
+    {
+        BackGround.drawBackground(this);
+        
+        Input.inputField.generate(this, function(){}, 
+            UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, '', 50, '#ffffff').getElement('text'));
+        
+    }
+});
 
 var roomScene = new Phaser.Class(
 {
@@ -263,8 +283,10 @@ var gameScene = new Phaser.Class(
         BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
         WordSpace.wordPhysicsGroup = this.physics.add.group();
-
-        Input.inputField.generate(this, Input.gameSceneEnterReaction);
+            
+        Input.inputField.generate(this, Input.gameSceneEnterReaction, 
+            UIObject.createLabel(this, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, '', 25, '#000000').getElement('text'));
+        
         WordSpace.attackGauge.generate(this);
         WordSpace.spaceInitiate(this);
         WordSpace.attackGauge.resetCycle(this);
@@ -320,6 +342,5 @@ var gameScene = new Phaser.Class(
 ScenesData.changeScene = function(scene)
 {
     game.scene.stop(ScenesData.currentScene);
-    ScenesData.currentScene = scene;
-    game.scene.start(scene);
+    ScenesData.currentScene = game.scene.start(scene);
 }

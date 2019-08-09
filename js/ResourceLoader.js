@@ -11,6 +11,7 @@ ResourceLoader.loadBackGround = function(scene)
 
 ResourceLoader.loadImage = function(scene)
 {
+    scene.load.image('inputfield', 'assets/placeholder/inputfield.png');
     for (let i = 0; i < 4; i++)
     {
         for (let j = 2; j < 7; j++)

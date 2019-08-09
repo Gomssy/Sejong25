@@ -35,7 +35,7 @@ Input.menuSceneEnterReaction = function()
     if (Input.finalInput.length > 1)
     {
         PlayerData.nickname = Input.finalInput;
-        ScenesData.menuScene.hopae.setText('내 호패 : ' + PlayerData.nickname);
+        ScenesData.menuScene.currentHopae.setText('현재 호패 : ' + PlayerData.nickname);
         Input.reset();
     }
     else 
@@ -44,6 +44,21 @@ Input.menuSceneEnterReaction = function()
         Input.reset();
     }
 }
+/*Input.hopaeSceneEnterReaction = function()
+{
+    Input.finalInput = Input.removeConVow(Input.finalInput);
+    if (Input.finalInput.length > 1)
+    {
+        PlayerData.nickname = Input.finalInput;
+        ScenesData.menuScene.currentHopae.setText('현재 호패 : ' + PlayerData.nickname);
+        Input.reset();
+    }
+    else 
+    {
+        alert('정확한 가명을 입력해주세요.');
+        Input.reset();
+    }
+}*/
 
 Input.reset = function()
 {
@@ -319,12 +334,12 @@ Input.removeConVow = function(_wordText)
 
 Input.inputField = 
 {
-    generate: function(scene, enterCallback)
+    generate: function(scene, enterCallback, text)
     {
-        this.background = scene.add.sprite(game.config.width / 2, game.config.height * 25 / 36, 'inputfield').setDepth(10);
-        this.text = scene.add.text(game.config.width / 2, game.config.height * 25 / 36, "", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
+        this.text = text.setFontFamily('궁서');
+        //this.text = scene.add.text(background.x, background.y, "", {font: fontSize + 'pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
 
-        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''})
+        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; console.log(Input.finalInput);})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});
         scene.input.keyboard.on('keydown-DELETE', function() {Input.reset()});
@@ -375,10 +390,6 @@ Input.inputField =
         scene.input.keyboard.on('keydown-B', function() {Input.pushInput('ㅠ')});
         scene.input.keyboard.on('keydown-N', function() {Input.pushInput('ㅜ')});
         scene.input.keyboard.on('keydown-M', function() {Input.pushInput('ㅡ')});
-    },
-    loadImage: function(scene)
-    {
-        scene.load.image('inputfield', 'assets/placeholder/inputfield.png');
     }
 }
 
@@ -411,29 +422,5 @@ Input.pushInput = function(inputKey)
             this.convert();
         }
         this.inputField.text.setText(Input.finalInput);
-    }
-}
-
-class Button extends Phaser.GameObjects.Sprite{
-  
-    constructor(scene, x, y, texture, overFrame, outFrame, downFrame)
-    {
-        super(scene, x, y, texture);
-        scene.add.existing(this);
-    
-        this.setFrame(outFrame).setInteractive()
-  
-        .on('pointerover', () => {
-            this.setFrame(overFrame)
-        })
-        .on('pointerdown', () => {
-            this.setFrame(downFrame)
-        })
-        .on('pointerup', () => {
-            this.setFrame(overFrame)
-        })
-        .on('pointerout', () => {
-            this.setFrame(outFrame)
-        })
     }
 }
