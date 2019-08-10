@@ -41,6 +41,7 @@ var menuScene = new Phaser.Class(
         this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.currentHopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.myHopae = [];
+        //PlayerData.userData.forEach(function(element){this.myHopae.push(element)});
         for(let i = 0; i < PlayerData.userData.hopae.length; i++)
         {
             let textLength = PlayerData.userData.hopae[i].name.length;
@@ -49,7 +50,7 @@ var menuScene = new Phaser.Class(
         }
 
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
-        PlayerData.nickname = PlayerData.userData.recentHopae;
+        PlayerData.nickname = (PlayerData.userData.recentHopae == '') ? PlayerData.userData.hopae[0].name : PlayerData.userData.recentHopae;
 
         this.roomEnterDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
@@ -120,7 +121,7 @@ var menuScene = new Phaser.Class(
         {
             enabled: true, mode: 0
         }).on('click', function(button, gameObject, pointer){
-            gameObject.setEnable(false);
+            button.setEnable(false);
             ScenesData.menuScene.roomEnterDialog.setVisible(true).popUp(200);
         }, this);
 
@@ -332,7 +333,7 @@ var roomScene = new Phaser.Class(
                 //console.log('end Count');
                 setTimeout(() => {
                     socket.emit('endCount');
-                }, (Phaser.Math.Distance.Between(0, 0, game.config.width / 2, game.config.height * 10 / 9) * 3));
+                }, (Phaser.Math.Distance.Between(0, 0, game.config.width / 2, game.config.height * 10 / 9) * 10));
                 this.isCounting = false;
                 this.isCountEnd = true;
                 this.players.forEach(function(element){
@@ -381,6 +382,16 @@ var gameScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.gameScene = this;
+        this.load.scenePlugin({
+            key: 'rexuiplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
+            sceneKey: 'rexUI'
+        });
+        this.load.scenePlugin({
+            key: 'rexbuttonplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexbuttonplugin.min.js',
+            sceneKey: 'button'
+        });
         WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
         WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
     },
@@ -398,7 +409,7 @@ var gameScene = new Phaser.Class(
         WordSpace.wordPhysicsGroup = this.physics.add.group();
             
         Input.inputField.generate(this, Input.gameSceneEnterReaction, 
-            UIObject.createLabel(this, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, '', 25, '#000000').getElement('text'));
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, '', 25, '#000000').getElement('text'));
         
         WordSpace.attackGauge.generate(this);
         WordSpace.spaceInitiate(this);
@@ -410,18 +421,14 @@ var gameScene = new Phaser.Class(
 
         WordSpace.nameWordTextForTest = this.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
-        WordSpace.generateWord.Item(this, Enums.item.nameList);
-        WordSpace.generateWord.Item(this, Enums.item.nameList);
-        WordSpace.generateWord.Item(this, Enums.item.invincible);
-        WordSpace.generateWord.Item(this, Enums.item.invincible);
-        WordSpace.generateWord.Item(this, Enums.item.charge);
-        WordSpace.generateWord.Item(this, Enums.item.charge);
-        WordSpace.generateWord.Item(this, Enums.item.clean);
-        WordSpace.generateWord.Item(this, Enums.item.clean);
-        WordSpace.generateWord.Item(this, Enums.item.heavy);
-        WordSpace.generateWord.Item(this, Enums.item.heavy);
-        WordSpace.generateWord.Item(this, Enums.item.dark);
-        WordSpace.generateWord.Item(this, Enums.item.dark);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+        WordSpace.attackGauge.add(11);
+
     },
 
     update: function()

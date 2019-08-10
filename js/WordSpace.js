@@ -186,8 +186,8 @@ WordSpace.generateWord =
     {
         if(newPlayerData == null)
         {
-            if(WordSpace.nameQueue.queue.length == 1) return null;
             let temp = WordSpace.nameQueue.pop();
+            if(temp == null) return null;
             word = new NameWord(temp, isStrong);
         }
         else word = new NameWord(newPlayerData, isStrong);
@@ -457,25 +457,30 @@ WordSpace.nameQueue =
         Phaser.Utils.Array.Shuffle(tempQueue);
         tempQueue.forEach(function(element)
         {
-            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive && WordSpace.nameQueue.getCount(element) < 3)
+            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive && WordSpace.nameQueue.getCount(RoomData.players[element]) < 3)
                 WordSpace.nameQueue.queue.push(element);
         });
     },
     pop: function()
     {
+        if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount - 1) this.shuffle();
+        if(WordSpace.nameQueue.queue.length == 0) return null;
         let tempElement = WordSpace.nameQueue.queue.shift();
-        if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
-        if(!RoomData.players[tempElement].isAlive && WordSpace.nameQueue.getCount(tempElement) < 3) return WordSpace.nameQueue.pop();
+        if(!RoomData.players[tempElement].isAlive || WordSpace.nameQueue.getCount(RoomData.players[tempElement]) >= 3) return WordSpace.nameQueue.pop();
         else return RoomData.players[tempElement];
     },
     getCount: function(player)
     {
-        let i = 0;
+        WordSpace.nameQueue.counter = 0;
         WordSpace.nameGroup.forEach(function(element){
-            if(element.id == player.id) i++;
+            if(element.id == player.id) WordSpace.nameQueue.counter++;
         })
-        return i;
+        WordSpace.wordGroup.forEach(function(element){
+            if(element instanceof NameWord && element.ownerId == player.id) WordSpace.nameQueue.counter++;
+        })
+        return WordSpace.nameQueue.counter;
     },
+    counter: 0,
     initiate: function()
     {
         this.shuffle();

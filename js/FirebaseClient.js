@@ -248,7 +248,7 @@ class UserData
         this.rank = -1;
         this.hopae = 
         [
-            {name: prompt("첫번째 호패의 닉네임을 입력해주세요."), type: 'wood'}
+            {name: prompt("첫번째 호패의 닉네임을 입력해주세요.\n(반드시 한글만 사용해주세요 띄어쓰기도 금지)"), type: 'wood'}
 		];
 		this.recentHopae = '';
 		this.title = [];

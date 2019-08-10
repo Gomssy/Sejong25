@@ -142,7 +142,7 @@ io.on('connection', function(socket)
     socket.on('disconnect', function(reason)
     {
         let data = socket.playerData;
-        if (typeof data.id === undefined)
+        if (data === undefined)
         {
             console.log('[ERROR] data.id is undefined');
             console.log(GameServer.currentPlayer);
