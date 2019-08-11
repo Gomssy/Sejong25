@@ -68,7 +68,16 @@ var menuScene = new Phaser.Class(
                         ScenesData.menuScene.currentHopae.destroy();
                         ScenesData.menuScene.createCurrentHopae();
                         ScenesData.menuScene.currentHopae.setEnable(true);
-                        ScenesData.menuScene.otherHopaeObject.forEach(function(element){element.destroy()});
+                        ScenesData.menuScene.otherHopaeObject.forEach(function(element){
+                            ScenesData.menuScene.tweens.add({
+                                targets: element,
+                                y: 0,
+                                duration: 200,
+                                ease: 'Linear',
+                                loop: 0,
+                                onComplete: function(){element.destroy()}
+                            });
+                        });
                     });
                 ScenesData.menuScene.tweens.add({
                     targets: temp,
@@ -77,6 +86,8 @@ var menuScene = new Phaser.Class(
                     ease: 'Bounce',
                     loop: 0
                 });
+                temp.count = i;
+                temp.total = this.otherHopae.length;
                 this.otherHopaeObject.push(temp);
             }
         }
@@ -92,6 +103,7 @@ var menuScene = new Phaser.Class(
                 })
         }
         this.createCurrentHopae();
+
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
 
         this.roomEnterDialog = this.rexUI.add.dialog({
@@ -110,7 +122,6 @@ var menuScene = new Phaser.Class(
             ],
 
             space: {
-                title: 25,
                 content: 25,
                 action: 100,
 
@@ -164,7 +175,6 @@ var menuScene = new Phaser.Class(
             {
                 ScenesData.changeScene('hopaeScene');
             })
-
     }
 });
 
