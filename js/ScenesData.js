@@ -39,15 +39,85 @@ var menuScene = new Phaser.Class(
 
         this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
-        this.currentHopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+        //this.currentHopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+
+
+
+
+
+
+
         this.myHopae = [];
         //PlayerData.userData.forEach(function(element){this.myHopae.push(element)});
-        for(let i = 0; i < PlayerData.userData.hopae.length; i++)
+        for(let i = 0; i < PlayerData.userData.hopae.length; i++) this.myHopae.push(PlayerData.userData.hopae[i]);
+
+
+
+
+
+
+
+
+
+        this.currentHopae = this.button.add(UIObject.createLabel(ScenesData.menuScene, 300, 300, 10, 
+            'nameBgr' + PlayerData.userData.recentHopae.length, 1, PlayerData.userData.recentHopae, 25, '#ffffff', 0.45, 0.5).getElement('background'),
         {
-            let textLength = PlayerData.userData.hopae[i].name.length;
-            this.myHopae.push(UIObject.createLabel(this, 300, 400 + 50 * i, 10, 'nameBgr' + textLength, 1, PlayerData.userData.hopae[i].name, 25, '#ffffff')
-                .getElement('text').setOrigin(0.45,0.5));
-        }
+            enabled: true, mode: 0
+        }).on('click', function(button, gameObject, pointer){
+            button.setEnable(false);
+
+
+            this.hopaeMenu = this.rexUI.add.menu({
+                x: 300,
+                y: 300,
+        
+                items: ScenesData.menuScene.myHopae,
+                createButtonCallback: function (item, i) {
+                    return ScenesData.menuScene.rexUI.add.label({
+                        background: UIObject.createLabel(ScenesData.menuScene, 0, 0, 10, 'nameBgr' + item.name.length, 1, item.name, 25, '#ffffff', 0.45, 0.5),
+                        text: ScenesData.menuScene.add.text(0, 0, item.name, {
+                            fontSize: '25px'
+                        }).setVisible(false),
+                        space: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 10,
+                            icon: 10
+                        }
+                    })
+                },
+        
+                easeIn: {
+                    duration: 500,
+                    orientation: 'y'
+                },
+        
+                easeOut: {
+                    duration: 100,
+                    orientation: 'y'
+                },
+            });
+        
+            this.hopaeMenu
+                .on('button.over', function (button) {
+                    
+                })
+                .on('button.out', function (button) {
+                    
+                })
+                .on('button.click', function (button) {
+                    PlayerData.nickname = button.text;
+                    ScenesData.menuScene.currentHopae.setEnable(true);
+                    this.collapse();
+                });
+
+
+        }, this);
+
+
+
+
 
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
         PlayerData.nickname = (PlayerData.userData.recentHopae == '') ? PlayerData.userData.hopae[0].name : PlayerData.userData.recentHopae;
@@ -223,7 +293,7 @@ var hopaeScene = new Phaser.Class(
                 else
                 {
                     this.checkDialog.setVisible(false);
-                    this.shopBtn = this.button.add(
+                    this.button.add(
                         this.rexUI.add.dialog({
                             x: game.config.width / 2,
                             y: game.config.height / 2,
@@ -421,13 +491,7 @@ var gameScene = new Phaser.Class(
 
         WordSpace.nameWordTextForTest = this.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
         WordSpace.nameQueue.initiate();
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
-        WordSpace.attackGauge.add(11);
+        //WordSpace.attackGauge.add(11);
 
     },
 

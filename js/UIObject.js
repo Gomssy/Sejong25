@@ -1,6 +1,6 @@
 var UIObject = UIObject || {};
 
-UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', textSize = 24, textColor = '#000000') {
+UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', textSize = 24, textColor = '#000000', textOriginX = 0.5, textOriginY = 0.5) {
     return scene.rexUI.add.label({
         /*width: width,
         height: height,*/
@@ -11,7 +11,7 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', tex
 
         text: scene.add.text(x, y, text, {
             fontSize: textSize + 'pt'
-        }).setDepth(depth).setOrigin(0.5, 0.5).setColor(textColor).setFontFamily('궁서'),
+        }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor).setFontFamily('궁서'),
 
         space: {
             left: 10,
