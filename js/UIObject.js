@@ -10,8 +10,8 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', tex
         background: scene.add.sprite(x, y, image).setScale(size).setOrigin(0.5, 0.5).setDepth(depth),
 
         text: scene.add.text(x, y, text, {
-            fontSize: textSize + 'pt'
-        }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor).setFontFamily('궁서'),
+            font: textSize + 'pt 궁서'
+        }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor),
 
         space: {
             left: 10,
@@ -22,26 +22,48 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', tex
     });
 }
 
-class Button extends Phaser.GameObjects.Sprite{
-  
-    constructor(scene, x, y, texture, overFrame, outFrame, downFrame)
+UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, downFrame, clickCallback) {
+    var temp = scene.rexUI.add.buttons({
+        x: 0,
+        y: 0,
+        width: undefined,
+        height: undefined,
+        orientation: 0,
+        buttons: [
+            buttonGameObject,
+        ],
+        click: {
+            mode: 'pointerdown',
+            clickInterval: 100
+        }
+    });
+    buttonGameObject = buttonGameObject.getElement('background');
+    temp.enabled = true;    
+    buttonGameObject.setFrame(outFrame).setInteractive()
+    .on('pointerover', () => {
+        if(temp.enabled)
+        {
+            buttonGameObject.setFrame(overFrame);
+        }
+    })
+    .on('pointerdown', () => {
+        if(temp.enabled)
+        {
+            buttonGameObject.setFrame(downFrame);
+            clickCallback();
+        }
+    })
+    .on('pointerup', () => {
+        buttonGameObject.setFrame(outFrame);
+    })
+    .on('pointerout', () => {
+        buttonGameObject.setFrame(outFrame);
+    })
+    temp.setEnable = function(isEnable)
     {
-        super(scene, x, y, texture);
-        scene.add.existing(this);
-    
-        this.setFrame(outFrame).setInteractive()
-  
-        .on('pointerover', () => {
-            this.setFrame(overFrame)
-        })
-        .on('pointerdown', () => {
-            this.setFrame(downFrame)
-        })
-        .on('pointerup', () => {
-            this.setFrame(overFrame)
-        })
-        .on('pointerout', () => {
-            this.setFrame(outFrame)
-        })
+        temp.enabled = isEnable;
+        return temp;
     }
+
+    return temp;
 }

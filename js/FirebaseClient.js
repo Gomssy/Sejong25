@@ -230,6 +230,7 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 			break;
 	}
 	PlayerData.userData = beforeData;
+	console.log(beforeData);
 	return this.database.ref('/user-data/' + this.auth.currentUser.uid).update(beforeData);
 }
 

@@ -36,110 +36,69 @@ var menuScene = new Phaser.Class(
     {
         BackGround.drawBackground(this);
         Audio.loopSound(this, 'login');
+        PlayerData.nickname = (PlayerData.userData.recentHopae == '') ? PlayerData.userData.hopae[0].name : PlayerData.userData.recentHopae;
 
         this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
         this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
-        //this.currentHopae = this.add.text(100, 300, '현재 호패 : ' + PlayerData.userData.recentHopae).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
 
-
-
-
-
-
-
-        this.myHopae = [];
-        //PlayerData.userData.forEach(function(element){this.myHopae.push(element)});
-        for(let i = 0; i < PlayerData.userData.hopae.length; i++) this.myHopae.push(PlayerData.userData.hopae[i]);
-
-
-
-
-
-
-
-
-
-        this.currentHopae = this.button.add(UIObject.createLabel(ScenesData.menuScene, 300, 300, 10, 
-            'nameBgr' + PlayerData.userData.recentHopae.length, 1, PlayerData.userData.recentHopae, 25, '#ffffff', 0.45, 0.5).getElement('background'),
+        this.setOtherHopae = function()
         {
-            enabled: true, mode: 0
-        }).on('click', function(button, gameObject, pointer){
-            button.setEnable(false);
+            this.otherHopae = [];
+            for(let i = 0; i < PlayerData.userData.hopae.length; i++)
+                if(PlayerData.userData.hopae[i].name != PlayerData.nickname)
+                    this.otherHopae.push(
+                        {
+                            name: PlayerData.userData.hopae[i].name,
+                            type: PlayerData.userData.hopae[i].type,
+                        });
+        }
+        this.setOtherHopae();
 
-
-            this.hopaeMenu = this.rexUI.add.menu({
-                x: 300,
-                y: 300,
-        
-                items: ScenesData.menuScene.myHopae,
-                createButtonCallback: function (item, i) {
-                    return ScenesData.menuScene.rexUI.add.label({
-                        background: UIObject.createLabel(ScenesData.menuScene, 0, 0, 10, 'nameBgr' + item.name.length, 1, item.name, 25, '#ffffff', 0.45, 0.5),
-                        text: ScenesData.menuScene.add.text(0, 0, item.name, {
-                            fontSize: '25px'
-                        }).setVisible(false),
-                        space: {
-                            left: 10,
-                            right: 10,
-                            top: 10,
-                            bottom: 10,
-                            icon: 10
-                        }
-                    })
-                },
-        
-                easeIn: {
+        this.createHopaeMenu = function()
+        {
+            this.otherHopaeObject = [];
+            for(let i = 0; i < this.otherHopae.length; i++)
+            {
+                let temp = UIObject.createButton(this, UIObject.createLabel(this, 300, 300, 10, 
+                    'nameBgr' + ScenesData.menuScene.otherHopae[i].name.length, 1, ScenesData.menuScene.otherHopae[i].name, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
+                    function()
+                    {
+                        PlayerData.nickname = ScenesData.menuScene.otherHopae[i].name;
+                        ScenesData.menuScene.setOtherHopae();
+                        ScenesData.menuScene.currentHopae.destroy();
+                        ScenesData.menuScene.createCurrentHopae();
+                        ScenesData.menuScene.currentHopae.setEnable(true);
+                        ScenesData.menuScene.otherHopaeObject.forEach(function(element){element.destroy()});
+                    });
+                ScenesData.menuScene.tweens.add({
+                    targets: temp,
+                    y: 50 * (i + 1),
                     duration: 500,
-                    orientation: 'y'
-                },
-        
-                easeOut: {
-                    duration: 100,
-                    orientation: 'y'
-                },
-            });
-        
-            this.hopaeMenu
-                .on('button.over', function (button) {
-                    
-                })
-                .on('button.out', function (button) {
-                    
-                })
-                .on('button.click', function (button) {
-                    PlayerData.nickname = button.text;
-                    ScenesData.menuScene.currentHopae.setEnable(true);
-                    this.collapse();
+                    ease: 'Bounce',
+                    loop: 0
                 });
+                this.otherHopaeObject.push(temp);
+            }
+        }
 
-
-        }, this);
-
-
-
-
-
+        this.createCurrentHopae = function()
+        {
+            this.currentHopae = UIObject.createButton(this, UIObject.createLabel(this, 300, 300, 10, 
+                'nameBgr' + PlayerData.nickname.length, 1, PlayerData.nickname, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
+                function()
+                {
+                    ScenesData.menuScene.currentHopae.setEnable(false);
+                    ScenesData.menuScene.createHopaeMenu();
+                })
+        }
+        this.createCurrentHopae();
         this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
-        PlayerData.nickname = (PlayerData.userData.recentHopae == '') ? PlayerData.userData.hopae[0].name : PlayerData.userData.recentHopae;
 
         this.roomEnterDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
             y: game.config.height / 2,
 
             background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
-
-            title: this.rexUI.add.label({
-                background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x1b0000),
-                text: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
-                    font: '50pt 궁서'
-                }).setOrigin(0.5, 0.5),
-                space: {
-                    left: 15,
-                    right: 15,
-                    top: 10,
-                    bottom: 10
-                }
-            }),
             
             content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
                 font: '50pt 궁서'
@@ -186,28 +145,26 @@ var menuScene = new Phaser.Class(
                 //console.log('button out');
         });
 
+        
+        this.gameStartBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5), 1, 0, 2, 
+            function()
+            {
+                ScenesData.menuScene.gameStartBtn.setEnable(false);
+                ScenesData.menuScene.roomEnterDialog.setVisible(true).popUp(200);
+            })
+        
+        this.shopBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 900, 5, 'pyeongminThrow', 0.5), 1, 0, 2, 
+            function()
+            {
+                console.log('상점 입장');
+            })
+        
+        this.hopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminThrow', 0.5), 1, 0, 2, 
+            function()
+            {
+                ScenesData.changeScene('hopaeScene');
+            })
 
-        this.gameStartBtn = this.button.add(new Button(this, game.config.width / 2, 900, 'pyeongminWrite', 1, 0, 2).setScale(0.5).setDepth(5),
-        {
-            enabled: true, mode: 0
-        }).on('click', function(button, gameObject, pointer){
-            button.setEnable(false);
-            ScenesData.menuScene.roomEnterDialog.setVisible(true).popUp(200);
-        }, this);
-
-        this.shopBtn = this.button.add(new Button(this, game.config.width - 100, 900, 'pyeongminThrow', 1, 0, 2).setScale(0.5).setDepth(5),
-        {
-            enabled: true, mode: 0
-        }).on('click', function(button, gameObject, pointer){
-            console.log('상점 입장');
-        }, this);
-
-        this.hopaeBtn = this.button.add(new Button(this, 100, 900, 'pyeongminThrow', 1, 0, 2).setScale(0.5).setDepth(5),
-        {
-            enabled: true, mode: 0
-        }).on('click', function(button, gameObject, pointer){
-            ScenesData.changeScene('hopaeScene');
-        }, this);
     }
 });
 
@@ -293,31 +250,14 @@ var hopaeScene = new Phaser.Class(
                 else
                 {
                     this.checkDialog.setVisible(false);
-                    this.button.add(
-                        this.rexUI.add.dialog({
-                            x: game.config.width / 2,
-                            y: game.config.height / 2,
-                
-                            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
-                            
-                            content: this.add.text(0, 0, '엽전이 부족합니다.', {
-                                font: '50pt 궁서',
-                                color: '#000000'
-                            }),
-                
-                            space: {
-                                left: 20,
-                                right: 20,
-                                top: 20,
-                                bottom: 20,
-                            }
-                        }).layout().setDepth(10).popUp(200),
-                    {
-                        enabled: true, mode: 0
-                    }).on('click', function(button, gameObject, pointer){
-                        gameObject.destroy();
-                        this.checkBtn.setEnable(true);
-                    }, this);
+
+                    this.errorMsg = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'panel', 1, 
+                        '엽전이 부족합니다', 50, '#000000').layout().popUp(200), 0, 0, 0, 
+                        function()
+                        {
+                            ScenesData.hopaeScene.errorMsg.destroy();
+                            ScenesData.hopaeScene.checkBtn.setEnable(true);
+                        })
                 }
             }
             else
@@ -332,29 +272,24 @@ var hopaeScene = new Phaser.Class(
         .on('button.out', function (button, groupName, index) {
             //console.log('button out');
         });
-        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 + 100, 10, 'button', 1, 
+        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 2, 'panel', 1, 
             '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다', 40, '#000000').setVisible(false).layout();
-        /*this.warningText = this.add.text(this, game.config.width / 2, game.config.height / 2 + 100, '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다')
-            .setOrigin(0, 0.5).setColor('#000000').setDepth(10).setFontSize(40);
-            this.warningText.visible = false;*/
-
-        this.checkBtn = this.button.add(new Button(this, game.config.width / 2, 900, 'pyeongminWrite', 1, 0, 2).setScale(0.5).setDepth(5),
-        {
-            enabled: true, mode: 0
-        }).on('click', function(button, gameObject, pointer){
-            if(Input.checkProperInput(Input.inputField.text.text))
+            
+        this.checkBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5), 1, 0, 2, 
+            function()
             {
-                this.checkBtn.setEnable(false);
-                ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
-            }
-        }, this).setEnable(false);
+                if(Input.checkProperInput(Input.inputField.text.text))
+                {
+                    ScenesData.hopaeScene.checkBtn.setEnable(false);
+                    ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
+                }
+            })
 
-        this.backBtn = this.button.add(new Button(this, 100, 900, 'pyeongminWrite', 1, 0, 2).setScale(0.5).setDepth(5),
-        {
-            enabled: true, mode: 0
-        }).on('click', function(button, gameObject, pointer){
-            ScenesData.changeScene('menuScene');
-        }, this);
+        this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminWrite', 0.5), 1, 0, 2, 
+            function()
+            {
+                ScenesData.changeScene('menuScene');
+            });
     }
 });
 

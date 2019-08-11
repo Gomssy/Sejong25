@@ -322,7 +322,6 @@ Input.inputField =
     generate: function(scene, enterCallback, text, isHopaeScene = false)
     {
         this.text = text;
-        //this.text = scene.add.text(background.x, background.y, "", {font: fontSize + 'pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
 
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; 
             if(isHopaeScene)
