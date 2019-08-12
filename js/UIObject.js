@@ -1,7 +1,7 @@
 var UIObject = UIObject || {};
 
-UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', textSize = 24, textColor = '#000000', textOriginX = 0.5, textOriginY = 0.5) {
-    return scene.rexUI.add.label({
+UIObject.createLabel = function (scene, x, y, depth, image, size, align, text = '', textSize = 24, textColor = '#000000', textOriginX = 0.5, textOriginY = 0.5) {
+    var temp = scene.rexUI.add.label({
         /*width: width,
         height: height,*/
         x: x,
@@ -20,6 +20,20 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, text = '', tex
             bottom: 10
         }
     });
+    switch(align)
+    {
+        case 'left':
+            temp.x += temp.getElement('background').width / 2;
+            break;
+        case 'right':
+            temp.x -= temp.getElement('background').width / 2;
+            break;
+        case 'center':
+            break;
+        default:
+            break;
+    }
+    return temp;
 }
 
 UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, downFrame, clickCallback) {

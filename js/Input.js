@@ -35,7 +35,6 @@ Input.menuSceneEnterReaction = function()
     if (Input.finalInput.length > 1)
     {
         PlayerData.nickname = Input.finalInput;
-        ScenesData.menuScene.currentHopae.setText('현재 호패 : ' + PlayerData.nickname);
         Input.reset();
     }
     else 

@@ -251,7 +251,7 @@ class UserData
         [
             {name: prompt("첫번째 호패의 닉네임을 입력해주세요.\n(반드시 한글만 사용해주세요 띄어쓰기도 금지)"), type: 'wood'}
 		];
-		this.recentHopae = '';
+		this.recentHopae = null;
 		this.title = [];
 		this.money = 0;
 		this.item = [];

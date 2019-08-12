@@ -29,7 +29,7 @@ socket.on('setId', function(msg) // {str, num playerNum}
 // init game
 socket.on('enterRoom', function()
 {
-    fbClient.updateUserData('recentHopae', PlayerData.nickname);
+    fbClient.updateUserData('recentHopae', PlayerData.currentHopae);
     Audio.killSound(ScenesData.menuScene, 'login');
     ScenesData.changeScene('roomScene');
 });
