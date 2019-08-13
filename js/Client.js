@@ -7,7 +7,8 @@ socket.on('alert', function(msg) // string errorcode
 {
     //let toAlert = 'null alert';
     if (msg === 'errNicknameOverlaped') alert('이미 사용중인 닉네임입니다.');
-    if (msg === 'gameWin') 
+    else if (msg === 'errNicknameEmpty') alert('설정된 닉네임이 없습니다.');
+    else if (msg === 'gameWin') 
     {
         //toAlert = '승리!';
         ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '승리!!!!', {fontSize: '30pt'})
@@ -28,10 +29,9 @@ socket.on('setId', function(msg) // {str, num playerNum}
 // init game
 socket.on('enterRoom', function()
 {
+    fbClient.updateUserData('recentHopae', PlayerData.currentHopae);
     Audio.killSound(ScenesData.menuScene, 'login');
-    game.scene.remove('menuScene');
-    game.scene.start('roomScene');
-    
+    ScenesData.changeScene('roomScene');
 });
 socket.on('syncRoomScene', function(msg)
 {
@@ -104,8 +104,7 @@ socket.on('syncRoomData', function(msg) // {num roomNum, [] players}
 socket.on('startGame', function()
 {
     Audio.killSound(ScenesData.roomScene, 'inRoom');
-    game.scene.remove('roomScene');
-    game.scene.start('gameScene');
+    ScenesData.changeScene('gameScene');
 });
 
 // in game
@@ -116,11 +115,13 @@ socket.on('changePhase', function(msg) // number Phase
 
     WordSpace.pauseCycle(true);
     // 여기서 종이 드르륵 열면됨
+    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phaseChangeBgr').setOrigin(0.5, 0.5).setDepth(10);
     ScenesData.gameScene.scene.pause('gameScene');
     setTimeout(function()
     {
         ScenesData.gameScene.scene.resume('gameScene');
         // 여기서 종이 닫으면됨
+        phaseChangeBgr.destroy();
         WordSpace.pauseCycle(false);
         //console.log('start again');
     }, 5000);
@@ -141,12 +142,12 @@ socket.on('attackMode', function(msg) // number playerId
     console.log(msg + ' is on attack Mode');
     // msg의 id를 가진 사람이 attack Mode이다.
 });
-socket.on('someoneAttacked', function(msg) // {Player attacker, Player victim}
+socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
 {
     // 이때 위의 attack Mode인 사람(msg.attackerId)을 해제해주자.
-    console.log(msg.attacker.id + ' attacked ' + msg.victim.id);
-    let attackerPos = RoomData.findPlayer(msg.attacker).position;
-    let victimPos = RoomData.findPlayer(msg.victim).position;
+    console.log(msg.attackerId + ' attacked ' + msg.victimId);
+    let attackerPos = RoomData.findPlayer(msg.attackerId).position;
+    let victimPos = RoomData.findPlayer(msg.victimId).position;
     WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos, msg.multiple);
 });
 socket.on('attacked', function(msg) // object attackData
@@ -155,13 +156,13 @@ socket.on('attacked', function(msg) // object attackData
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
-            for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, msg.attacker, msg.attackOption);
+            for (let i = 0; i < msg.multiple; i++) WordSpace.generateWord.Attack(ScenesData.gameScene, msg.text, msg.grade, RoomData.findPlayer(msg.attackerId), msg.attackOption);
         attackedEvent.currentCycle.destroy();
         WordSpace.attackedEvents.splice(WordSpace.attackedEvents.findIndex(function(element) {
-            return element.cert === (msg.text + msg.attacker);
+            return element.cert === (msg.text + msg.attackerId);
         }), 1);
     });
-    attackedEvent.cert = msg.text + msg.attacker;
+    attackedEvent.cert = msg.text + msg.attackerId;
     attackedEvent.resetCycle(ScenesData.gameScene, 4000, 0, false);
 
     WordSpace.attackedEvents.push(attackedEvent);
@@ -169,12 +170,23 @@ socket.on('attacked', function(msg) // object attackData
 });
 socket.on('defeat', function(msg) // object player
 {
+    let playerImage = RoomData.findPlayer(msg.id).playerImage;
+    let position = RoomData.findPlayer(msg.id).position;
+    let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
     RoomData.players[msg.index] = msg;
+    RoomData.players[msg.index].playerImage = playerImage;
+    RoomData.players[msg.index].position = position;
+    RoomData.players[msg.index].nicknameText = nicknameText;
+
     RoomData.aliveCount--;
+    console.log(msg.id);
+    console.log(RoomData.findPlayer(msg.id));
+    RoomData.findPlayer(msg.id).playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
     if (msg.lastAttack != null) 
     {
-        console.log(RoomData.players[msg.index].nickname + ' defeated by ' + msg.lastAttack.attacker + ', with ' + msg.lastAttack.word);
-        WordSpace.killLogForTest += ('\n' + msg.lastAttack.attacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.players[msg.index].nickname);
+        let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId).nickname;
+        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated by ' + lastAttacker + ', with ' + msg.lastAttack.word);
+        WordSpace.killLogForTest += ('\n' + lastAttacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.findPlayer(msg.id).nickname);
         if(msg.lastAttack.attackerId == RoomData.myself.id)
         {
             var keys = Object.keys(Enums.item);
@@ -183,8 +195,8 @@ socket.on('defeat', function(msg) // object player
     }
     else 
     {
-        console.log(RoomData.players[msg.index].nickname + ' defeated');
-        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.players[msg.index].nickname);
+        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated');
+        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
     }
 });
 socket.on('gameEnd', function(msg) // object player
@@ -194,8 +206,8 @@ socket.on('gameEnd', function(msg) // object player
 socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
-    let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, msg.victim);
-    let victimPos = RoomData.findPlayer(msg.victim).position;
+    let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.findPlayer(msg.victimId));
+    let victimPos = RoomData.findPlayer(msg.victimId).position;
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
     tempWord.destroy();

@@ -59,6 +59,7 @@ class WordObject
             breakAnim.destroy();
         }, 200);
         RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
+        RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
     }
     
     attract()
@@ -206,8 +207,8 @@ class AttackWord extends WordObject
                 let attackData = 
                 {
                     roomNum: RoomData.roomId,
-                    attacker: RoomData.myself,
-                    target: this.attacker.id,
+                    attackerId: RoomData.myself.id,
+                    victimId: this.attacker.id,
                     text: this.wordText,
                     grade: Math.min(3, this.wordGrade + 1),
                     attackOption: {
@@ -390,7 +391,7 @@ class ItemWord extends WordObject
                     tempWords = Phaser.Utils.Array.Shuffle(tempWords);
                     let tempLenth = tempWords.length * 0.3;
                     for(let i = 0; i < tempLenth; i++)
-                        if(WordSpace.wordGroup[tempWords[i]] != null) WordSpace.wordGroup[tempWords[i]].destroy();
+                        if(WordSpace.wordGroup[tempWords[i]] != null) WordSpace.wordGroup[tempWords[i]].destroy(false);
                     break;
                 case Enums.item.heavy:
                     Input.attackOption.isHeavy = true;

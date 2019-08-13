@@ -168,69 +168,6 @@ WordSpace.genWordByProb = function(scene)
     //WordSpace.generateWord(scene, SelectWord.selectWord(wordIdx));
 }
 
-WordSpace.loadImage = function(scene)
-{
-    for (let i = 0; i < 4; i++)
-    {
-        for (let j = 2; j < 7; j++)
-        {
-            scene.load.image(('wordBgr' + i + '_' + j), ('assets/placeholder/'+i + '_' + j + '.png'));
-        }
-    }
-    for (let i = 0; i < 4; i++)
-    {
-        scene.load.image('attackAlert' + i, 'assets/placeholder/attackalert' + (i+1) + '.png');
-    }
-    for (let i = 0; i < 6; i++)
-    {
-        scene.load.image('item' + i, 'assets/placeholder/item' + i + '.png');
-    }
-    for (let i = 2; i < 7; i++)
-    {
-        scene.load.image('nameBgr' + i, 'assets/placeholder/name' + i + '.png');
-        scene.load.image('strongBgr' + i, 'assets/placeholder/strong' + i + '.png');
-    }
-    scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
-    scene.load.spritesheet('pyeongminWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 490, frameHeight: 423 });
-    scene.load.spritesheet('pyeongminThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 490, frameHeight: 423 });
-    scene.load.image('attackPapaer', 'assets/image/etc/paper_crumbled.png');
-
-    WordSpace.weightTextObjForTest = scene.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
-    WordSpace.killLogTextForTest = scene.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
-}
-
-WordSpace.loadAnimation = function(scene)
-{
-    scene.anims.create({
-        key: 'wordBreakAnim',
-        frames: scene.anims.generateFrameNumbers('wordBreak'),
-        frameRate: 10,
-        repeat: 0,
-        hideOnComplete: false
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.write] = scene.anims.create({
-        key: 'pyeongminWriteAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
-        frameRate: 10,
-        repeat: 0,
-        hideOnComplete: false
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite] = scene.anims.create({
-        key: 'pyeongminattackWriteAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
-        frameRate: 10,
-        repeat: -1,
-        hideOnComplete: false
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.throw] = scene.anims.create({
-        key: 'pyeongminThrowAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminThrow'),
-        frameRate: 10,
-        repeat: 0,
-        hideOnComplete: false
-    });
-}
-
 WordSpace.generateWord = 
 {
     Normal: function(scene, grade, lenRate)
@@ -249,8 +186,8 @@ WordSpace.generateWord =
     {
         if(newPlayerData == null)
         {
-            if(WordSpace.nameQueue.queue.length == 1) return null;
             let temp = WordSpace.nameQueue.pop();
+            if(temp == null) return null;
             word = new NameWord(temp, isStrong);
         }
         else word = new NameWord(newPlayerData, isStrong);
@@ -344,7 +281,24 @@ WordSpace.findWord = function(wordText)
         Input.attackMode = true;
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
-        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.attackWrite]);
+        switch(tempAttackOption.wordCount)
+        {
+            case 2:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.notBurning]);
+                break;
+            case 3:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning]);
+                break;
+            case 4:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning]);
+                break;
+            case 5:
+                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.bigBurning]);
+                break;
+            default:
+                console.log('Improper attack option.');
+                break;
+        }
         RoomData.myself.playerImage.anims.msPerFrame /= (4 - Input.attackOption.wordGrade);
     }
     else // 오타 체크
@@ -368,8 +322,8 @@ WordSpace.findWord = function(wordText)
                 let victimData = 
                 {
                     roomNum: RoomData.roomId,
-                    victim: RoomData.myself, 
-                    target: element.attacker.id,
+                    attackerId: element.attacker.id,
+                    victimId: RoomData.myself.id,
                     word: element.wordText
                 }
                 socket.emit('defenseFailed', victimData);
@@ -410,7 +364,7 @@ WordSpace.attack = function(wordText, grade)
             let victimId = element.ownerId;
             let sendIdx = toSend.findIndex(function(element)
             {
-                return element.victim.id === victimId;
+                return element.victimId === victimId;
             });
             if (sendIdx != -1) toSend[sendIdx].multiple++;
             else
@@ -421,8 +375,8 @@ WordSpace.attack = function(wordText, grade)
                 let attackData = 
                 {
                     roomNum: RoomData.roomId,
-                    attacker: RoomData.myself, 
-                    victim: target,
+                    attackerId: RoomData.myself.id, 
+                    victimId: target.id,
                     text: wordText, 
                     grade: grade,
                     attackOption: {
@@ -450,6 +404,7 @@ WordSpace.attack = function(wordText, grade)
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
         RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
+        RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
         Input.attackOption.isHeavy = false;
         Input.attackOption.isDark = false;
     }
@@ -461,7 +416,7 @@ WordSpace.attack = function(wordText, grade)
 
 WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
 {
-    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPapaer').setScale(0.5 * multiple).setDepth(3);
+    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPaper').setScale(0.5 * multiple).setDepth(3);
     attackPaper.mask = new Phaser.Display.Masks.BitmapMask(scene, BackGround.gameBackground);
     attackPaper.throwTarget = attackTo;
     attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -502,25 +457,30 @@ WordSpace.nameQueue =
         Phaser.Utils.Array.Shuffle(tempQueue);
         tempQueue.forEach(function(element)
         {
-            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive && WordSpace.nameQueue.getCount(element) < 3)
+            if(RoomData.players[element].id != PlayerData.id && RoomData.players[element].isAlive && WordSpace.nameQueue.getCount(RoomData.players[element]) < 3)
                 WordSpace.nameQueue.queue.push(element);
         });
     },
     pop: function()
     {
+        if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount - 1) this.shuffle();
+        if(WordSpace.nameQueue.queue.length == 0) return null;
         let tempElement = WordSpace.nameQueue.queue.shift();
-        if(WordSpace.nameQueue.queue.length <= RoomData.aliveCount) this.shuffle();
-        if(!RoomData.players[tempElement].isAlive && WordSpace.nameQueue.getCount(tempElement) < 3) return WordSpace.nameQueue.pop();
+        if(!RoomData.players[tempElement].isAlive || WordSpace.nameQueue.getCount(RoomData.players[tempElement]) >= 3) return WordSpace.nameQueue.pop();
         else return RoomData.players[tempElement];
     },
     getCount: function(player)
     {
-        let i = 0;
+        WordSpace.nameQueue.counter = 0;
         WordSpace.nameGroup.forEach(function(element){
-            if(element.id == player.id) i++;
+            if(element.id == player.id) WordSpace.nameQueue.counter++;
         })
-        return i;
+        WordSpace.wordGroup.forEach(function(element){
+            if(element instanceof NameWord && element.ownerId == player.id) WordSpace.nameQueue.counter++;
+        })
+        return WordSpace.nameQueue.counter;
     },
+    counter: 0,
     initiate: function()
     {
         this.shuffle();

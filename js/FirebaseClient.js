@@ -50,10 +50,29 @@ FirebaseClient.prototype.onAuthChange = function(user)
 FirebaseClient.prototype.setLogin = function()
 {
     this.database = firebase.database();
-    this.database.goOnline();
-    document.getElementById('mainTitle').style.display = 'none';
-    document.getElementById('titleImg').style.display = 'none';
-    game = new Phaser.Game(config);
+	this.database.goOnline();
+	
+	var userDataRef = this.database.ref('/user-data/' + this.auth.currentUser.uid);
+	userDataRef.once('value').then(function(snapshot)
+	{
+		if (snapshot.exists())
+		{
+			PlayerData.userData = snapshot.val();
+		}
+		else
+		{
+			let newUserData = new UserData();
+			PlayerData.userData = newUserData;
+			userDataRef.set(newUserData);
+		}
+	})
+	.then(function()
+	{
+		game = new Phaser.Game(config);
+	});
+	
+	document.getElementById('mainTitle').style.display = 'none';
+	document.getElementById('titleImg').style.display = 'none';
 }
 
 FirebaseClient.prototype.setLogOut = function()
@@ -94,7 +113,7 @@ FirebaseClient.prototype.onEmailBtnClick = function()
 					}
 				});
 		}
-		this.auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+		this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
 			.then(cbSignInEmail.bind(this));
 	}
 }
@@ -146,7 +165,7 @@ FirebaseClient.prototype.createEmailUser = function()
 					}
 				});
 		}
-		this.auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+		this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
 			.then(cbAfterPersistence.bind(this))
 			.catch(function(error) {
 				console.error('인증 상태 설정 중 에러 발생' , error);
@@ -157,7 +176,7 @@ FirebaseClient.prototype.createEmailUser = function()
 FirebaseClient.prototype.onGoogleBtnClick = function()
 {
 	var googleProvider = new firebase.auth.GoogleAuthProvider();
-	this.auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+	this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
 	.then(this.signInWithPopup.bind(this, googleProvider))
 	.catch(function(error)
 	{
@@ -177,8 +196,64 @@ FirebaseClient.prototype.signInWithPopup = function(provider)
 	});
 }
 
+FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = false)
+{
+	var beforeData = PlayerData.userData;
+	switch(key)
+	{
+		case 'exp':
+			beforeData.exp = replace ? (valueChanged) : (beforeData.exp + valueChanged);
+			break;
+		case 'rank':
+			beforeData.rank = replace ? (valueChanged) : (beforeData.rank + valueChanged);
+			break;
+		case 'hopae':
+			if (beforeData.hopae != null) beforeData.hopae.push(valueChanged);
+			else beforeData.hopae = [valueChanged];
+			break;
+		case 'recentHopae':
+			beforeData.recentHopae = valueChanged;
+			break;
+		case 'title':
+			if (beforeData.title != null) beforeData.title.push(valueChanged);
+			else beforeData.title = [valueChanged];
+			break;
+		case 'money':
+			beforeData.money = replace ? (valueChanged) : (beforeData.money + valueChanged);;
+			break;
+		case 'item':
+			if (beforeData.item != null) beforeData.item.push(valueChanged);
+			else beforeData.item = [valueChanged];
+			break;
+		default:
+			console.log('[ERROR] database has no key for ' + key);
+			break;
+	}
+	PlayerData.userData = beforeData;
+	console.log(beforeData);
+	return this.database.ref('/user-data/' + this.auth.currentUser.uid).update(beforeData);
+}
+
 document.addEventListener('DOMContentLoaded', function()
 {
     window.fbClient = new FirebaseClient();
     console.log('done load');
 });
+
+class UserData
+{
+    constructor()
+    {
+        this.userName = prompt("유저의 이름을 입력해주세요.");
+        this.exp = 0;
+        this.rank = -1;
+        this.hopae = 
+        [
+            {name: prompt("첫번째 호패의 닉네임을 입력해주세요.\n(반드시 한글만 사용해주세요 띄어쓰기도 금지)"), type: 'wood'}
+		];
+		this.recentHopae = null;
+		this.title = [];
+		this.money = 0;
+		this.item = [];
+    }
+}

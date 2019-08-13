@@ -34,7 +34,6 @@ Input.menuSceneEnterReaction = function()
     Input.finalInput = Input.removeConVow(Input.finalInput);
     if (Input.finalInput.length > 1)
     {
-        socket.emit('setNickname', Input.finalInput);
         PlayerData.nickname = Input.finalInput;
         Input.reset();
     }
@@ -319,12 +318,17 @@ Input.removeConVow = function(_wordText)
 
 Input.inputField = 
 {
-    generate: function(scene, enterCallback)
+    generate: function(scene, enterCallback, text, isHopaeScene = false)
     {
-        this.background = scene.add.sprite(game.config.width / 2, game.config.height * 25 / 36, 'inputfield').setDepth(10);
-        this.text = scene.add.text(game.config.width / 2, game.config.height * 25 / 36, "", {font: '25pt 궁서'}).setOrigin(0.5, 0.5).setColor('#000000').setDepth(10);
+        this.text = text;
 
-        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''})
+        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; 
+            if(isHopaeScene)
+            {
+                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) ? true : false);
+                if(Input.finalInput.length > 4) ScenesData.hopaeScene.warningText.setVisible(true);
+                else ScenesData.hopaeScene.warningText.setVisible(false);
+            }})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});
         scene.input.keyboard.on('keydown-DELETE', function() {Input.reset()});
@@ -375,10 +379,6 @@ Input.inputField =
         scene.input.keyboard.on('keydown-B', function() {Input.pushInput('ㅠ')});
         scene.input.keyboard.on('keydown-N', function() {Input.pushInput('ㅜ')});
         scene.input.keyboard.on('keydown-M', function() {Input.pushInput('ㅡ')});
-    },
-    loadImage: function(scene)
-    {
-        scene.load.image('inputfield', 'assets/placeholder/inputfield.png');
     }
 }
 

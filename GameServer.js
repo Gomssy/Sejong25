@@ -132,7 +132,7 @@ class GameRoom
         {
             if (this.currentPhase === GameServer.Phase.READY)
             {
-                this.endTime = Date.now() + 5000; // 테스트용 10초
+                this.endTime = Date.now() + 1000; // 테스트용 10초
                 this.announceToRoom('setRoomCount', 
                 {
                     isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
@@ -208,7 +208,7 @@ class GameRoom
     {
         if (this.currentPhase === GameServer.Phase.START)
         {
-            if (this.phaseChanger < 0 && checkTime - this.startTime > 60000)
+            if (this.phaseChanger < 0 && checkTime - this.startTime > 6000)
             {
                 this.currentPhase = GameServer.Phase.MAIN;
                 this.rateArrangePoint = 150;
