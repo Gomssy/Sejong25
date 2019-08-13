@@ -178,6 +178,7 @@ socket.on('attacked', function(msg) // object attackData
     WordSpace.attackedEvents.push(attackedEvent);
     //console.log(timeout);
 });
+
 socket.on('defeat', function(msg) // object player
 {
     let playerImage = RoomData.findPlayer(msg.id).playerImage;
@@ -201,7 +202,33 @@ socket.on('defeat', function(msg) // object player
         {
             var keys = Object.keys(Enums.item);
             WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
-            let itemBag = ScenesData.gameScene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'itemBag').setScale(1).setDepth(5);
+            let itemBag = ScenesData.gameScene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'itemBag').setScale(0).setDepth(5);
+            ScenesData.gameScene.tweens.add({
+                targets: itemBag,
+                scaleX: 1,
+                scaleY: 1,
+                ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 500,
+                repeat: 0, // -1: infinity
+                yoyo: false,
+                onComplete: function () {
+                    
+                    
+                    setTimeout(function() {
+                        ScenesData.gameScene.tweens.add({
+                            targets: itemBag,
+                            scaleX: 0,
+                            scaleY: 0,
+                            ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                            duration: 500,
+                            repeat: 0, // -1: infinity
+                            yoyo: false });
+                    }, 1500);
+                    
+                    
+                },
+                onCompleteScope: ScenesData.gameScene
+            });
             setTimeout(function() {
                 itemBag.destroy();
             }, 3000);
