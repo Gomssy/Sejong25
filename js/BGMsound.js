@@ -5,6 +5,8 @@ Audio.loadSound = function(scene)
 {
     scene.load.audio('login', 'assets/sound/login.ogg');
     scene.load.audio('startGame', 'assets/sound/startGame.ogg');
+    scene.load.audio('attack', 'assets/sound/attackShort.ogg');
+    scene.load.audio('inRoom', 'assets/sound/roomBGM.ogg');
 }
 
 Audio.playSound = function(scene, title) // 한 번만 재생할 때 사용

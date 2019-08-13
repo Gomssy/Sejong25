@@ -15,11 +15,15 @@ app.get('/', function(req, res) {
 // http 기본 포트(80)에 서버 열기
 server.listen(80, function() {
     console.log('[SERVER] Listening on port ' + server.address().port);
+    GameServer.serverNumber = Math.floor(Math.random() * 1000 + 1);
+    console.log('[SERVER] server number is ${GameServer.serverNumber}');
+
 });
 
 // 클라이언트 요청에 대한 콜백 정의
 io.on('connection', function(socket) 
 {
+    socket.emit('syncServer', GameServer.serverNumber);
     socket.on('idRequest', function() {
         socket.playerData = 
         {
@@ -36,21 +40,26 @@ io.on('connection', function(socket)
             str: 'your number is ' + socket.playerData.id,
             num: socket.playerData.id
         });
+        GameServer.connectCount++;
     });
 
-    socket.on('setNickname', function(msg) // string new_nickname
+    socket.on('enterRoom', function(msg) // string new_nickname
     {
-        let isAlreadyHave = false;
-        GameServer.currentPlayer.forEach(function(element)
-        {
-            if (element.playerData.nickname === msg) isAlreadyHave = true;
-        });
-        if (isAlreadyHave) socket.emit('alert' ,'errNicknameOverlaped');
+        if(msg.length < 1) socket.emit('alert' ,'errNicknameEmpty');
         else
         {
-            socket.playerData.nickname = msg;
-            console.log('['+socket.playerData.id+'] nickname set to ' + msg);
-            GameServer.enterEmptyRoom(socket);
+            let isAlreadyHave = false;
+            GameServer.currentPlayer.forEach(function(element)
+            {
+                if (element.playerData.nickname === msg) isAlreadyHave = true;
+            });
+            if (isAlreadyHave) socket.emit('alert' ,'errNicknameOverlaped');
+            else
+            {
+                socket.playerData.nickname = msg;
+                console.log('['+socket.playerData.id+'] nickname set to ' + msg);
+                GameServer.enterEmptyRoom(socket);
+            }
         }
     });
 
@@ -58,22 +67,29 @@ io.on('connection', function(socket)
     {
         try
         {
-            socket.playerData.playingData.playerTyping = msg;
-            if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg)
+            socket.playerData.playingData.playerTyping = msg.playerTyping;
+            if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg.playerTyping)
             {
                 socket.playerData.currentRoom.maxTypingPlayer = socket.playerData.playingData;
             }
-            if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg)
+            if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg.playerTyping)
             {
                 socket.playerData.currentRoom.minTypingPlayer = socket.playerData.playingData;
             }
-            let playerTypingRate = (msg - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
+            let playerTypingRate = (msg.playerTyping - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
             (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
             socket.emit('setPlayerTypingRate', playerTypingRate);
+
+            if (msg.isWord)
+            {
+                socket.playerData.currentRoom.announceToRoom('writeWord', socket.playerData.id);
+            }
+            if (msg.isAttackMode)
+            {
+                socket.playerData.currentRoom.announceToRoom('attackMode', socket.playerData.id);
+            }
         }
-        catch (e)
-        {
-        }
+        catch (e) {console.error('[ERR] error catched on setPlayerTyping')}
     });
 
     socket.on('endCount', function()
@@ -87,27 +103,27 @@ io.on('connection', function(socket)
 
     socket.on('attack', function(msg)
     {
-        socket.playerData.currentRoom.announceToTarget(msg.target, 'attacked', msg);
-        //console.log('attack ' + msg.target + ' by ' + msg.attacker.id + ' with ' + msg.text);
+        socket.playerData.currentRoom.announceToTarget(msg.victimId, 'attacked', msg);
+        socket.playerData.currentRoom.announceToRoom('someoneAttacked', {attackerId: msg.attackerId, victimId: msg.victimId, multiple: msg.multiple});
+        //console.log('attack ' + msg.victimId + ' by ' + msg.attackerId + ' with ' + msg.text);
         setTimeout(function()
         {
-            let target = GameServer.findPlayerSocket(msg.target);
+            let target = GameServer.findPlayerSocket(msg.victimId);
             if (target != null)
             {
                 let dataToPush = 
                 {
-                    attackerId: msg.attacker.id,
-                    attacker: msg.attacker.nickname,
+                    attackerId: msg.attackerId,
+                    wrongCount: 0,
                     word: msg.text,
                     wordGrade: msg.grade,
                     time: Date.now()
                 }
 
-                if (target.playerData.playingData.lastAttacks.length < 5) target.playerData.playingData.lastAttacks.push(dataToPush);
-                else
+                target.playerData.playingData.lastAttacks.push(dataToPush);
+                while (target.playerData.playingData.lastAttacks[0].time + 20000 < Date.now())
                 {
                     target.playerData.playingData.lastAttacks.splice(0, 1);
-                    target.playerData.playingData.lastAttacks.push(dataToPush);
                 }
             }
         }, 4000);
@@ -120,56 +136,70 @@ io.on('connection', function(socket)
 
     socket.on('defenseFailed', function(msg)
     {
-        socket.playerData.currentRoom.announceToTarget(msg.target, 'attackSucceed', msg);
+        socket.playerData.currentRoom.announceToTarget(msg.attackerId, 'attackSucceed', msg);
+        let wrongCountIndex = socket.playerData.playingData.lastAttacks.findIndex(function(element)
+        {
+            return (element.word === msg.word) && (element.attackerId === msg.victimId);
+        });
+        if (wrongCountIndex !== -1) socket.playerData.playingData.lastAttacks[wrongCountIndex].wrongCount++;
     });
 
     socket.on('disconnect', function(reason)
     {
+        GameServer.disconnectCount++;
         let data = socket.playerData;
-        if (typeof data.id === undefined)
+        if (typeof data === undefined)
         {
-            console.log('[ERROR] data.id is undefined');
-            console.log(GameServer.currentPlayer);
+            console.error('[ERROR] data is undefined');
+            console.table(GameServer.currentPlayer);
         }
         else // data.id is not undefined
         {
-            console.log('['+ data.id +'] client disconnected, reason: ' + reason);
-            let idxToDel = GameServer.currentPlayer.findIndex(function(element)
-            {
-                return element.playerData.id === data.id;
-            });
-            if (idxToDel != -1) 
-            {
-                // 룸에서도 제거
-                if (data.currentRoom != null)
-                {
-                    if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
-                    {
-                        data.currentRoom.exitRoom(data.id);
-                        if (data.currentRoom.aliveCount < data.currentRoom.startCount)
-                        {
-                            data.currentRoom.announceToRoom('setRoomCount', 
-                            {
-                                isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length,
-                                isEnter: false, player: data.playingData
-                            });
-                            data.currentRoom.currentPhase = GameServer.Phase.READY;
-                        }
-                        else data.currentRoom.announceToRoom('setRoomCount', 
-                            {
-                                isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length,
-                                isEnter: false, player: data.playingData
-                            });
-                    }
-                    else if (data.playingData.isAlive)
-                    {
-                        data.playingData.defeat();
-                        data.currentRoom.announceToRoom('userDisconnect', data.playingData);
-                    }
-                }
-                GameServer.currentPlayer.splice(idxToDel, 1);
-            }
-            console.log('['+ data.id +'] disconnect complete');
+            disconnectUser(data, reason);
         }
+        const connectDiff = GameServer.connectCount - GameServer.disconnectCount;
+        const playerCount = GameServer.currentPlayer.length
+        console.log({ connectDiff, playerCount });
     });
 });
+
+var disconnectUser = function(data, reason)
+{
+    console.log('['+ data.id +'] client disconnected, reason: ' + reason);
+    let idxToDel = GameServer.currentPlayer.findIndex(function(element)
+    {
+        return element.playerData.id === data.id;
+    });
+    if (idxToDel != -1) 
+    {
+        // 룸에서도 제거
+        if (data.currentRoom != null)
+        {
+            if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
+            {
+                data.currentRoom.exitRoom(data.id);
+                if (data.currentRoom.aliveCount < data.currentRoom.startCount)
+                {
+                    data.currentRoom.announceToRoom('setRoomCount', 
+                    {
+                        isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length,
+                        isEnter: false, player: data.playingData
+                    });
+                    data.currentRoom.currentPhase = GameServer.Phase.READY;
+                }
+                else data.currentRoom.announceToRoom('setRoomCount', 
+                    {
+                        isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length,
+                        isEnter: false, player: data.playingData
+                    });
+            }
+            else if (data.playingData.isAlive)
+            {
+                data.playingData.defeat();
+                data.currentRoom.announceToRoom('userDisconnect', data.playingData);
+            }
+        }
+        GameServer.currentPlayer.splice(idxToDel, 1);
+    }
+    console.log('['+ data.id +'] disconnect complete');
+}
