@@ -164,7 +164,8 @@ var menuScene = new Phaser.Class(
             function()
             {
                 ScenesData.menuScene.gameStartBtn.setEnable(false);
-                ScenesData.menuScene.roomEnterDialog.setVisible(true).popUp(200);
+                ScenesData.menuScene.roomEnterDialog.setVisible(true);
+                ScenesData.menuScene.roomEnterDialog.popUp(200);
             })
         
         this.shopBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
@@ -473,8 +474,7 @@ var gameScene = new Phaser.Class(
 
 ScenesData.changeScene = function(sceneKey)
 {
-    ScenesData.currentScene.scene.switch(sceneKey);
-
+    ScenesData.currentScene.scene.start(sceneKey);
     Input.input = [];
     Input.converted = '';
     Input.convInput = '';
