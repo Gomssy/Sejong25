@@ -1,6 +1,8 @@
 var GameServer = GameServer || {};
 
 GameServer.Phase = {READY: 0, COUNT: -1, START: 1, MAIN: 2, MUSIC: 3};
+GameServer.connectCount = 0;
+GameServer.disconnectCount = 0;
 
 GameServer.currentPlayer = [];
 GameServer.playingRoom = [];

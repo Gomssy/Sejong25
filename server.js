@@ -36,6 +36,7 @@ io.on('connection', function(socket)
             str: 'your number is ' + socket.playerData.id,
             num: socket.playerData.id
         });
+        GameServer.connectCount++;
     });
 
     socket.on('setNickname', function(msg) // string new_nickname
@@ -80,7 +81,7 @@ io.on('connection', function(socket)
                 socket.playerData.currentRoom.announceToRoom('attackMode', socket.playerData.id);
             }
         }
-        catch (e) {console.log('[ERR] error catched on setPlayerTyping')}
+        catch (e) {console.error('[ERR] error catched on setPlayerTyping')}
     });
 
     socket.on('endCount', function()
@@ -137,51 +138,60 @@ io.on('connection', function(socket)
 
     socket.on('disconnect', function(reason)
     {
+        GameServer.disconnectCount++;
         let data = socket.playerData;
-        if (typeof data.id === undefined)
+        if (typeof data === undefined)
         {
-            console.log('[ERROR] data.id is undefined');
-            console.log(GameServer.currentPlayer);
+            console.error('[ERROR] data is undefined');
+            console.table(GameServer.currentPlayer);
         }
         else // data.id is not undefined
         {
-            console.log('['+ data.id +'] client disconnected, reason: ' + reason);
-            let idxToDel = GameServer.currentPlayer.findIndex(function(element)
-            {
-                return element.playerData.id === data.id;
-            });
-            if (idxToDel != -1) 
-            {
-                // 룸에서도 제거
-                if (data.currentRoom != null)
-                {
-                    if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
-                    {
-                        data.currentRoom.exitRoom(data.id);
-                        if (data.currentRoom.aliveCount < data.currentRoom.startCount)
-                        {
-                            data.currentRoom.announceToRoom('setRoomCount', 
-                            {
-                                isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length,
-                                isEnter: false, player: data.playingData
-                            });
-                            data.currentRoom.currentPhase = GameServer.Phase.READY;
-                        }
-                        else data.currentRoom.announceToRoom('setRoomCount', 
-                            {
-                                isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length,
-                                isEnter: false, player: data.playingData
-                            });
-                    }
-                    else if (data.playingData.isAlive)
-                    {
-                        data.playingData.defeat();
-                        data.currentRoom.announceToRoom('userDisconnect', data.playingData);
-                    }
-                }
-                GameServer.currentPlayer.splice(idxToDel, 1);
-            }
-            console.log('['+ data.id +'] disconnect complete');
+            disconnectUser(data, reason);
         }
+        const connectDiff = GameServer.connectCount - GameServer.disconnectCount;
+        const playerCount = GameServer.currentPlayer.length
+        console.log({ connectDiff, playerCount });
     });
 });
+
+var disconnectUser = function(data, reason)
+{
+    console.log('['+ data.id +'] client disconnected, reason: ' + reason);
+    let idxToDel = GameServer.currentPlayer.findIndex(function(element)
+    {
+        return element.playerData.id === data.id;
+    });
+    if (idxToDel != -1) 
+    {
+        // 룸에서도 제거
+        if (data.currentRoom != null)
+        {
+            if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
+            {
+                data.currentRoom.exitRoom(data.id);
+                if (data.currentRoom.aliveCount < data.currentRoom.startCount)
+                {
+                    data.currentRoom.announceToRoom('setRoomCount', 
+                    {
+                        isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length,
+                        isEnter: false, player: data.playingData
+                    });
+                    data.currentRoom.currentPhase = GameServer.Phase.READY;
+                }
+                else data.currentRoom.announceToRoom('setRoomCount', 
+                    {
+                        isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length,
+                        isEnter: false, player: data.playingData
+                    });
+            }
+            else if (data.playingData.isAlive)
+            {
+                data.playingData.defeat();
+                data.currentRoom.announceToRoom('userDisconnect', data.playingData);
+            }
+        }
+        GameServer.currentPlayer.splice(idxToDel, 1);
+    }
+    console.log('['+ data.id +'] disconnect complete');
+}
