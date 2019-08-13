@@ -16,7 +16,7 @@ app.get('/', function(req, res) {
 server.listen(80, function() {
     console.log('[SERVER] Listening on port ' + server.address().port);
     GameServer.serverNumber = Math.floor(Math.random() * 1000 + 1);
-    console.log('[SERVER] server number is ${GameServer.serverNumber}');
+    console.log('[SERVER] server number is ' + GameServer.serverNumber);
 
 });
 
@@ -148,18 +148,23 @@ io.on('connection', function(socket)
     {
         GameServer.disconnectCount++;
         let data = socket.playerData;
-        if (typeof data === undefined)
+        if (data === undefined)
         {
             console.error('[ERROR] data is undefined');
             console.table(GameServer.currentPlayer);
+            GameServer.disconnectCount--;
         }
         else // data.id is not undefined
         {
             disconnectUser(data, reason);
         }
         const connectDiff = GameServer.connectCount - GameServer.disconnectCount;
-        const playerCount = GameServer.currentPlayer.length
-        console.log({ connectDiff, playerCount });
+        const playerCount = GameServer.currentPlayer.length;
+        if (connectDiff != playerCount) 
+        {
+            console.log({ connectDiff, playerCount });
+            console.table(GameServer.currentPlayer);
+        }
     });
 });
 
