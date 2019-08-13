@@ -131,6 +131,7 @@ socket.on('changePhase', function(msg) // number Phase
         ScenesData.gameScene.scene.resume('gameScene');
         // 여기서 종이 닫으면됨
         phaseChangeBgr.destroy();
+        Audio.playSound(ScenesData.gameScene, 'startGame');
         WordSpace.pauseCycle(false);
         //console.log('start again');
     }, 5000);
