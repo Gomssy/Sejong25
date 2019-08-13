@@ -471,14 +471,13 @@ var gameScene = new Phaser.Class(
     }
 });
 
-ScenesData.changeScene = function(scene)
+ScenesData.changeScene = function(sceneKey)
 {
-    game.scene.stop(ScenesData.currentScene);
-    game.scene.start(scene);
+    ScenesData.currentScene.scene.switch(sceneKey);
 
     Input.input = [];
     Input.converted = '';
     Input.convInput = '';
     Input.finalInput = '';
-    ScenesData.currentScene = scene;
+    ScenesData.currentScene = game.scene.getScene(sceneKey);
 }

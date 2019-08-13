@@ -68,7 +68,7 @@ UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, d
         }
     })
     .on('pointerup', () => {
-        buttonGameObject.setFrame(outFrame);
+        buttonGameObject.setFrame(overFrame);
     })
     .on('pointerout', () => {
         buttonGameObject.setFrame(outFrame);
