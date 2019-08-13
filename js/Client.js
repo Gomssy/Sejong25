@@ -1,7 +1,16 @@
 var socket = io.connect();
+var serverNumber = -1;
 
 // init account
-socket.emit('idRequest');
+socket.on('syncServer', function(msg)
+{
+    if (serverNumber < 0 || serverNumber === msg) 
+    {
+        socket.emit('idRequest');
+        serverNumber = msg;
+    }
+    else location.reload();
+});
 
 socket.on('alert', function(msg) // string errorcode
 {
