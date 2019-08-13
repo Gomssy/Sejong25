@@ -80,7 +80,7 @@ class GameRoom
     {
         this.roomId = GameServer.getRoomNumber();
         this.roomIndex = -1;
-        this.startCount = 5;
+        this.startCount = 2;
         this.maxPlayer = 100;
         this.nextRank = 100;
 
@@ -176,7 +176,7 @@ class GameRoom
                 }
                 this.currentPlayer.splice(i, 1);
                 this.currentSocket.splice(i, 1);
-                this.aliveCount--;
+                //this.aliveCount--;
                 return;
             }
         }
@@ -315,7 +315,7 @@ class Player
         room.aliveCount--;
 
         room.checkPhase(Date.now());
-
+        
         if (this.lastAttacks.length > 0)
         {
             this.lastAttack = this.lastAttacks[this.lastAttacks.length - 1];

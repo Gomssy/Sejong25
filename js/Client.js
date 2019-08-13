@@ -190,8 +190,6 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index].nicknameText = nicknameText;
 
     RoomData.aliveCount--;
-    console.log(msg.id);
-    console.log(RoomData.findPlayer(msg.id));
     RoomData.findPlayer(msg.id).playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
     if (msg.lastAttack != null) 
     {
@@ -239,11 +237,19 @@ socket.on('defeat', function(msg) // object player
         console.log(RoomData.findPlayer(msg.id).nickname + ' defeated');
         WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
     }
+    if(msg.id == RoomData.myself.id)
+    {   
+        setTimeout(() => {
+            socket.emit('exitRoom', {roomId: RoomData.myself.gameRoomId, playerId: RoomData.myself.id});
+            ScenesData.changeScene('menuScene');
+        }, 2000);
+    }
 });
 socket.on('gameEnd', function(msg) // object player
 {
     console.log(msg.nickname + ' Win!!!!!!');
 });
+
 socket.on('attackSucceed', function(msg)
 {
     //console.log('client');

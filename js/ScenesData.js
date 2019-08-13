@@ -437,8 +437,7 @@ var gameScene = new Phaser.Class(
         WordSpace.startCycle(this);
         
         WordSpace.setPlayerTyping.initiate(this);
-
-        WordSpace.nameWordTextForTest = this.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
+        
         WordSpace.nameQueue.initiate();
         //WordSpace.attackGauge.add(11);
 
@@ -446,29 +445,25 @@ var gameScene = new Phaser.Class(
 
     update: function()
     {
-        WordSpace.deltaTime = this.sys.game.loop.delta;
-        WordSpace.wordForcedGroup.forEach(function(element)
+        if(ScenesData.currentScene == ScenesData.gameScene)
         {
-            element.attract();
-        });
-        WordSpace.nameGroup.forEach(function(element)
-        {
-            element.attract();
-        })
-        WordSpace.attackPaperGroup.forEach(function(element){
-            element.moveObject(element);
-        });
-        let tempNames = '';
-        WordSpace.nameGroup.forEach(function(element)
-        {
-            //테스트용
-            tempNames += element.wordText + (element.isStrong?' [강]':'') + '\n';
-        });
-        
-        WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);
-        WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
-        WordSpace.killLogTextForTest.setText(WordSpace.killLogForTest);
-        WordSpace.setPlayerTyping.add('');
+            WordSpace.deltaTime = this.sys.game.loop.delta;
+            WordSpace.wordForcedGroup.forEach(function(element)
+            {
+                element.attract();
+            });
+            WordSpace.nameGroup.forEach(function(element)
+            {
+                element.attract();
+            })
+            WordSpace.attackPaperGroup.forEach(function(element){
+                element.moveObject(element);
+            });
+            
+            WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
+            WordSpace.killLogTextForTest.setText(WordSpace.killLogForTest);
+            WordSpace.setPlayerTyping.add('');
+        }
     }
 });
 

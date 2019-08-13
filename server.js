@@ -63,6 +63,11 @@ io.on('connection', function(socket)
         }
     });
 
+    socket.on('exitRoom', function(msg) // string new_nickname
+    {
+        GameServer.findRoom(msg.roomId).exitRoom(msg.playerId);
+    });
+
     socket.on('setPlayerTyping', function(msg) // number playerTyping
     {
         try
