@@ -15,11 +15,15 @@ app.get('/', function(req, res) {
 // http 기본 포트(80)에 서버 열기
 server.listen(80, function() {
     console.log('[SERVER] Listening on port ' + server.address().port);
+    GameServer.serverNumber = Math.floor(Math.random() * 1000 + 1);
+    console.log('[SERVER] server number is ${GameServer.serverNumber}');
+
 });
 
 // 클라이언트 요청에 대한 콜백 정의
 io.on('connection', function(socket) 
 {
+    socket.emit('syncServer', GameServer.serverNumber);
     socket.on('idRequest', function() {
         socket.playerData = 
         {
