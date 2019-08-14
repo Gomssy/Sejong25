@@ -344,16 +344,15 @@ var roomScene = new Phaser.Class(
     {
         this.peopleText.setText(this.peopleCount + ' / 10');
         
-        if (this.isCounting)
+        if (this.isCounting && !this.isCountEnd)
         {
             this.countText.setText(((this.endTime - Date.now()) / 1000).toFixed(1));
-            if (this.endTime < Date.now()) 
+            if (this.endTime != 0 && this.endTime < Date.now()) 
             {
                 //console.log('end Count');
-                setTimeout(() => {
+                ScenesData.endCountTimer = setTimeout(() => {
                     socket.emit('endCount');
-                }, (Phaser.Math.Distance.Between(0, 0, game.config.width / 2, game.config.height * 10 / 9) * 10));
-                this.isCounting = false;
+                }, (Phaser.Math.Distance.Between(0, 0, game.config.width / 2, game.config.height * 10 / 9) * 3));
                 this.isCountEnd = true;
                 this.players.forEach(function(element){
                     element.follower = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -373,12 +372,21 @@ var roomScene = new Phaser.Class(
         }
         else if (this.isCountEnd)
         {
-            this.players.forEach(function(element){
-                element.path.getPoint(element.follower.t, element.follower.vec);
-                element.sprite.setPosition(element.follower.vec.x, element.follower.vec.y);
-                element.nickname.setPosition(element.sprite.x - game.config.width / 128, element.sprite.y - game.config.height / 12);
-            });
-            this.countText.setText('잠시만 기다려주세요...');
+            if (this.isCounting)
+            {
+                this.players.forEach(function(element){
+                    element.path.getPoint(element.follower.t, element.follower.vec);
+                    element.sprite.setPosition(element.follower.vec.x, element.follower.vec.y);
+                    element.nickname.setPosition(element.sprite.x - game.config.width / 128, element.sprite.y - game.config.height / 12);
+                });
+                this.countText.setText('잠시만 기다려주세요...');
+            }
+            else
+            {
+                this.countText.setText('이동 도중 사람이 퇴실했습니다...\n잠시만 기다려주세요...');
+                clearTimeout(ScenesData.endCountTimer);
+                ScenesData.endCountTimer = undefined;
+            }
         }
         else
         {

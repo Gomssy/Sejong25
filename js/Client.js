@@ -41,6 +41,11 @@ socket.on('enterRoom', function()
     fbClient.updateUserData('recentHopae', PlayerData.currentHopae);
     Audio.killSound(ScenesData.menuScene, 'login');
     ScenesData.changeScene('roomScene');
+    if (ScenesData.endCountTimer != undefined) 
+    {
+        clearTimeout(ScenesData.endCountTimer);
+        ScenesData.endCountTimer = undefined;
+    }
 });
 socket.on('syncRoomScene', function(msg)
 {
@@ -240,7 +245,7 @@ socket.on('defeat', function(msg) // object player
     if(msg.id == RoomData.myself.id)
     {   
         setTimeout(() => {
-            socket.emit('exitRoom', {roomId: RoomData.myself.gameRoomId, playerId: RoomData.myself.id});
+            socket.emit('defeat');
             ScenesData.changeScene('menuScene');
         }, 2000);
     }
