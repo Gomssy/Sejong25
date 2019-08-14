@@ -386,7 +386,6 @@ class Player
                 console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
             }
         }
-        this.isInThisRoom = false;
     }
 }
 

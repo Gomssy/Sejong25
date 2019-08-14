@@ -241,6 +241,7 @@ socket.on('defeat', function(msg) // object player
     }
     if(msg.id == RoomData.myself.id)
     {
+        RoomData.myself = RoomData.players[msg.index];
         backToMenu();
     }
 });
@@ -273,37 +274,38 @@ socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
 
 var backToMenu = function()
 {
-    ScenesData.gameScene.roomEnterDialog = ScenesData.gameScene.rexUI.add.dialog({
+    ScenesData.gameScene.backToMenuDialog = ScenesData.gameScene.rexUI.add.dialog({
         x: game.config.width / 2,
         y: game.config.height / 2,
 
         background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
 
-        content: ScenesData.gameScene.roomEnterDialog = ScenesData.gameScene.rexUI.add.dialog({
+        content: ScenesData.gameScene.rexUI.add.dialog({
             x: game.config.width / 2,
             y: game.config.height / 2,
             choices: [
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 0, 'playerStand', 1, 'center'),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 - 150, 0, 'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 30),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 - 50, 0, 'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 30),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 + 50, 0, 'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 + 150, 0, 'button', 1, 'center', '획득 골드 : ' + 10, 30)
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 0, 'playerStand', 0.7, 'center'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 150, 0, 
+                    'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 30).layout(),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 50, 0, 
+                    'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 30).layout(),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 0, 
+                    'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30).layout(),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 0, 
+                    'button', 1, 'center', '획득 골드 : ' + 10, 30).layout()
             ],
-            space: {
-                choice: 20,
-                left: 20,
-                right: 20,
-                top: 300,
-                bottom: 20,
-            },
     
             align: {
                 choices: 'center' // 'center'|'left'|'right'
             }
         }),
+        actions: [
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 10, 'button', 1, 'center', '나가기').layout(),
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 10, 'button', 1, 'center', '관전하기').layout()
+        ],
 
         space: {
-            action: 0,
+            action: 10,
 
             left: 20,
             right: 20,
@@ -316,13 +318,26 @@ var backToMenu = function()
         }
     }).setDepth(10);
 
-    /*ScenesData.gameScene.roomEnterDialog
+    ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {
-            if(index == 0) socket.emit('enterRoom', PlayerData.nickname);
+            if(index == 0)
+            {
+                socket.emit('exitFromRoom', RoomData.myself.id);
+                fbClient.updateUserData('killCount', RoomData.myself.killCount);
+                fbClient.updateUserData('money', 10);
+                ScenesData.changeScene('menuScene');
+            }
             else
             {
-                ScenesData.gameScene.roomEnterDialog.setVisible(false);
-                ScenesData.gameScene.gameStartBtn.setEnable(true);
+                ScenesData.gameScene.backToMenuDialog.setVisible(false);
+                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
+                    function()
+                    {
+                        socket.emit('exitFromRoom', RoomData.myself.id);
+                        fbClient.updateUserData('killCount', RoomData.myself.killCount);
+                        fbClient.updateUserData('money', 10);
+                        ScenesData.changeScene('menuScene');
+                    });
             }
         }, ScenesData.gameScene)
         .on('button.over', function (button, groupName, index) {
@@ -331,9 +346,4 @@ var backToMenu = function()
         .on('button.out', function (button, groupName, index) {
             //console.log('button out');
     });
-    setTimeout(() => {
-        socket.emit('defeat');
-        fbClient.updateUserData('killCount', RoomData.myself.killCount);
-        ScenesData.changeScene('menuScene');
-    }, 2000);*/
 }

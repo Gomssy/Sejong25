@@ -448,7 +448,7 @@ var gameScene = new Phaser.Class(
         
         WordSpace.nameQueue.initiate();
         //WordSpace.attackGauge.add(11);
-
+        
     },
 
     update: function()

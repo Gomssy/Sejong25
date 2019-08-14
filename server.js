@@ -13,7 +13,7 @@ app.get('/', function(req, res) {
 });
 
 // http 기본 포트(80)에 서버 열기
-server.listen(80, function() {
+server.listen(8080, function() {
     console.log('[SERVER] Listening on port ' + server.address().port);
     GameServer.serverNumber = Math.floor(Math.random() * 1000 + 1);
     console.log('[SERVER] server number is ' + GameServer.serverNumber);
@@ -61,6 +61,10 @@ io.on('connection', function(socket)
                 GameServer.enterEmptyRoom(socket);
             }
         }
+    });
+    
+    socket.on('exitFromRoom', function(msg){
+        GameServer.findPlayerSocket(msg).playerData.playingData.isInThisRoom = false;
     });
 
     socket.on('setPlayerTyping', function(msg) // number playerTyping
