@@ -303,7 +303,7 @@ class GameRoom
     {
         this.currentSocket.forEach(function(element)
         {
-            element.emit(_message, _data);
+            if(element.playerData.playingData.isInThisRoom) element.emit(_message, _data);
         });
     }
 
@@ -328,6 +328,7 @@ class Player
         this.nickname = playerData.nickname;
         this.playerImage = null;
         this.position = null;
+        this.isInThisRoom = true;
 
         this.isAlive = false;
         this.rank = -1;
@@ -383,6 +384,7 @@ class Player
                 console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
             }
         }
+        this.isInThisRoom = false;
     }
 }
 

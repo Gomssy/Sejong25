@@ -253,6 +253,12 @@ socket.on('defeat', function(msg) // object player
 socket.on('gameEnd', function(msg) // object player
 {
     console.log(msg.nickname + ' Win!!!!!!');
+    if(msg.id == RoomData.myself.id)
+    {   
+        setTimeout(() => {
+            ScenesData.changeScene('menuScene');
+        }, 2000);
+    }
 });
 
 socket.on('attackSucceed', function(msg)
