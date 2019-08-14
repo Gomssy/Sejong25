@@ -16,7 +16,7 @@ app.get('/', function(req, res) {
 server.listen(80, function() {
     console.log('[SERVER] Listening on port ' + server.address().port);
     GameServer.serverNumber = Math.floor(Math.random() * 1000 + 1);
-    console.log('[SERVER] server number is ${GameServer.serverNumber}');
+    console.log('[SERVER] server number is ' + GameServer.serverNumber);
 
 });
 
@@ -89,15 +89,51 @@ io.on('connection', function(socket)
                 socket.playerData.currentRoom.announceToRoom('attackMode', socket.playerData.id);
             }
         }
-        catch (e) {console.error('[ERR] error catched on setPlayerTyping')}
+        catch (e) {
+            console.error('[ERR] error catched on setPlayerTyping');
+            socket.disconnect();
+        }
     });
 
     socket.on('endCount', function()
     {
         socket.playerData.currentRoom.aliveCount--;
-        if (socket.playerData.currentRoom.aliveCount === 0)
+        //console.log('counted, ' + socket.playerData.currentRoom.aliveCount);
+        socket.playerData.playingData.isAlive = true;
+        if (socket.playerData.currentRoom.aliveCount === 0 && socket.playerData.currentRoom.currentPlayer.length >= socket.playerData.currentRoom.startCount)
         {
             socket.playerData.currentRoom.startRoom();
+            clearTimeout(socket.playerData.currentRoom.startTimer);
+        }
+        if (socket.playerData.currentRoom.startTimer === undefined)
+        {
+            const room = socket.playerData.currentRoom;
+            room.startTimer = setTimeout(function()
+            {
+                let deads = room.currentPlayer.filter(element => !element.isAlive);
+                if (room.aliveCount != 0)
+                {
+                    console.error('[ROOM#'+room.roomId+'] FORCE START!!!');
+                    if (room.currentPlayer.length - deads.length >= room.startCount)
+                    {
+                        room.startRoom();
+                        deads.forEach(function(element)
+                        {
+                            element.defeat();
+                        });
+                    }
+                    clearTimeout(room.startTimer);
+                }
+                else
+                {
+                    deads.forEach(function(element)
+                    {
+                        room.currentSocket[element.index].disconnect();
+                        room.exitRoom(element.id);
+                    });
+                    room.refreshRoom();
+                }
+            }, 2000);
         }
     });
 
@@ -148,18 +184,24 @@ io.on('connection', function(socket)
     {
         GameServer.disconnectCount++;
         let data = socket.playerData;
-        if (typeof data === undefined)
+        if (data === undefined)
         {
             console.error('[ERROR] data is undefined');
             console.table(GameServer.currentPlayer);
+            GameServer.disconnectCount--;
         }
         else // data.id is not undefined
         {
             disconnectUser(data, reason);
         }
         const connectDiff = GameServer.connectCount - GameServer.disconnectCount;
-        const playerCount = GameServer.currentPlayer.length
-        console.log({ connectDiff, playerCount });
+        const playerCount = GameServer.currentPlayer.length;
+        if (connectDiff != playerCount) 
+        {
+            console.log({ connectDiff, playerCount });
+            console.table(GameServer.currentPlayer);
+        }
+        socket.disconnect();
     });
 });
 
@@ -178,20 +220,6 @@ var disconnectUser = function(data, reason)
             if (data.currentRoom.currentPhase === GameServer.Phase.READY || data.currentRoom.currentPhase === GameServer.Phase.COUNT)
             {
                 data.currentRoom.exitRoom(data.id);
-                if (data.currentRoom.aliveCount < data.currentRoom.startCount)
-                {
-                    data.currentRoom.announceToRoom('setRoomCount', 
-                    {
-                        isEnable: false, endTime: 0, playerCount: data.currentRoom.currentPlayer.length,
-                        isEnter: false, player: data.playingData
-                    });
-                    data.currentRoom.currentPhase = GameServer.Phase.READY;
-                }
-                else data.currentRoom.announceToRoom('setRoomCount', 
-                    {
-                        isEnable: true, endTime: data.currentRoom.endTime, playerCount: data.currentRoom.currentPlayer.length,
-                        isEnter: false, player: data.playingData
-                    });
             }
             else if (data.playingData.isAlive)
             {

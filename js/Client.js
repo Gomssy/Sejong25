@@ -41,6 +41,11 @@ socket.on('enterRoom', function()
     fbClient.updateUserData('recentHopae', PlayerData.currentHopae);
     Audio.killSound(ScenesData.menuScene, 'login');
     ScenesData.changeScene('roomScene');
+    if (ScenesData.endCountTimer != undefined) 
+    {
+        clearTimeout(ScenesData.endCountTimer);
+        ScenesData.endCountTimer = undefined;
+    }
 });
 socket.on('syncRoomScene', function(msg)
 {
@@ -190,8 +195,6 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index].nicknameText = nicknameText;
 
     RoomData.aliveCount--;
-    console.log(msg.id);
-    console.log(RoomData.findPlayer(msg.id));
     RoomData.findPlayer(msg.id).playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
     if (msg.lastAttack != null) 
     {
@@ -239,11 +242,25 @@ socket.on('defeat', function(msg) // object player
         console.log(RoomData.findPlayer(msg.id).nickname + ' defeated');
         WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
     }
+    if(msg.id == RoomData.myself.id)
+    {   
+        setTimeout(() => {
+            socket.emit('defeat');
+            ScenesData.changeScene('menuScene');
+        }, 2000);
+    }
 });
 socket.on('gameEnd', function(msg) // object player
 {
     console.log(msg.nickname + ' Win!!!!!!');
+    if(msg.id == RoomData.myself.id)
+    {   
+        setTimeout(() => {
+            ScenesData.changeScene('menuScene');
+        }, 2000);
+    }
 });
+
 socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
