@@ -225,7 +225,6 @@ function gameOver()
     ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '패배', {fontSize: '30pt'})
     .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(10)
     .setColor('#000000').setBackgroundColor('#ffffff');
-    //alert('defeat');
 }
 
 //게임 오버 판정을 위한 타이머
@@ -487,3 +486,5 @@ WordSpace.nameQueue =
         this.shuffle();
     }
 }
+
+WordSpace.gameOverUI

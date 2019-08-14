@@ -328,9 +328,11 @@ class Player
         this.nickname = playerData.nickname;
         this.playerImage = null;
         this.position = null;
-        this.isInThisRoom = true;
+        this.killCount = 0;
+        this.earnedStrongHopae = 0;
 
         this.isAlive = false;
+        this.isInThisRoom = true;
         this.rank = -1;
 
         this.playerTyping = 0;

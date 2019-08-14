@@ -230,6 +230,9 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 			if (beforeData.item != null) beforeData.item.push(valueChanged);
 			else beforeData.item = [valueChanged];
 			break;
+		case 'killCount':
+			beforeData.killCount = replace ? (valueChanged) : (beforeData.killCount + valueChanged);
+			break;
 		default:
 			console.log('[ERROR] database has no key for ' + key);
 			break;
@@ -271,5 +274,6 @@ class UserData
 		this.title = [];
 		this.money = 0;
 		this.item = [];
+		this.killCount = 0;
     }
 }

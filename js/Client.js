@@ -215,8 +215,6 @@ socket.on('defeat', function(msg) // object player
                 repeat: 0, // -1: infinity
                 yoyo: false,
                 onComplete: function () {
-                    
-                    
                     setTimeout(function() {
                         ScenesData.gameScene.tweens.add({
                             targets: itemBag,
@@ -227,14 +225,13 @@ socket.on('defeat', function(msg) // object player
                             repeat: 0, // -1: infinity
                             yoyo: false });
                     }, 1500);
-                    
-                    
                 },
                 onCompleteScope: ScenesData.gameScene
             });
             setTimeout(function() {
                 itemBag.destroy();
             }, 3000);
+            RoomData.myself.killCount++;
         }
     }
     else 
@@ -243,21 +240,16 @@ socket.on('defeat', function(msg) // object player
         WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
     }
     if(msg.id == RoomData.myself.id)
-    {   
-        setTimeout(() => {
-            socket.emit('defeat');
-            ScenesData.changeScene('menuScene');
-        }, 2000);
+    {
+        backToMenu();
     }
 });
 socket.on('gameEnd', function(msg) // object player
 {
     console.log(msg.nickname + ' Win!!!!!!');
     if(msg.id == RoomData.myself.id)
-    {   
-        setTimeout(() => {
-            ScenesData.changeScene('menuScene');
-        }, 2000);
+    {
+        backToMenu();
     }
 });
 
@@ -278,3 +270,70 @@ socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
     RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
 });
+
+var backToMenu = function()
+{
+    ScenesData.gameScene.roomEnterDialog = ScenesData.gameScene.rexUI.add.dialog({
+        x: game.config.width / 2,
+        y: game.config.height / 2,
+
+        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+
+        content: ScenesData.gameScene.roomEnterDialog = ScenesData.gameScene.rexUI.add.dialog({
+            x: game.config.width / 2,
+            y: game.config.height / 2,
+            choices: [
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 0, 'playerStand', 1, 'center'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 - 150, 0, 'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 30),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 - 50, 0, 'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 30),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 + 50, 0, 'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 100, game.config.height / 2 + 150, 0, 'button', 1, 'center', '획득 골드 : ' + 10, 30)
+            ],
+            space: {
+                choice: 20,
+                left: 20,
+                right: 20,
+                top: 300,
+                bottom: 20,
+            },
+    
+            align: {
+                choices: 'center' // 'center'|'left'|'right'
+            }
+        }),
+
+        space: {
+            action: 0,
+
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20,
+        },
+
+        align: {
+            actions: 'center' // 'center'|'left'|'right'
+        }
+    }).setDepth(10);
+
+    /*ScenesData.gameScene.roomEnterDialog
+        .on('button.click', function (button, groupName, index) {
+            if(index == 0) socket.emit('enterRoom', PlayerData.nickname);
+            else
+            {
+                ScenesData.gameScene.roomEnterDialog.setVisible(false);
+                ScenesData.gameScene.gameStartBtn.setEnable(true);
+            }
+        }, ScenesData.gameScene)
+        .on('button.over', function (button, groupName, index) {
+            //console.log('button over');
+        })
+        .on('button.out', function (button, groupName, index) {
+            //console.log('button out');
+    });
+    setTimeout(() => {
+        socket.emit('defeat');
+        fbClient.updateUserData('killCount', RoomData.myself.killCount);
+        ScenesData.changeScene('menuScene');
+    }, 2000);*/
+}
