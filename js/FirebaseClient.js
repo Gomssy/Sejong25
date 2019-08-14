@@ -1,7 +1,8 @@
 function FirebaseClient()
 {
     this.init();
-    this.initEvent();
+	this.initEvent();
+	this.isGameStarted = false;
 }
 
 FirebaseClient.prototype.init = function()
@@ -69,6 +70,7 @@ FirebaseClient.prototype.setLogin = function()
 	.then(function()
 	{
 		game = new Phaser.Game(config);
+		this.isGameStarted = true;
 	});
 	
 	document.getElementById('mainTitle').style.display = 'none';
@@ -235,7 +237,14 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 
 document.addEventListener('DOMContentLoaded', function()
 {
-    window.fbClient = new FirebaseClient();
+	window.fbClient = new FirebaseClient();
+	document.onkeydown = function(e)
+	{
+		if (!fbClient.isGameStarted && e.keyCode === 13)
+		{
+			fbClient.onEmailBtnClick();
+		}
+	}
     console.log('done load');
 });
 
