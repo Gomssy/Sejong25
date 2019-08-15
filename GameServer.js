@@ -35,7 +35,9 @@ GameServer.enterEmptyRoom = function(playerSocket)
     let emptyRoomIndex = -1;
     for (let i = 0; i < this.playingRoom.length; i++)
     {
-        if ((this.playingRoom[i].currentPhase === this.Phase.READY || this.playingRoom[i].currentPhase === this.Phase.COUNT) && this.playingRoom[i].maxPlayer > this.playingRoom[i].currentPlayer.length)
+        if ((this.playingRoom[i].currentPhase === this.Phase.READY || this.playingRoom[i].currentPhase === this.Phase.COUNT)
+         && this.playingRoom[i].maxPlayer > this.playingRoom[i].currentPlayer.length
+         && this.playingRoom[i].checkHopae(playerSocket.playerData.nickname))
         {
             emptyRoomIndex = i;
             break;
@@ -114,6 +116,11 @@ class GameRoom
             GameServer.playingRoom[this.roomIndex] = this;
         }
         console.log('[LOG] new room #'+this.roomId+' made, roomCount: ' + GameServer.playingRoom.length);
+    }
+
+    checkHopae(newHopae)
+    {
+        return !this.currentPlayer.includes((element) => element.nickname === newHopae);
     }
 
     enterRoom(playerSocket)
