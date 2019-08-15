@@ -45,8 +45,8 @@ var menuScene = new Phaser.Class(
         PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
         PlayerData.nickname = PlayerData.currentHopae.name;
 
-        this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
-        this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(10).setPadding(5,5,5,5).setFontSize(40);
+        this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFontSize(40);
+        this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFontSize(40);
 
         this.organizeHopae = function()
         {
@@ -68,7 +68,7 @@ var menuScene = new Phaser.Class(
             this.hopaeMenuObject = [];
             for(let i = 0; i < this.myHopae.length; i++)
             {
-                let temp = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 10,
+                let temp = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 5,
                     'nameBgr' + ScenesData.menuScene.myHopae[i].name.length, 1, 'left', ScenesData.menuScene.myHopae[i].name, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
                     function()
                     {
@@ -101,7 +101,7 @@ var menuScene = new Phaser.Class(
 
         this.createCurrentHopae = function()
         {
-            this.currentHopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 10,
+            this.currentHopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 5,
                 'nameBgr' + PlayerData.nickname.length, 1, 'left', PlayerData.nickname, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
                 function()
                 {
@@ -147,7 +147,7 @@ var menuScene = new Phaser.Class(
             expand: {
                 content: false, // Content is a pure text object
             }
-        }).layout().setDepth(10).setVisible(false);
+        }).layout().setDepth(11).setVisible(false);
 
         this.roomEnterDialog
             .on('button.click', function (button, groupName, index) {
@@ -230,7 +230,7 @@ var hopaeScene = new Phaser.Class(
 
             background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
             
-            content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae == undefined ? '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
+            content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae.length == 0 ? '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
                 font: '50pt 궁서',
                 color: '#000000',
                 align: 'center'
@@ -258,7 +258,7 @@ var hopaeScene = new Phaser.Class(
             expand: {
                 content: false, // Content is a pure text object
             }
-        }).layout().setDepth(10).setVisible(false);
+        }).layout().setDepth(11).setVisible(false);
 
         this.checkDialog
         .on('button.click', function (button, groupName, index) {
@@ -295,7 +295,7 @@ var hopaeScene = new Phaser.Class(
         .on('button.out', function (button, groupName, index) {
             //console.log('button out');
         });
-        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 2, 'panel', 1, 'center', 
+        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'panel', 1, 'center', 
             '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다', 40, '#000000').setVisible(false).layout();
             
         this.checkBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
@@ -347,8 +347,8 @@ var roomScene = new Phaser.Class(
         this.isCountEnd = false;
         this.endTime = 0;
         this.peopleCount = 1;
-        this.countText = this.add.text(game.config.width / 2, game.config.height / 2, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10).setPadding(5,5,5,5);
-        this.peopleText = this.add.text(game.config.width / 2, game.config.height / 9, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(10);
+        this.countText = this.add.text(game.config.width / 2, game.config.height / 2, '사람들을 위해 대기중입니다...').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(9.9).setPadding(5,5,5,5);
+        this.peopleText = this.add.text(game.config.width / 2, game.config.height / 9, '1 / 10').setOrigin(0.5, 0.5).setColor('#000000').setBackgroundColor('#ffffff').setDepth(9.9);
     },
 
     update: function()
@@ -431,8 +431,8 @@ var gameScene = new Phaser.Class(
             sceneKey: 'button'
         });
         WordSpace.resetGame();
-        WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
-        WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
+        WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(9.9).setColor('#000000');
+        WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(9.9).setColor('#000000').setAlign('right');
     },
     
     create: function()

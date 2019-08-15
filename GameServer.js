@@ -253,7 +253,7 @@ class GameRoom
     {
         if (this.currentPhase === GameServer.Phase.START)
         {
-            if (this.phaseChanger < 0 && checkTime - this.startTime > 6000)
+            if (this.phaseChanger < 0 && checkTime - this.startTime > 60000)
             {
                 this.currentPhase = GameServer.Phase.MAIN;
                 this.rateArrangePoint = 150;

@@ -21,7 +21,7 @@ socket.on('alert', function(msg) // string errorcode
     {
         //toAlert = '승리!';
         ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '승리!!!!', {fontSize: '30pt'})
-        .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(11)
+        .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(9.9)
         .setColor('#000000').setBackgroundColor('#ffffff');
 
         gameOver();
@@ -57,8 +57,8 @@ socket.on('syncRoomScene', function(msg)
             let randY = Math.random() * 380 + 100;
             var playerSet = 
             {
-                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
-                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg[i].nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2).setDepth(5),
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg[i].nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(5.1),
                 id: msg[i].id
             }
             ScenesData.roomScene.players.push(playerSet);
@@ -79,8 +79,8 @@ socket.on('setRoomCount', function(msg)
             let randY = Math.random() * 380 + 100;
             var playerSet = 
             {
-                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
-                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg.player.nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2).setDepth(5),
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg.player.nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(5.1),
                 id: msg.player.id
             }
             ScenesData.roomScene.players.push(playerSet);
@@ -129,7 +129,7 @@ socket.on('changePhase', function(msg) // number Phase
 
     WordSpace.pauseCycle(true);
     // 여기서 종이 드르륵 열면됨
-    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phaseChangeBgr').setOrigin(0.5, 0.5).setDepth(10);
+    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phaseChangeBgr').setOrigin(0.5, 0.5).setDepth(9.9);
     ScenesData.gameScene.scene.pause('gameScene');
     setTimeout(function()
     {
@@ -204,7 +204,7 @@ socket.on('defeat', function(msg) // object player
         {
             var keys = Object.keys(Enums.item);
             WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
-            let itemBag = ScenesData.gameScene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'itemBag').setScale(0).setDepth(5);
+            let itemBag = ScenesData.gameScene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'itemBag').setScale(0).setDepth(5.3);
             ScenesData.gameScene.tweens.add({
                 targets: itemBag,
                 scaleX: 1,
@@ -300,14 +300,14 @@ var backToMenu = function(isWin)
             x: game.config.width / 2,
             y: game.config.height / 2,
             choices: [
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 0, 'playerStand', 0.7, 'center'),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 150, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 10.2, 'playerStand', 0.7, 'center'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 150, 10.2, 
                     'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 50, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 50, 10.2, 
                     'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 10.2, 
                     'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 10.2, 
                     'button', 1, 'center', '획득 골드 : ' + earnedMoney + '원', 30).layout()
             ],
     
@@ -316,8 +316,8 @@ var backToMenu = function(isWin)
             }
         }),
         actions: [
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 20, 'button', 1, 'center', '나가기').layout(),
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 20, 'button', 1, 'center', '관전하기').layout()
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 10.2, 'button', 1, 'center', '나가기').layout(),
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 10.2, 'button', 1, 'center', '관전하기').layout()
         ],
 
         space: {
@@ -332,7 +332,7 @@ var backToMenu = function(isWin)
         align: {
             actions: 'center' // 'center'|'left'|'right'
         }
-    }).setDepth(20);
+    }).setDepth(10.2);
 
     ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {
@@ -340,7 +340,7 @@ var backToMenu = function(isWin)
             else
             {
                 ScenesData.gameScene.backToMenuDialog.setVisible(false);
-                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, temp);
+                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 10.2, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, temp);
             }
         }, ScenesData.gameScene)
         .on('button.over', function (button, groupName, index) {
