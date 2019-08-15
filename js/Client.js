@@ -143,8 +143,8 @@ socket.on('changePhase', function(msg) // number Phase
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {
-    WordSpace.PlayerTypingRate = msg;
-    WordSpace.AdjustVarByPhase(WordSpace.playerTypingRate, WordSpace.CurrentPhase);
+    WordSpace.playerTypingRate = msg;
+    WordSpace.adjustVarByPhase();
     //console.log('rate: ' + msg);
 });
 socket.on('writeWord', function(msg) // number playerId
