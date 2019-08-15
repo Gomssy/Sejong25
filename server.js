@@ -106,20 +106,17 @@ io.on('connection', function(socket)
             room.startTimer = setTimeout(function()
             {
                 let deads = room.currentPlayer.filter(element => !element.isAlive);
-                if (room.aliveCount != 0)
+                if (room.aliveCount != 0 && room.currentPlayer.length - deads.length >= room.startCount)
                 {
                     console.error('[ROOM#'+room.roomId+'] FORCE START!!!');
-                    if (room.currentPlayer.length - deads.length >= room.startCount)
+                    room.startRoom();
+                    deads.forEach(function(element)
                     {
-                        room.startRoom();
-                        deads.forEach(function(element)
-                        {
-                            element.defeat();
-                        });
-                    }
+                        element.defeat();
+                    });
                     clearTimeout(room.startTimer);
                 }
-                else
+                else if (deads.length > 0)
                 {
                     deads.forEach(function(element)
                     {
