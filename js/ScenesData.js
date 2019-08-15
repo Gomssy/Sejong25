@@ -36,11 +36,10 @@ var menuScene = new Phaser.Class(
     {
         BackGround.drawBackground(this);
         Audio.loopSound(this, 'login');
-        console.log(PlayerData.userData.hopae);
         if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0)
         {
-            ScenesData.changeScene('hopaeScene');
             PlayerData.userData.money += 1;
+            ScenesData.changeScene('hopaeScene');
             return;
         }
         PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
@@ -243,7 +242,6 @@ var hopaeScene = new Phaser.Class(
             ],
 
             space: {
-                title: 25,
                 content: 25,
                 action: 100,
 
@@ -309,12 +307,14 @@ var hopaeScene = new Phaser.Class(
                     ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
                 }
             })
-
-        this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
+        if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0))
+        {
+            this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
             function()
             {
                 ScenesData.changeScene('menuScene');
             });
+        }
     }
 });
 

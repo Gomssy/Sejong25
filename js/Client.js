@@ -249,6 +249,7 @@ socket.on('gameEnd', function(msg) // object player
     console.log(msg.nickname + ' Win!!!!!!');
     if(msg.id == RoomData.myself.id)
     {
+        RoomData.myself.rank = 1;
         backToMenu(true);
     }
 });
@@ -315,8 +316,8 @@ var backToMenu = function(isWin)
             }
         }),
         actions: [
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 10, 'button', 1, 'center', '나가기').layout(),
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 10, 'button', 1, 'center', '관전하기').layout()
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 20, 'button', 1, 'center', '나가기').layout(),
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 20, 'button', 1, 'center', '관전하기').layout()
         ],
 
         space: {
@@ -331,22 +332,15 @@ var backToMenu = function(isWin)
         align: {
             actions: 'center' // 'center'|'left'|'right'
         }
-    }).setDepth(10);
+    }).setDepth(20);
 
     ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {
-            if(index == 0)
-            {
-                temp();
-            }
+            if(index == 0) temp();
             else
             {
                 ScenesData.gameScene.backToMenuDialog.setVisible(false);
-                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
-                    function()
-                    {
-                        temp();
-                    });
+                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, temp);
             }
         }, ScenesData.gameScene)
         .on('button.over', function (button, groupName, index) {
