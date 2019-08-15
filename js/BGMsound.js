@@ -3,7 +3,7 @@ var Audio = Audio || {}
 var bgm;
 Audio.loadSound = function(scene)
 {
-    scene.load.audio('login', 'assets/sound/login.ogg');
+    scene.load.audio('login', 'assets/sound/newLogin.ogg');
     scene.load.audio('startGame', 'assets/sound/startGame.ogg');
     scene.load.audio('attack', 'assets/sound/attackShort.ogg');
     scene.load.audio('inRoom', 'assets/sound/roomBGM.ogg');
