@@ -17,7 +17,7 @@ WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
-WordSpace.attackPaperGroup = [];
+WordSpace.attackPaperGroup = null;
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
 
@@ -161,6 +161,8 @@ WordSpace.attackGauge =
 WordSpace.genWordByProb = function(scene)
 {
     let wordRnd = Math.random();
+    console.log(wordRnd);
+    console.log(WordSpace);
     let wordIdx = wordRnd < WordSpace.GradeProb[0] ? 3 :
                   wordRnd < WordSpace.GradeProb[1] ? 2 :
                   wordRnd < WordSpace.GradeProb[2] ? 1 : 0;
@@ -432,9 +434,8 @@ WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
         ease: 'Linear',
         duration: 4000,
         repeat: 0,
-        onComplete: function() { 
-            attackPaper.destroy();
-            WordSpace.attackPaperGroup = [];
+        onComplete: function() {
+            WordSpace.attackPaperGroup.remove(attackPaper, true);
         }
     });
     attackPaper.moveObject = function(obj)
@@ -443,7 +444,7 @@ WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
         obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
         obj.angle = 720 * obj.follower.t;
     }
-    WordSpace.attackPaperGroup.push(attackPaper);
+    WordSpace.attackPaperGroup.add(attackPaper);
 }
 
 WordSpace.nameQueue = 
@@ -506,7 +507,7 @@ WordSpace.resetGame = function()
 
     WordSpace.wordGroup = [];
     WordSpace.nameGroup = [];
-    WordSpace.attackPaperGroup = [];
+    WordSpace.attackPaperGroup = null;
     WordSpace.wordForcedGroup = [];
     WordSpace.wordPhysicsGroup = null;
 

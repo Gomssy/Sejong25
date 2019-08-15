@@ -445,6 +445,7 @@ var gameScene = new Phaser.Class(
         BackGround.drawBrain(this);
         BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
+        WordSpace.attackPaperGroup = this.physics.add.group();
         WordSpace.wordPhysicsGroup = this.physics.add.group();
             
         Input.inputField.generate(this, Input.gameSceneEnterReaction, 
@@ -476,7 +477,7 @@ var gameScene = new Phaser.Class(
             {
                 element.attract();
             })
-            WordSpace.attackPaperGroup.forEach(function(element){
+            WordSpace.attackPaperGroup.getChildren().forEach(function(element){
                 element.moveObject(element);
             });
             

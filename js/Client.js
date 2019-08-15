@@ -282,6 +282,8 @@ var backToMenu = function(isWin)
     earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
     earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
 
+    Input.inputField.text.destroy();
+
     var temp = function(){
 
         socket.emit('exitFromRoom', RoomData.myself.id);
