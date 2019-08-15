@@ -167,7 +167,6 @@ socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
 });
 socket.on('attacked', function(msg) // object attackData
 {
-    //console.log('attacked by ' + msg.attacker.nickname);
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
@@ -242,7 +241,7 @@ socket.on('defeat', function(msg) // object player
     if(msg.id == RoomData.myself.id)
     {
         RoomData.myself = RoomData.players[msg.index];
-        backToMenu();
+        backToMenu(false);
     }
 });
 socket.on('gameEnd', function(msg) // object player
@@ -250,7 +249,7 @@ socket.on('gameEnd', function(msg) // object player
     console.log(msg.nickname + ' Win!!!!!!');
     if(msg.id == RoomData.myself.id)
     {
-        backToMenu();
+        backToMenu(true);
     }
 });
 
@@ -262,6 +261,7 @@ socket.on('attackSucceed', function(msg)
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
     tempWord.destroy();
+    RoomData.myself.attackSucceed += 1;
 });
 
 // out game
@@ -272,8 +272,23 @@ socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
     RoomData.aliveCount--;
 });
 
-var backToMenu = function()
+var backToMenu = function(isWin)
 {
+    let earnedMoney = 0;
+    if(isWin) earnedMoney += 20;
+    earnedMoney += RoomData.myself.killCount * 3;
+    earnedMoney += parseInt(WordSpace.playerTypingRate / 10);
+    earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
+    earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
+
+    var temp = function(){
+
+        socket.emit('exitFromRoom', RoomData.myself.id);
+        fbClient.updateUserData('killCount', RoomData.myself.killCount);
+        fbClient.updateUserData('money', earnedMoney);
+        ScenesData.changeScene('menuScene');
+    }
+
     ScenesData.gameScene.backToMenuDialog = ScenesData.gameScene.rexUI.add.dialog({
         x: game.config.width / 2,
         y: game.config.height / 2,
@@ -292,7 +307,7 @@ var backToMenu = function()
                 UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 0, 
                     'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30).layout(),
                 UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 0, 
-                    'button', 1, 'center', '획득 골드 : ' + 10, 30).layout()
+                    'button', 1, 'center', '획득 골드 : ' + earnedMoney + '원', 30).layout()
             ],
     
             align: {
@@ -317,13 +332,6 @@ var backToMenu = function()
             actions: 'center' // 'center'|'left'|'right'
         }
     }).setDepth(10);
-    var temp = function(){
-        //WordSpace.resetGame();
-        socket.emit('exitFromRoom', RoomData.myself.id);
-        fbClient.updateUserData('killCount', RoomData.myself.killCount);
-        fbClient.updateUserData('money', 10);
-        ScenesData.changeScene('menuScene');
-    }
 
     ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {

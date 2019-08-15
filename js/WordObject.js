@@ -210,6 +210,7 @@ class AttackWord extends WordObject
                     attackerId: RoomData.myself.id,
                     victimId: this.attacker.id,
                     text: this.wordText,
+                    multiple: 1,
                     grade: Math.min(3, this.wordGrade + 1),
                     attackOption: {
                         isStrong: false,

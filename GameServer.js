@@ -337,6 +337,7 @@ class Player
         this.position = null;
         this.killCount = 0;
         this.earnedStrongHopae = 0;
+        this.attackSucceed = 0;
 
         this.isAlive = false;
         this.isInThisRoom = true;
