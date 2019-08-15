@@ -2,7 +2,6 @@ WordSpace.startCycle = function(scene)
 {
     WordSpace.wordCycle.resetCycle(scene, 3000, 0, true);
     WordSpace.nameCycle.resetCycle(scene, 3000, 0, true);
-    WordSpace.varAdjustCycle.resetCycle(scene, 100, 0, true);
     WordSpace.playerTypingCycle.resetCycle(scene, 500, 500, true);
 }
 
@@ -10,7 +9,6 @@ WordSpace.pauseCycle = function(isPause)
 {
     WordSpace.wordCycle.currentCycle.paused = isPause;
     WordSpace.nameCycle.currentCycle.paused = isPause;
-    WordSpace.varAdjustCycle.currentCycle.paused = isPause;
     WordSpace.attackGauge.pauseCycle(isPause);
     WordSpace.playerTypingCycle.currentCycle.paused = isPause;
     WordSpace.attackedEvents.forEach(function(element) {element.currentCycle.paused = isPause});

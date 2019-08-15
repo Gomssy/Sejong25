@@ -530,14 +530,6 @@ WordSpace.resetGame = function()
     {
         WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
     });
-    //이건 뭐지
-    WordSpace.varAdjustCycle = new Cycle(function()
-    {
-        //나중에는 메세지 분석해서 Phase랑 playerTypingRate 받겠지만 일단 이렇게 해둠
-        //WordSpace.GetPhase();
-        //WordSpace.GetPlayerTypingRate();
-        WordSpace.AdjustVarByPhase(WordSpace.playerTypingRate, WordSpace.CurrentPhase);
-    });
     // playerTypingRate 갱신용 사이클
     WordSpace.playerTypingCycle = new Cycle(function()
     {
