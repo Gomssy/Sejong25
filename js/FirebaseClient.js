@@ -266,10 +266,7 @@ class UserData
         this.userName = prompt("유저의 이름을 입력해주세요.");
         this.exp = 0;
         this.rank = -1;
-        this.hopae = 
-        [
-            {name: prompt("첫번째 호패의 닉네임을 입력해주세요.\n(반드시 한글만 사용해주세요 띄어쓰기도 금지)"), type: 'wood'}
-		];
+        this.hopae = [];
 		this.recentHopae = null;
 		this.title = [];
 		this.money = 0;

@@ -10,7 +10,8 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, align, text = 
         background: scene.add.sprite(x, y, image).setScale(size).setOrigin(0.5, 0.5).setDepth(depth),
 
         text: scene.add.text(x, y, text, {
-            font: textSize + 'pt 궁서'
+            font: textSize + 'pt 궁서',
+            align: 'center'
         }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor),
 
         space: {

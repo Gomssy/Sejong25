@@ -36,6 +36,13 @@ var menuScene = new Phaser.Class(
     {
         BackGround.drawBackground(this);
         Audio.loopSound(this, 'login');
+        console.log(PlayerData.userData.hopae);
+        if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0)
+        {
+            ScenesData.changeScene('hopaeScene');
+            PlayerData.userData.money += 1;
+            return;
+        }
         PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
         PlayerData.nickname = PlayerData.currentHopae.name;
 
@@ -214,6 +221,9 @@ var hopaeScene = new Phaser.Class(
         
         Input.inputField.generate(this, function(){}, 
             UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, 'center', '', 50, '#ffffff').getElement('text').setOrigin(0.45,0.5), true);
+            
+        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'panel', 1, 'center', 
+            '호패는 오직 한글만 입력이 가능합니다.\n띄어쓰기도 사용할 수 없습니다.', 50, '#000000').layout();
 
         this.checkDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
@@ -221,9 +231,10 @@ var hopaeScene = new Phaser.Class(
 
             background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
             
-            content: this.add.text(0, 0, '이 이름으로 하시겠습니까?\n변경에는 엽전이 소모됩니다.', {
+            content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae == undefined ? '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
                 font: '50pt 궁서',
-                color: '#000000'
+                color: '#000000',
+                align: 'center'
             }),
 
             actions: [
