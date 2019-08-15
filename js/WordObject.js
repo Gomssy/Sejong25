@@ -210,6 +210,7 @@ class AttackWord extends WordObject
                     attackerId: RoomData.myself.id,
                     victimId: this.attacker.id,
                     text: this.wordText,
+                    multiple: 1,
                     grade: Math.min(3, this.wordGrade + 1),
                     attackOption: {
                         isStrong: false,
@@ -236,6 +237,7 @@ class NameWord extends WordObject
         this.wordWeight = 2;
         this.isStrong = _isStrong;
         this.isActive = true;
+        if(_isStrong) RoomData.myself.earnedStrongHopae++;
         //console.log('Name : ' + player.nickname + ', Strong : ' + this.isStrong + ', Weight : ' + this.wordWeight);
     }
     instantiate(scene, lenRate)

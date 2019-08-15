@@ -344,16 +344,15 @@ var roomScene = new Phaser.Class(
     {
         this.peopleText.setText(this.peopleCount + ' / 10');
         
-        if (this.isCounting)
+        if (this.isCounting && !this.isCountEnd)
         {
             this.countText.setText(((this.endTime - Date.now()) / 1000).toFixed(1));
-            if (this.endTime < Date.now()) 
+            if (this.endTime != 0 && this.endTime < Date.now()) 
             {
                 //console.log('end Count');
-                setTimeout(() => {
+                ScenesData.endCountTimer = setTimeout(() => {
                     socket.emit('endCount');
-                }, (Phaser.Math.Distance.Between(0, 0, game.config.width / 2, game.config.height * 10 / 9) * 10));
-                this.isCounting = false;
+                }, (Phaser.Math.Distance.Between(0, 0, game.config.width / 2, game.config.height * 10 / 9) * 3));
                 this.isCountEnd = true;
                 this.players.forEach(function(element){
                     element.follower = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -373,12 +372,21 @@ var roomScene = new Phaser.Class(
         }
         else if (this.isCountEnd)
         {
-            this.players.forEach(function(element){
-                element.path.getPoint(element.follower.t, element.follower.vec);
-                element.sprite.setPosition(element.follower.vec.x, element.follower.vec.y);
-                element.nickname.setPosition(element.sprite.x - game.config.width / 128, element.sprite.y - game.config.height / 12);
-            });
-            this.countText.setText('잠시만 기다려주세요...');
+            if (this.isCounting)
+            {
+                this.players.forEach(function(element){
+                    element.path.getPoint(element.follower.t, element.follower.vec);
+                    element.sprite.setPosition(element.follower.vec.x, element.follower.vec.y);
+                    element.nickname.setPosition(element.sprite.x - game.config.width / 128, element.sprite.y - game.config.height / 12);
+                });
+                this.countText.setText('잠시만 기다려주세요...');
+            }
+            else
+            {
+                this.countText.setText('이동 도중 사람이 퇴실했습니다...\n잠시만 기다려주세요...');
+                clearTimeout(ScenesData.endCountTimer);
+                ScenesData.endCountTimer = undefined;
+            }
         }
         else
         {
@@ -411,6 +419,7 @@ var gameScene = new Phaser.Class(
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexbuttonplugin.min.js',
             sceneKey: 'button'
         });
+        WordSpace.resetGame();
         WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
         WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
     },
@@ -437,38 +446,33 @@ var gameScene = new Phaser.Class(
         WordSpace.startCycle(this);
         
         WordSpace.setPlayerTyping.initiate(this);
-
-        WordSpace.nameWordTextForTest = this.add.text(50,400,'현재 가진 호패들 : 없음').setDepth(10).setColor('#000000');
+        
         WordSpace.nameQueue.initiate();
         //WordSpace.attackGauge.add(11);
-
+        
     },
 
     update: function()
     {
-        WordSpace.deltaTime = this.sys.game.loop.delta;
-        WordSpace.wordForcedGroup.forEach(function(element)
+        if(ScenesData.currentScene == ScenesData.gameScene && WordSpace.gameTimer != null)
         {
-            element.attract();
-        });
-        WordSpace.nameGroup.forEach(function(element)
-        {
-            element.attract();
-        })
-        WordSpace.attackPaperGroup.forEach(function(element){
-            element.moveObject(element);
-        });
-        let tempNames = '';
-        WordSpace.nameGroup.forEach(function(element)
-        {
-            //테스트용
-            tempNames += element.wordText + (element.isStrong?' [강]':'') + '\n';
-        });
-        
-        WordSpace.nameWordTextForTest.setText('현재 가진 호패들 : \n' + tempNames);
-        WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
-        WordSpace.killLogTextForTest.setText(WordSpace.killLogForTest);
-        WordSpace.setPlayerTyping.add('');
+            WordSpace.deltaTime = this.sys.game.loop.delta;
+            WordSpace.wordForcedGroup.forEach(function(element)
+            {
+                element.attract();
+            });
+            WordSpace.nameGroup.forEach(function(element)
+            {
+                element.attract();
+            })
+            WordSpace.attackPaperGroup.forEach(function(element){
+                element.moveObject(element);
+            });
+            
+            WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
+            WordSpace.killLogTextForTest.setText(WordSpace.killLogForTest);
+            WordSpace.setPlayerTyping.add('');
+        }
     }
 });
 

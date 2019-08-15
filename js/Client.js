@@ -41,6 +41,11 @@ socket.on('enterRoom', function()
     fbClient.updateUserData('recentHopae', PlayerData.currentHopae);
     Audio.killSound(ScenesData.menuScene, 'login');
     ScenesData.changeScene('roomScene');
+    if (ScenesData.endCountTimer != undefined) 
+    {
+        clearTimeout(ScenesData.endCountTimer);
+        ScenesData.endCountTimer = undefined;
+    }
 });
 socket.on('syncRoomScene', function(msg)
 {
@@ -162,7 +167,6 @@ socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
 });
 socket.on('attacked', function(msg) // object attackData
 {
-    //console.log('attacked by ' + msg.attacker.nickname);
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
@@ -190,8 +194,6 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index].nicknameText = nicknameText;
 
     RoomData.aliveCount--;
-    console.log(msg.id);
-    console.log(RoomData.findPlayer(msg.id));
     RoomData.findPlayer(msg.id).playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
     if (msg.lastAttack != null) 
     {
@@ -212,8 +214,6 @@ socket.on('defeat', function(msg) // object player
                 repeat: 0, // -1: infinity
                 yoyo: false,
                 onComplete: function () {
-                    
-                    
                     setTimeout(function() {
                         ScenesData.gameScene.tweens.add({
                             targets: itemBag,
@@ -224,14 +224,13 @@ socket.on('defeat', function(msg) // object player
                             repeat: 0, // -1: infinity
                             yoyo: false });
                     }, 1500);
-                    
-                    
                 },
                 onCompleteScope: ScenesData.gameScene
             });
             setTimeout(function() {
                 itemBag.destroy();
             }, 3000);
+            RoomData.myself.killCount++;
         }
     }
     else 
@@ -239,11 +238,21 @@ socket.on('defeat', function(msg) // object player
         console.log(RoomData.findPlayer(msg.id).nickname + ' defeated');
         WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
     }
+    if(msg.id == RoomData.myself.id)
+    {
+        RoomData.myself = RoomData.players[msg.index];
+        backToMenu(false);
+    }
 });
 socket.on('gameEnd', function(msg) // object player
 {
     console.log(msg.nickname + ' Win!!!!!!');
+    if(msg.id == RoomData.myself.id)
+    {
+        backToMenu(true);
+    }
 });
+
 socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
@@ -252,6 +261,7 @@ socket.on('attackSucceed', function(msg)
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
     tempWord.destroy();
+    RoomData.myself.attackSucceed += 1;
 });
 
 // out game
@@ -261,3 +271,88 @@ socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
     RoomData.players[msg.index] = msg;
     RoomData.aliveCount--;
 });
+
+var backToMenu = function(isWin)
+{
+    let earnedMoney = 0;
+    if(isWin) earnedMoney += 20;
+    earnedMoney += RoomData.myself.killCount * 3;
+    earnedMoney += parseInt(WordSpace.playerTypingRate / 10);
+    earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
+    earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
+
+    var temp = function(){
+
+        socket.emit('exitFromRoom', RoomData.myself.id);
+        fbClient.updateUserData('killCount', RoomData.myself.killCount);
+        fbClient.updateUserData('money', earnedMoney);
+        ScenesData.changeScene('menuScene');
+    }
+
+    ScenesData.gameScene.backToMenuDialog = ScenesData.gameScene.rexUI.add.dialog({
+        x: game.config.width / 2,
+        y: game.config.height / 2,
+
+        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+
+        content: ScenesData.gameScene.rexUI.add.dialog({
+            x: game.config.width / 2,
+            y: game.config.height / 2,
+            choices: [
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 0, 'playerStand', 0.7, 'center'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 150, 0, 
+                    'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 30).layout(),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 50, 0, 
+                    'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 30).layout(),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 0, 
+                    'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30).layout(),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 0, 
+                    'button', 1, 'center', '획득 골드 : ' + earnedMoney + '원', 30).layout()
+            ],
+    
+            align: {
+                choices: 'center' // 'center'|'left'|'right'
+            }
+        }),
+        actions: [
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 10, 'button', 1, 'center', '나가기').layout(),
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 10, 'button', 1, 'center', '관전하기').layout()
+        ],
+
+        space: {
+            action: 10,
+
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20,
+        },
+
+        align: {
+            actions: 'center' // 'center'|'left'|'right'
+        }
+    }).setDepth(10);
+
+    ScenesData.gameScene.backToMenuDialog
+        .on('button.click', function (button, groupName, index) {
+            if(index == 0)
+            {
+                temp();
+            }
+            else
+            {
+                ScenesData.gameScene.backToMenuDialog.setVisible(false);
+                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
+                    function()
+                    {
+                        temp();
+                    });
+            }
+        }, ScenesData.gameScene)
+        .on('button.over', function (button, groupName, index) {
+            //console.log('button over');
+        })
+        .on('button.out', function (button, groupName, index) {
+            //console.log('button out');
+    });
+}
