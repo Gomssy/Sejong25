@@ -419,6 +419,7 @@ var gameScene = new Phaser.Class(
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexbuttonplugin.min.js',
             sceneKey: 'button'
         });
+        WordSpace.resetGame();
         WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(10).setColor('#000000');
         WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(10).setColor('#000000').setAlign('right');
     },
@@ -453,7 +454,7 @@ var gameScene = new Phaser.Class(
 
     update: function()
     {
-        if(ScenesData.currentScene == ScenesData.gameScene)
+        if(ScenesData.currentScene == ScenesData.gameScene && WordSpace.gameTimer != null)
         {
             WordSpace.deltaTime = this.sys.game.loop.delta;
             WordSpace.wordForcedGroup.forEach(function(element)

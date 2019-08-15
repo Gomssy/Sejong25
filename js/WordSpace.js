@@ -222,9 +222,6 @@ function gameOver()
     
     socket.emit('defeated');
     console.log('defeat');
-    ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '패배', {fontSize: '30pt'})
-    .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(10)
-    .setColor('#000000').setBackgroundColor('#ffffff');
 }
 
 //게임 오버 판정을 위한 타이머
@@ -347,6 +344,11 @@ WordSpace.setPlayerTyping =
     initiate: function(scene)
     {
         this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
+    },
+    reset: function()
+    {
+        this.totalTyping = 0;
+        this.writeWord = false;
     }
 }
 
@@ -486,5 +488,62 @@ WordSpace.nameQueue =
         this.shuffle();
     }
 }
+WordSpace.resetGame = function()
+{
+    WordSpace.weightTextObjForTest = null;
+    WordSpace.nameWordTextForTest = null;
+    WordSpace.killLogTextForTest = null;
+    WordSpace.killLogForTest = '';
+    
+    WordSpace.nextWordCode = 0;
+    WordSpace.totalWeight = 0; //현재 단어 무게 총합
+    WordSpace.totalWordNum = 0;
+    WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
+    WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
+    WordSpace.isTimerOn = false;
+    WordSpace.isInvincible = false;
+    WordSpace.pyeongminAnims = [];
 
-WordSpace.gameOverUI
+    WordSpace.wordGroup = [];
+    WordSpace.nameGroup = [];
+    WordSpace.attackPaperGroup = [];
+    WordSpace.wordForcedGroup = [];
+    WordSpace.wordPhysicsGroup = null;
+
+    WordSpace.nameQueue.queue = [];
+    WordSpace.setPlayerTyping.reset();
+    WordSpace.isTimerOn = false;
+    WordSpace.attackGauge.resetValue();
+    WordSpace.CurrentPhase = WordSpace.Phase.START;
+    WordSpace.playerTyping = 0;
+    WordSpace.playerTypingRate = 0;
+
+    //단어 생성 사이클
+    WordSpace.wordCycle = new Cycle(function()
+    {
+        WordSpace.genWordByProb(this);
+    });
+    //게임 오버 사이클
+    WordSpace.gameOverCycle = new Cycle(gameOver);
+    //호패 생성 사이클
+    WordSpace.nameCycle = new Cycle(function()
+    {
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+    });
+    //이건 뭐지
+    WordSpace.varAdjustCycle = new Cycle(function()
+    {
+        //나중에는 메세지 분석해서 Phase랑 playerTypingRate 받겠지만 일단 이렇게 해둠
+        //WordSpace.GetPhase();
+        //WordSpace.GetPlayerTypingRate();
+        WordSpace.AdjustVarByPhase(WordSpace.playerTypingRate, WordSpace.CurrentPhase);
+    });
+    // playerTypingRate 갱신용 사이클
+    WordSpace.playerTypingCycle = new Cycle(function()
+    {
+        socket.emit('setPlayerTyping', {playerTyping: WordSpace.playerTyping, isWord: WordSpace.setPlayerTyping.writeWord, isAttackMode: Input.attackMode} );
+        WordSpace.setPlayerTyping.writeWord = false;
+    });
+    // 공격받을때의 일회용 이벤트들
+    WordSpace.attackedEvents = [];
+}

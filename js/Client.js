@@ -317,15 +317,19 @@ var backToMenu = function()
             actions: 'center' // 'center'|'left'|'right'
         }
     }).setDepth(10);
+    var temp = function(){
+        //WordSpace.resetGame();
+        socket.emit('exitFromRoom', RoomData.myself.id);
+        fbClient.updateUserData('killCount', RoomData.myself.killCount);
+        fbClient.updateUserData('money', 10);
+        ScenesData.changeScene('menuScene');
+    }
 
     ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {
             if(index == 0)
             {
-                socket.emit('exitFromRoom', RoomData.myself.id);
-                fbClient.updateUserData('killCount', RoomData.myself.killCount);
-                fbClient.updateUserData('money', 10);
-                ScenesData.changeScene('menuScene');
+                temp();
             }
             else
             {
@@ -333,10 +337,7 @@ var backToMenu = function()
                 ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
                     function()
                     {
-                        socket.emit('exitFromRoom', RoomData.myself.id);
-                        fbClient.updateUserData('killCount', RoomData.myself.killCount);
-                        fbClient.updateUserData('money', 10);
-                        ScenesData.changeScene('menuScene');
+                        temp();
                     });
             }
         }, ScenesData.gameScene)
