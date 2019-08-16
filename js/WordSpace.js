@@ -161,8 +161,6 @@ WordSpace.attackGauge =
 WordSpace.genWordByProb = function(scene)
 {
     let wordRnd = Math.random();
-    console.log(wordRnd);
-    console.log(WordSpace);
     let wordIdx = wordRnd < WordSpace.GradeProb[0] ? 3 :
                   wordRnd < WordSpace.GradeProb[1] ? 2 :
                   wordRnd < WordSpace.GradeProb[2] ? 1 : 0;
