@@ -207,14 +207,54 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index].position = position;
     RoomData.players[msg.index].nicknameText = nicknameText;
 
+    let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
-    RoomData.findPlayer(msg.id).playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
+    victim.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
+
+    
     if (msg.lastAttack != null) 
     {
-        let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId).nickname;
-        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated by ' + lastAttacker + ', with ' + msg.lastAttack.word);
-        WordSpace.killLogForTest += ('\n' + lastAttacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.findPlayer(msg.id).nickname);
-        let itemBag = ScenesData.gameScene.add.sprite(RoomData.findPlayer(msg.lastAttack.attackerId).position.x, RoomData.findPlayer(msg.lastAttack.attackerId).position.y, 
+        let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId);
+        let attackWord = msg.lastAttack.word;
+        console.log(victim.nickname + ' defeated by ' + lastAttacker.nickname + ', with ' + msg.lastAttack.word);
+        if(WordSpace.lastAttackGroup.length != 0)
+        {
+            WordSpace.lastAttackGroup.forEach(function(element){
+                element.destroy();
+            })
+        }
+
+        let attackerLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 400, 0, 10.2, 'nameBgr' + lastAttacker.nickname.length, 2, 
+            'center', lastAttacker.nickname, 50, '#ffffff', 0.45, 0.5);
+        let wordLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, 0, 10.2, 'wordBgr' + msg.lastAttack.wordGrade + '_' + attackWord.length, 2, 
+            'center', attackWord, 50, '#000000', 0.45, 0.5);
+        let victimLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 400, 0, 10.2, 'nameBgr' + victim.nickname.length, 2, 
+            'center', victim.nickname, 50, '#ffffff', 0.45, 0.5);
+        
+        WordSpace.lastAttackGroup.push(attackerLabel);
+        WordSpace.lastAttackGroup.push(wordLabel);
+        WordSpace.lastAttackGroup.push(victimLabel);
+
+        ScenesData.gameScene.tweens.add({
+            targets: [attackerLabel, wordLabel, victimLabel],
+            y: 100,
+            ese: 'Linear',
+            duration: 500,
+            repeat: 0,
+            onComplete: function () {
+                setTimeout(function() {
+                    ScenesData.gameScene.tweens.add({
+                        targets: [attackerLabel, wordLabel, victimLabel],
+                        y: -100,
+                        ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                        duration: 500,
+                        repeat: 0, // -1: infinity
+                        yoyo: false });
+                }, 1000);
+            },
+        })
+
+        let itemBag = ScenesData.gameScene.add.sprite(lastAttacker.position.x, lastAttacker.position.y, 
             'itemBag').setScale(0).setDepth(5.3);
             ScenesData.gameScene.tweens.add({
                 targets: itemBag,
@@ -233,10 +273,9 @@ socket.on('defeat', function(msg) // object player
                             ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
                             duration: 500,
                             repeat: 0, // -1: infinity
-                            yoyo: false });
-                    }, 1500);
-                },
-                onCompleteScope: ScenesData.gameScene
+                        });
+                    }, 1000);
+                }
             });
             setTimeout(function() {
                 itemBag.destroy();
@@ -245,14 +284,42 @@ socket.on('defeat', function(msg) // object player
         {
             var keys = Object.keys(Enums.item);
             WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
-            
             RoomData.myself.killCount++;
         }
     }
     else 
     {
-        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated');
-        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
+        console.log(victim.nickname + ' defeated');
+        if(WordSpace.lastAttackGroup.length != 0)
+        {
+            WordSpace.lastAttackGroup.forEach(function(element){
+                element.destroy();
+            })
+        }
+        
+        let victimLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, 0, 10.2, 'nameBgr' + victim.nickname.length, 2, 'center', victim.nickname, 50, '#ffffff', 0.45, 0.5);
+
+        WordSpace.lastAttackGroup.push(victimLabel);
+        ScenesData.gameScene.tweens.add({
+            targets: victimLabel,
+            y: 100,
+            ese: 'Linear',
+            duration: 500,
+            repeat: 0,
+            onComplete: function () {
+                setTimeout(function() {
+                    ScenesData.gameScene.tweens.add({
+                        targets: victimLabel,
+                        y: -100,
+                        ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                        duration: 500,
+                        repeat: 0, // -1: infinity
+                    });
+                }, 1000);
+            }
+        })
+
+
     }
     if(msg.id == RoomData.myself.id)
     {

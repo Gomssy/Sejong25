@@ -432,7 +432,6 @@ var gameScene = new Phaser.Class(
         });
         WordSpace.resetGame();
         WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(9.9).setColor('#000000');
-        WordSpace.killLogTextForTest = this.add.text(game.config.width * 25 / 32, game.config.height * 5 / 72, WordSpace.killLogForTest).setDepth(9.9).setColor('#000000').setAlign('right');
     },
     
     create: function()
@@ -487,7 +486,6 @@ var gameScene = new Phaser.Class(
             });
             
             WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
-            WordSpace.killLogTextForTest.setText(WordSpace.killLogForTest);
             WordSpace.setPlayerTyping.add('');
         }
     }

@@ -3,8 +3,6 @@ var WordSpace = WordSpace || {};
 // for test
 WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
-WordSpace.killLogTextForTest = null;
-WordSpace.killLogForTest = '';
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
@@ -20,6 +18,7 @@ WordSpace.nameGroup = [];
 WordSpace.attackPaperGroup = null;
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
+WordSpace.lastAttackGroup = [];
 
 WordSpace.GradeProb = [0.35, 0.6, 0.8];
 WordSpace.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
@@ -502,7 +501,6 @@ WordSpace.changePhase = function(newPhase)
         // 여기서 종이 닫으면됨
         phaseChangeBgr.anims.playReverse('phase' + newPhase + 'Anim');
         phaseChangeBgr.on('animationcomplete', function(currentAnim, currentFrame, sprite){sprite.destroy()});
-        //phaseChangeBgr.destroy();
         Audio.playSound(ScenesData.gameScene, 'startGame');
         //WordSpace.pauseCycle(false);
         //console.log('start again');
@@ -512,8 +510,6 @@ WordSpace.resetGame = function()
 {
     WordSpace.weightTextObjForTest = null;
     WordSpace.nameWordTextForTest = null;
-    WordSpace.killLogTextForTest = null;
-    WordSpace.killLogForTest = '';
     
     WordSpace.nextWordCode = 0;
     WordSpace.totalWeight = 0; //현재 단어 무게 총합
