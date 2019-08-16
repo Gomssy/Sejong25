@@ -42,9 +42,9 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('pyeongminStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
-    scene.load.spritesheet('phase0', 'assets/image/etc/scroll/startPhase/startPhase.png', { frameWidth: 280, frameHeight: 920 });
-    scene.load.spritesheet('phase1', 'assets/image/etc/scroll/bonPhase/bonPhase.png', { frameWidth: 280, frameHeight: 920 });
-    scene.load.spritesheet('phase2', 'assets/image/etc/scroll/poongPhase/poongPhase.png', { frameWidth: 280, frameHeight: 920 });
+    scene.load.spritesheet('phase1', 'assets/image/etc/scroll/startPhase/startPhase.png', { frameWidth: 280, frameHeight: 920 });
+    scene.load.spritesheet('phase2', 'assets/image/etc/scroll/bonPhase/bonPhase.png', { frameWidth: 280, frameHeight: 920 });
+    scene.load.spritesheet('phase3', 'assets/image/etc/scroll/poongPhase/poongPhase.png', { frameWidth: 280, frameHeight: 920 });
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
     scene.load.image('panel', 'assets/placeholder/panel.png');
     scene.load.image('button', 'assets/placeholder/button.png');
@@ -60,12 +60,6 @@ ResourceLoader.loadAnimation = function(scene)
         repeat: 0
     });
     scene.anims.create({
-        key: 'phase0Anim',
-        frames: scene.anims.generateFrameNumbers('phase0'),
-        frameRate: 20,
-        repeat: 0
-    });
-    scene.anims.create({
         key: 'phase1Anim',
         frames: scene.anims.generateFrameNumbers('phase1'),
         frameRate: 20,
@@ -74,6 +68,12 @@ ResourceLoader.loadAnimation = function(scene)
     scene.anims.create({
         key: 'phase2Anim',
         frames: scene.anims.generateFrameNumbers('phase2'),
+        frameRate: 20,
+        repeat: 0
+    });
+    scene.anims.create({
+        key: 'phase3Anim',
+        frames: scene.anims.generateFrameNumbers('phase3'),
         frameRate: 20,
         repeat: 0
     });

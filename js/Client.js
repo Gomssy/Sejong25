@@ -124,24 +124,7 @@ socket.on('startGame', function()
 // in game
 socket.on('changePhase', function(msg) // number Phase
 {
-    console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + msg);
-    WordSpace.CurrentPhase = msg;
-
-    //WordSpace.pauseCycle(true);
-    // 여기서 종이 드르륵 열면됨
-    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phase' + msg).setOrigin(0.5, 0.5).setDepth(9.9).play('phase' + msg + 'Anim');
-    //ScenesData.gameScene.scene.pause('gameScene');
-    setTimeout(function()
-    {
-        //ScenesData.gameScene.scene.resume('gameScene');
-        // 여기서 종이 닫으면됨
-        phaseChangeBgr.anims.playReverse('phase' + msg + 'Anim');
-        phaseChangeBgr.on('animationcomplete', function(currentAnim, currentFrame, sprite){sprite.destroy()});
-        //phaseChangeBgr.destroy();
-        Audio.playSound(ScenesData.gameScene, 'startGame');
-        //WordSpace.pauseCycle(false);
-        //console.log('start again');
-    }, 5000);
+    WordSpace.changePhase(msg);
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {

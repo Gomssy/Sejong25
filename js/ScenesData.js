@@ -466,6 +466,7 @@ var gameScene = new Phaser.Class(
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
         WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
         
+        WordSpace.changePhase(WordSpace.Phase.START);
     },
 
     update: function()

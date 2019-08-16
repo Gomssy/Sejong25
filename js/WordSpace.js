@@ -487,6 +487,27 @@ WordSpace.nameQueue =
         this.shuffle();
     }
 }
+WordSpace.changePhase = function(newPhase)
+{
+    console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + newPhase);
+    WordSpace.CurrentPhase = newPhase;
+
+    //WordSpace.pauseCycle(true);
+    // 여기서 종이 드르륵 열면됨
+    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phase' + newPhase).setOrigin(0.5, 0.5).setDepth(9.9).play('phase' + newPhase + 'Anim');
+    //ScenesData.gameScene.scene.pause('gameScene');
+    setTimeout(function()
+    {
+        //ScenesData.gameScene.scene.resume('gameScene');
+        // 여기서 종이 닫으면됨
+        phaseChangeBgr.anims.playReverse('phase' + newPhase + 'Anim');
+        phaseChangeBgr.on('animationcomplete', function(currentAnim, currentFrame, sprite){sprite.destroy()});
+        //phaseChangeBgr.destroy();
+        Audio.playSound(ScenesData.gameScene, 'startGame');
+        //WordSpace.pauseCycle(false);
+        //console.log('start again');
+    }, 5000);
+}
 WordSpace.resetGame = function()
 {
     WordSpace.weightTextObjForTest = null;
