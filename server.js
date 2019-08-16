@@ -175,6 +175,15 @@ io.on('connection', function(socket)
         if (wrongCountIndex !== -1) socket.playerData.playingData.lastAttacks[wrongCountIndex].wrongCount++;
     });
 
+    socket.on('itemStart', function(msg) //playerID, item
+    {
+        socket.playerData.currentRoom.announceToRoom('someoneItemStart', msg);
+    });
+    socket.on('itemEnd', function(msg) //playerID, item
+    {
+        socket.playerData.currentRoom.announceToRoom('someoneItemEnd', msg);
+    });
+
     socket.on('disconnect', function(reason)
     {
         GameServer.disconnectCount++;

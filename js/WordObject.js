@@ -363,8 +363,10 @@ class ItemWord extends WordObject
             {
                 case Enums.item.invincible:
                     WordSpace.isInvincible = true;
+                    socket.emit('itemStart', {id: RoomData.myself.id, itemType: Enums.item.invincible});
                     setTimeout(() => {
                         WordSpace.isInvincible = false;
+                        socket.emit('itemEnd', {id: RoomData.myself.id, itemType: Enums.item.invincible});
                     }, 5000);
                     break;
                 case Enums.item.nameList:

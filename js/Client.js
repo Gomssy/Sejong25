@@ -184,6 +184,35 @@ socket.on('attacked', function(msg) // object attackData
     WordSpace.attackedEvents.push(attackedEvent);
     //console.log(timeout);
 });
+socket.on('someoneItemStart', function(msg)
+{
+    let itemPlayer = RoomData.findPlayer(msg.id);
+    let size = msg.id == RoomData.myself.id ? 1 : 0.7;
+    let xOffset = msg.id != RoomData.myself.id && itemPlayer.position.x < game.config.width / 2 ? -1 : 1;
+    switch(msg.itemType)
+    {
+        case Enums.item.invincible:
+                itemPlayer.invincibleMark = ScenesData.gameScene.add.sprite(itemPlayer.position.x + 20 * size * xOffset, itemPlayer.position.y - 50 * size, 'attackPaper')
+                    .setDepth(5.3).setOrigin(0.5, 0.5).setScale(size);
+            break;
+        default:
+            console.log('Improper item type.');
+            break;
+    }
+});
+socket.on('someoneItemEnd', function(msg)
+{
+    let itemPlayer = RoomData.findPlayer(msg.id);
+    switch(msg.itemType)
+    {
+        case Enums.item.invincible:
+            itemPlayer.invincibleMark.destroy();
+            break;
+        default:
+            console.log('Improper item type.');
+            break;
+    }
+});
 
 socket.on('defeat', function(msg) // object player
 {
@@ -202,11 +231,8 @@ socket.on('defeat', function(msg) // object player
         let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId).nickname;
         console.log(RoomData.findPlayer(msg.id).nickname + ' defeated by ' + lastAttacker + ', with ' + msg.lastAttack.word);
         WordSpace.killLogForTest += ('\n' + lastAttacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.findPlayer(msg.id).nickname);
-        if(msg.lastAttack.attackerId == RoomData.myself.id)
-        {
-            var keys = Object.keys(Enums.item);
-            WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
-            let itemBag = ScenesData.gameScene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'itemBag').setScale(0).setDepth(5.3);
+        let itemBag = ScenesData.gameScene.add.sprite(RoomData.findPlayer(msg.lastAttack.attackerId).position.x, RoomData.findPlayer(msg.lastAttack.attackerId).position.y, 
+            'itemBag').setScale(0).setDepth(5.3);
             ScenesData.gameScene.tweens.add({
                 targets: itemBag,
                 scaleX: 1,
@@ -232,6 +258,11 @@ socket.on('defeat', function(msg) // object player
             setTimeout(function() {
                 itemBag.destroy();
             }, 3000);
+        if(msg.lastAttack.attackerId == RoomData.myself.id)
+        {
+            var keys = Object.keys(Enums.item);
+            WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
+            
             RoomData.myself.killCount++;
         }
     }
