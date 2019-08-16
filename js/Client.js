@@ -230,13 +230,18 @@ socket.on('defeat', function(msg) // object player
             'center', attackWord, 50, '#000000', 0.45, 0.5);
         let victimLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 400, 0, 10.2, 'nameBgr' + victim.nickname.length, 2, 
             'center', victim.nickname, 50, '#ffffff', 0.45, 0.5);
+        let explosionEffect = ScenesData.gameScene.add.sprite(game.config.width / 2, 0, 'wordBreak').setScale(1).setDepth(10.2);
+        explosionEffect.play('wordBreakAnim');
+        explosionEffect.anims.setRepeat(-1);
         
+
         WordSpace.lastAttackGroup.push(attackerLabel);
         WordSpace.lastAttackGroup.push(wordLabel);
         WordSpace.lastAttackGroup.push(victimLabel);
+        WordSpace.lastAttackGroup.push(explosionEffect);
 
         ScenesData.gameScene.tweens.add({
-            targets: [attackerLabel, wordLabel, victimLabel],
+            targets: [attackerLabel, wordLabel, victimLabel, explosionEffect],
             y: 100,
             ese: 'Linear',
             duration: 500,
@@ -244,7 +249,7 @@ socket.on('defeat', function(msg) // object player
             onComplete: function () {
                 setTimeout(function() {
                     ScenesData.gameScene.tweens.add({
-                        targets: [attackerLabel, wordLabel, victimLabel],
+                        targets: [attackerLabel, wordLabel, victimLabel, explosionEffect],
                         y: -100,
                         ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
                         duration: 500,
@@ -272,7 +277,14 @@ socket.on('defeat', function(msg) // object player
                             scaleY: 0,
                             ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
                             duration: 500,
-                            repeat: 0, // -1: infinity
+                            repeat: 0,
+                            onComplete: function()
+                            {
+                                attackerLabel.destroy();
+                                wordLabel.destroy();
+                                victimLabel.destroy();
+                                explosionEffect.destroy();
+                            }
                         });
                     }, 1000);
                 }
@@ -298,10 +310,15 @@ socket.on('defeat', function(msg) // object player
         }
         
         let victimLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, 0, 10.2, 'nameBgr' + victim.nickname.length, 2, 'center', victim.nickname, 50, '#ffffff', 0.45, 0.5);
+        let explosionEffect = ScenesData.gameScene.add.sprite(game.config.width / 2, 0, 'wordBreak').setScale(1).setDepth(10.2);
+        explosionEffect.play('wordBreakAnim');
+        explosionEffect.anims.setRepeat(-1);
 
+        explosionEffect.anims.setRepeat(-1);
         WordSpace.lastAttackGroup.push(victimLabel);
+        WordSpace.lastAttackGroup.push(explosionEffect);
         ScenesData.gameScene.tweens.add({
-            targets: victimLabel,
+            targets: [victimLabel, explosionEffect],
             y: 100,
             ese: 'Linear',
             duration: 500,
@@ -309,11 +326,16 @@ socket.on('defeat', function(msg) // object player
             onComplete: function () {
                 setTimeout(function() {
                     ScenesData.gameScene.tweens.add({
-                        targets: victimLabel,
+                        targets: [victimLabel, explosionEffect],
                         y: -100,
                         ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
                         duration: 500,
-                        repeat: 0, // -1: infinity
+                        repeat: 0,
+                        onComplete: function()
+                        {
+                            victimLabel.destroy();
+                            explosionEffect.destroy();
+                        }
                     });
                 }, 1000);
             }
