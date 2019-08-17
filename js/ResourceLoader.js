@@ -2,7 +2,7 @@ var ResourceLoader = ResourceLoader || {};
 
 ResourceLoader.loadBackGround = function(scene)
 {
-    scene.load.image('brain', 'assets/image/background/brain.png');
+    scene.load.image('weightWarning', 'assets/image/background/weightWarning.png');
     scene.load.image('baseBackground', 'assets/image/background/yellowBack.png');
     scene.load.image('gameBackground', 'assets/image/background/background_brain.png');
     scene.load.image('menuBackground', 'assets/placeholder/menuBackground.png');

@@ -346,7 +346,9 @@ socket.on('defeat', function(msg) // object player
     if(msg.id == RoomData.myself.id)
     {
         RoomData.myself = RoomData.players[msg.index];
-        backToMenu(false);
+        setTimeout(() => {
+            gameEndMenu(true);
+        }, 2000);
     }
 });
 socket.on('gameEnd', function(msg) // object player
@@ -355,7 +357,9 @@ socket.on('gameEnd', function(msg) // object player
     if(msg.id == RoomData.myself.id)
     {
         RoomData.myself.rank = 1;
-        backToMenu(true);
+        setTimeout(() => {
+            gameEndMenu(true);
+        }, 2000);
     }
 });
 
@@ -378,8 +382,11 @@ socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
     RoomData.aliveCount--;
 });
 
-var backToMenu = function(isWin)
+var gameEndMenu = function(isWin)
 {
+    WordSpace.isGameOver = true;
+    ScenesData.gameScene.warningImage.destroy();
+    ScenesData.gameScene.warningTween.remove();
     let earnedMoney = 0;
     if(isWin) earnedMoney += 20;
     earnedMoney += RoomData.myself.killCount * 3;

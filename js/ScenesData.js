@@ -459,11 +459,18 @@ var gameScene = new Phaser.Class(
         WordSpace.setPlayerTyping.initiate(this);
         
         WordSpace.nameQueue.initiate();
-        //WordSpace.attackGauge.add(11);
-
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
-        WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item.invincible);
+        
+        this.warningImage = this.add.sprite(game.config.width / 2, game.config.height / 2, 'weightWarning').setDisplaySize(game.config.width, game.config.height).setDepth(0.1).setAlpha(0)
+        
+        this.warningTween = this.tweens.add({
+            targets: this.warningImage,
+            alpha: 1,
+            duration: 500,
+            ease: 'Linear',
+            yoyo: true,
+            repeat: -1
+        });
+        this.warningTween.timeScale = 0;
         
         WordSpace.changePhase(WordSpace.Phase.START);
     },
@@ -487,6 +494,26 @@ var gameScene = new Phaser.Class(
             
             WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
             WordSpace.setPlayerTyping.add('');
+
+            if(!WordSpace.isGameOver)
+            {
+                if(WordSpace.totalWeight < 180)
+                {
+                    this.warningTween.timeScale = 0;
+                }
+                else if(WordSpace.totalWeight < 190)
+                {
+                    this.warningTween.timeScale = 0.3;
+                }
+                else if(WordSpace.totalWeight < 200)
+                {
+                    this.warningTween.timeScale = 0.6;
+                }
+                else if(WordSpace.isTimerOn)
+                {
+                    this.warningTween.timeScale = 0.6 + WordSpace.gameOverCycle.currentCycle.getElapsed() / WordSpace.delay.GameOver * 3;
+                }
+            }
         }
     }
 });
