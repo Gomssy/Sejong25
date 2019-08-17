@@ -175,8 +175,8 @@ socket.on('someoneItemStart', function(msg)
     switch(msg.itemType)
     {
         case Enums.item.invincible:
-                itemPlayer.invincibleMark = ScenesData.gameScene.add.sprite(itemPlayer.position.x + 20 * size * xOffset, itemPlayer.position.y - 50 * size, 'attackPaper')
-                    .setDepth(5.3).setOrigin(0.5, 0.5).setScale(size);
+            itemPlayer.invincibleMark = ScenesData.gameScene.add.sprite(itemPlayer.position.x + 20 * size * xOffset, itemPlayer.position.y - 50 * size, 'attackPaper')
+                .setDepth(5.3).setOrigin(0.5, 0.5).setScale(size);
             break;
         default:
             console.log('Improper item type.');

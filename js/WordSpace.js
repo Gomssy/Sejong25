@@ -417,6 +417,9 @@ WordSpace.attack = function(wordText, grade)
 
 WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
 {
+    let size = attackTo == RoomData.myself.position ? 1 : 0.7;
+    let xOffset = attackTo != RoomData.myself.position && attackTo.x < game.config.width / 2 ? -1 : 1;
+    
     var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPaper').setScale(0.5 * multiple).setDepth(5.2);
     attackPaper.mask = new Phaser.Display.Masks.BitmapMask(scene, BackGround.gameBackground);
     attackPaper.throwTarget = attackTo;
@@ -424,7 +427,7 @@ WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
     attackPaper.path = new Phaser.Curves.Spline([
         attackFrom.x, attackFrom.y,
         (attackFrom.x + attackPaper.throwTarget.x) / 2, Math.min(attackFrom.y, attackPaper.throwTarget.y) - 100,
-        attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
+        attackPaper.throwTarget.x + 20 * size * xOffset, attackPaper.throwTarget.y - 50 * size
     ]);
     scene.tweens.add({
         targets: attackPaper.follower,
