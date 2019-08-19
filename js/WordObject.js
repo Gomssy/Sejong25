@@ -31,8 +31,7 @@ class WordObject
         
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
-                fontSize: (this.scale * this.fontScale) +'pt',
-                fontFamily: '"궁서", 궁서체, serif',
+                font: (this.scale * this.fontScale) +'pt sejongFont',
                 //fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             });
         this.wordObj.setColor(textColor).setOrigin(0.5,0.5).setDepth(1);
@@ -261,8 +260,7 @@ class NameWord extends WordObject
             {
                 this.physicsObj.setScale(this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale);
                 this.wordObj.setFont({
-                    fontSize: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt',
-                    fontFamily: '"궁서", 궁서체, serif',
+                    font: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt sejongFont',
                     fontStyle: (this.wordWeight > 5 ? 'bold' : '')
                 });
             }

@@ -1,7 +1,5 @@
 var WordSpace = WordSpace || {};
 
-// for test
-WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
 
 WordSpace.nextWordCode = 0;
@@ -512,9 +510,6 @@ WordSpace.changePhase = function(newPhase)
 }
 WordSpace.resetGame = function()
 {
-    WordSpace.weightTextObjForTest = null;
-    WordSpace.nameWordTextForTest = null;
-    
     WordSpace.nextWordCode = 0;
     WordSpace.totalWeight = 0; //현재 단어 무게 총합
     WordSpace.totalWordNum = 0;

@@ -122,7 +122,7 @@ var menuScene = new Phaser.Class(
             background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
             
             content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
-                font: '50pt 궁서'
+                font: '50pt sejongFont'
             }),
 
             actions: [
@@ -231,7 +231,7 @@ var hopaeScene = new Phaser.Class(
             background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
             
             content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae.length == 0 ? '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
-                font: '50pt 궁서',
+                font: '50pt sejongFont',
                 color: '#000000',
                 align: 'center'
             }),
@@ -431,7 +431,6 @@ var gameScene = new Phaser.Class(
             sceneKey: 'button'
         });
         WordSpace.resetGame();
-        WordSpace.weightTextObjForTest = this.add.text(game.config.width * 5 / 64, game.config.height * 5 / 48, '뇌의 무게: (현재) 0 / ' + this.brainCapacity + ' (전체)').setDepth(9.9).setColor('#000000');
     },
     
     create: function()
@@ -492,27 +491,14 @@ var gameScene = new Phaser.Class(
                 element.moveObject(element);
             });
             
-            WordSpace.weightTextObjForTest.setText('뇌의 무게: (현재) '+WordSpace.totalWeight+' / '+ WordSpace.brainCapacity+' (전체)');
             WordSpace.setPlayerTyping.add('');
 
             if(!WordSpace.isGameOver)
             {
-                if(WordSpace.totalWeight < 180)
-                {
-                    this.warningTween.timeScale = 0;
-                }
-                else if(WordSpace.totalWeight < 190)
-                {
-                    this.warningTween.timeScale = 0.3;
-                }
-                else if(WordSpace.totalWeight < 200)
-                {
-                    this.warningTween.timeScale = 0.6;
-                }
-                else if(WordSpace.isTimerOn)
-                {
-                    this.warningTween.timeScale = 0.6 + WordSpace.gameOverCycle.currentCycle.getElapsed() / WordSpace.delay.GameOver * 3;
-                }
+                if(WordSpace.totalWeight < 180) this.warningTween.timeScale = 0;
+                else if(WordSpace.totalWeight < 190) this.warningTween.timeScale = 0.3;
+                else if(WordSpace.totalWeight < 200) this.warningTween.timeScale = 0.6;
+                else if(WordSpace.isTimerOn) this.warningTween.timeScale = 0.6 + WordSpace.gameOverCycle.currentCycle.getElapsed() / WordSpace.delay.GameOver * 3;
             }
         }
     }
