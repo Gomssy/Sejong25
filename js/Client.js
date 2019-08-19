@@ -245,10 +245,11 @@ socket.on('defeat', function(msg) // object player
         backToMenu(false);
     }
 });
-socket.on('gameEnd', function(msg) // object player
+socket.on('gameEnd', function(msg) // number winnerId
 {
-    console.log(msg.nickname + ' Win!!!!!!');
-    if(msg.id == RoomData.myself.id)
+    const winner = RoomData.findPlayer(msg);
+    console.log(winner.nickname + ' Win!!!!!!');
+    if(msg == RoomData.myself.id)
     {
         RoomData.myself.rank = 1;
         backToMenu(true);

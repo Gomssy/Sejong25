@@ -380,6 +380,7 @@ class Player
 
         this.isAlive = false;
         this.rank = room.nextRank--;
+        if (this.tabCheckTime != undefined) clearTimeout(this.tabCheckTime);
         socket.playerData.isReceivable = false;
         room.aliveCount--;
 
@@ -407,13 +408,14 @@ class Player
             room.announceToRoom('defeat', this);
             console.log('[' + this.id + '] defeated, rank: ' + this.rank + ', ' + room.aliveCount + ' player left');
 
-            if (socket.playerData.currentRoom.aliveCount === 1)
+            if (room.aliveCount === 1)
             {
                 let winner = room.currentPlayer.find(function(element)
                 {
                     return element.isAlive;
                 });
-                room.announceToRoom('gameEnd', winner);
+                if (winner.tabCheckTime != undefined) clearTimeout(winner.tabCheckTime);
+                room.announceToRoom('gameEnd', winner.id);
                 room.announceToTarget(winner.id, 'alert', 'gameWin');
                 room.currentPhase = GameServer.Phase.GAMEEND;
                 console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
