@@ -62,30 +62,45 @@ io.on('connection', function(socket)
     {
         try
         {
-            socket.playerData.playingData.playerTyping = msg.playerTyping;
-            if (socket.playerData.currentRoom.maxTypingPlayer.playerTyping < msg.playerTyping)
+            let player = socket.playerData.playingData;
+            let room = socket.playerData.currentRoom;
+
+            player.playerTyping = msg.playerTyping;
+            if (room.maxTypingPlayer.playerTyping < msg.playerTyping)
             {
-                socket.playerData.currentRoom.maxTypingPlayer = socket.playerData.playingData;
+                room.maxTypingPlayer = player;
             }
-            if (socket.playerData.currentRoom.minTypingPlayer.playerTyping > msg.playerTyping)
+            if (room.minTypingPlayer.playerTyping > msg.playerTyping)
             {
-                socket.playerData.currentRoom.minTypingPlayer = socket.playerData.playingData;
+                room.minTypingPlayer = player;
             }
-            let playerTypingRate = (msg.playerTyping - (socket.playerData.currentRoom.minTypingPlayer.playerTyping - socket.playerData.currentRoom.rateArrangePoint)) /
-            (socket.playerData.currentRoom.maxTypingPlayer.playerTyping - socket.playerData.currentRoom.minTypingPlayer.playerTyping + socket.playerData.currentRoom.rateArrangePoint * 2);
+            let playerTypingRate = (msg.playerTyping - (room.minTypingPlayer.playerTyping - room.rateArrangePoint)) /
+            (room.maxTypingPlayer.playerTyping - room.minTypingPlayer.playerTyping + room.rateArrangePoint * 2);
             socket.emit('setPlayerTypingRate', playerTypingRate);
 
             if (msg.isWord)
             {
-                socket.playerData.currentRoom.announceToRoom('writeWord', socket.playerData.id);
+                room.announceToRoom('writeWord', player.id);
             }
             if (msg.isAttackMode)
             {
-                socket.playerData.currentRoom.announceToRoom('attackMode', socket.playerData.id);
+                room.announceToRoom('attackMode', player.id);
             }
+            if (player.tabCheckTime != undefined)
+            {
+                clearTimeout(player.tabCheckTime);
+                player.tabCheckTime = setTimeout(function()
+                {
+                    if (room.currentPhase != GameServer.Phase.GAMEEND) player.defeat();
+                }, 1000);
+            }
+            else player.tabCheckTime = setTimeout(function()
+            {
+                if (room.currentPhase != GameServer.Phase.GAMEEND) player.defeat();
+            }, 1000);
         }
         catch (e) {
-            console.error('[ERR] error catched on setPlayerTyping');
+            console.error('[ERR] error catched on setPlayerTyping (' + e + ')');
             socket.disconnect();
         }
     });
@@ -106,20 +121,17 @@ io.on('connection', function(socket)
             room.startTimer = setTimeout(function()
             {
                 let deads = room.currentPlayer.filter(element => !element.isAlive);
-                if (room.aliveCount != 0)
+                if (room.aliveCount != 0 && room.currentPlayer.length - deads.length >= room.startCount)
                 {
                     console.error('[ROOM#'+room.roomId+'] FORCE START!!!');
-                    if (room.currentPlayer.length - deads.length >= room.startCount)
+                    room.startRoom();
+                    deads.forEach(function(element)
                     {
-                        room.startRoom();
-                        deads.forEach(function(element)
-                        {
-                            element.defeat();
-                        });
-                    }
+                        element.defeat();
+                    });
                     clearTimeout(room.startTimer);
                 }
-                else
+                else if (deads.length > 0)
                 {
                     deads.forEach(function(element)
                     {

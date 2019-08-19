@@ -143,7 +143,8 @@ socket.on('changePhase', function(msg) // number Phase
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {
-    WordSpace.PlayerTypingRate = msg;
+    WordSpace.playerTypingRate = msg;
+    WordSpace.adjustVarByPhase();
     //console.log('rate: ' + msg);
 });
 socket.on('writeWord', function(msg) // number playerId
@@ -244,10 +245,11 @@ socket.on('defeat', function(msg) // object player
         backToMenu(false);
     }
 });
-socket.on('gameEnd', function(msg) // object player
+socket.on('gameEnd', function(msg) // number winnerId
 {
-    console.log(msg.nickname + ' Win!!!!!!');
-    if(msg.id == RoomData.myself.id)
+    const winner = RoomData.findPlayer(msg);
+    console.log(winner.nickname + ' Win!!!!!!');
+    if(msg == RoomData.myself.id)
     {
         RoomData.myself.rank = 1;
         backToMenu(true);
