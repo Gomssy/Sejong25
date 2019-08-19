@@ -21,7 +21,7 @@ socket.on('alert', function(msg) // string errorcode
     {
         //toAlert = '승리!';
         ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '승리!!!!', {fontSize: '30pt'})
-        .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(11)
+        .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(9.9)
         .setColor('#000000').setBackgroundColor('#ffffff');
 
         gameOver();
@@ -57,8 +57,8 @@ socket.on('syncRoomScene', function(msg)
             let randY = Math.random() * 380 + 100;
             var playerSet = 
             {
-                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
-                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg[i].nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2).setDepth(5),
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg[i].nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(5.1),
                 id: msg[i].id
             }
             ScenesData.roomScene.players.push(playerSet);
@@ -79,8 +79,8 @@ socket.on('setRoomCount', function(msg)
             let randY = Math.random() * 380 + 100;
             var playerSet = 
             {
-                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2),
-                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg.player.nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5),
+                sprite: ScenesData.roomScene.add.sprite(randX, randY, 'playerStand').setOrigin(0.5, 0.5).setScale(0.2, 0.2).setDepth(5),
+                nickname: ScenesData.roomScene.add.text(randX-10, randY-60, msg.player.nickname).setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(5.1),
                 id: msg.player.id
             }
             ScenesData.roomScene.players.push(playerSet);
@@ -124,22 +124,7 @@ socket.on('startGame', function()
 // in game
 socket.on('changePhase', function(msg) // number Phase
 {
-    console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + msg);
-    WordSpace.CurrentPhase = msg;
-
-    WordSpace.pauseCycle(true);
-    // 여기서 종이 드르륵 열면됨
-    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phaseChangeBgr').setOrigin(0.5, 0.5).setDepth(10);
-    ScenesData.gameScene.scene.pause('gameScene');
-    setTimeout(function()
-    {
-        ScenesData.gameScene.scene.resume('gameScene');
-        // 여기서 종이 닫으면됨
-        phaseChangeBgr.destroy();
-        Audio.playSound(ScenesData.gameScene, 'startGame');
-        WordSpace.pauseCycle(false);
-        //console.log('start again');
-    }, 5000);
+    WordSpace.changePhase(msg);
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
 {
@@ -183,6 +168,35 @@ socket.on('attacked', function(msg) // object attackData
     WordSpace.attackedEvents.push(attackedEvent);
     //console.log(timeout);
 });
+socket.on('someoneItemStart', function(msg)
+{
+    let itemPlayer = RoomData.findPlayer(msg.id);
+    let size = msg.id == RoomData.myself.id ? 1 : 0.7;
+    let xOffset = msg.id != RoomData.myself.id && itemPlayer.position.x < game.config.width / 2 ? -1 : 1;
+    switch(msg.itemType)
+    {
+        case Enums.item.invincible:
+            itemPlayer.invincibleMark = ScenesData.gameScene.add.sprite(itemPlayer.position.x + 20 * size * xOffset, itemPlayer.position.y - 50 * size, 'attackPaper')
+                .setDepth(5.3).setOrigin(0.5, 0.5).setScale(size);
+            break;
+        default:
+            console.log('Improper item type.');
+            break;
+    }
+});
+socket.on('someoneItemEnd', function(msg)
+{
+    let itemPlayer = RoomData.findPlayer(msg.id);
+    switch(msg.itemType)
+    {
+        case Enums.item.invincible:
+            itemPlayer.invincibleMark.destroy();
+            break;
+        default:
+            console.log('Improper item type.');
+            break;
+    }
+});
 
 socket.on('defeat', function(msg) // object player
 {
@@ -194,18 +208,60 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index].position = position;
     RoomData.players[msg.index].nicknameText = nicknameText;
 
+    let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
-    RoomData.findPlayer(msg.id).playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
+    victim.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
+
+    
     if (msg.lastAttack != null) 
     {
-        let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId).nickname;
-        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated by ' + lastAttacker + ', with ' + msg.lastAttack.word);
-        WordSpace.killLogForTest += ('\n' + lastAttacker + ' --' + msg.lastAttack.word + '-> ' + RoomData.findPlayer(msg.id).nickname);
-        if(msg.lastAttack.attackerId == RoomData.myself.id)
+        let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId);
+        let attackWord = msg.lastAttack.word;
+        console.log(victim.nickname + ' defeated by ' + lastAttacker.nickname + ', with ' + msg.lastAttack.word);
+        if(WordSpace.lastAttackGroup.length != 0)
         {
-            var keys = Object.keys(Enums.item);
-            WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
-            let itemBag = ScenesData.gameScene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'itemBag').setScale(0).setDepth(5);
+            WordSpace.lastAttackGroup.forEach(function(element){
+                element.destroy();
+            })
+        }
+
+        let attackerLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 400, 0, 10.2, 'nameBgr' + lastAttacker.nickname.length, 2, 
+            'center', lastAttacker.nickname, 50, '#ffffff', 0.45, 0.5);
+        let wordLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, 0, 10.2, 'wordBgr' + msg.lastAttack.wordGrade + '_' + attackWord.length, 2, 
+            'center', attackWord, 50, '#000000', 0.45, 0.5);
+        let victimLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 400, 0, 10.2, 'nameBgr' + victim.nickname.length, 2, 
+            'center', victim.nickname, 50, '#ffffff', 0.45, 0.5);
+        let explosionEffect = ScenesData.gameScene.add.sprite(game.config.width / 2, 0, 'wordBreak').setScale(1).setDepth(10.2);
+        explosionEffect.play('wordBreakAnim');
+        explosionEffect.anims.setRepeat(-1);
+        
+
+        WordSpace.lastAttackGroup.push(attackerLabel);
+        WordSpace.lastAttackGroup.push(wordLabel);
+        WordSpace.lastAttackGroup.push(victimLabel);
+        WordSpace.lastAttackGroup.push(explosionEffect);
+
+        ScenesData.gameScene.tweens.add({
+            targets: [attackerLabel, wordLabel, victimLabel, explosionEffect],
+            y: 100,
+            ese: 'Linear',
+            duration: 500,
+            repeat: 0,
+            onComplete: function () {
+                setTimeout(function() {
+                    ScenesData.gameScene.tweens.add({
+                        targets: [attackerLabel, wordLabel, victimLabel, explosionEffect],
+                        y: -100,
+                        ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                        duration: 500,
+                        repeat: 0, // -1: infinity
+                        yoyo: false });
+                }, 1000);
+            },
+        })
+
+        let itemBag = ScenesData.gameScene.add.sprite(lastAttacker.position.x, lastAttacker.position.y, 
+            'itemBag').setScale(0).setDepth(5.3);
             ScenesData.gameScene.tweens.add({
                 targets: itemBag,
                 scaleX: 1,
@@ -222,27 +278,78 @@ socket.on('defeat', function(msg) // object player
                             scaleY: 0,
                             ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
                             duration: 500,
-                            repeat: 0, // -1: infinity
-                            yoyo: false });
-                    }, 1500);
-                },
-                onCompleteScope: ScenesData.gameScene
+                            repeat: 0,
+                            onComplete: function()
+                            {
+                                attackerLabel.destroy();
+                                wordLabel.destroy();
+                                victimLabel.destroy();
+                                explosionEffect.destroy();
+                            }
+                        });
+                    }, 1000);
+                }
             });
             setTimeout(function() {
                 itemBag.destroy();
             }, 3000);
+        if(msg.lastAttack.attackerId == RoomData.myself.id)
+        {
+            var keys = Object.keys(Enums.item);
+            WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
             RoomData.myself.killCount++;
         }
     }
     else 
     {
-        console.log(RoomData.findPlayer(msg.id).nickname + ' defeated');
-        WordSpace.killLogForTest += ('\n--Suicide->' + RoomData.findPlayer(msg.id).nickname);
+        console.log(victim.nickname + ' defeated');
+        if(WordSpace.lastAttackGroup.length != 0)
+        {
+            WordSpace.lastAttackGroup.forEach(function(element){
+                element.destroy();
+            })
+        }
+        
+        let victimLabel = UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, 0, 10.2, 'nameBgr' + victim.nickname.length, 2, 'center', victim.nickname, 50, '#ffffff', 0.45, 0.5);
+        let explosionEffect = ScenesData.gameScene.add.sprite(game.config.width / 2, 0, 'wordBreak').setScale(1).setDepth(10.2);
+        explosionEffect.play('wordBreakAnim');
+        explosionEffect.anims.setRepeat(-1);
+
+        explosionEffect.anims.setRepeat(-1);
+        WordSpace.lastAttackGroup.push(victimLabel);
+        WordSpace.lastAttackGroup.push(explosionEffect);
+        ScenesData.gameScene.tweens.add({
+            targets: [victimLabel, explosionEffect],
+            y: 100,
+            ese: 'Linear',
+            duration: 500,
+            repeat: 0,
+            onComplete: function () {
+                setTimeout(function() {
+                    ScenesData.gameScene.tweens.add({
+                        targets: [victimLabel, explosionEffect],
+                        y: -100,
+                        ease: 'Linear', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                        duration: 500,
+                        repeat: 0,
+                        onComplete: function()
+                        {
+                            victimLabel.destroy();
+                            explosionEffect.destroy();
+                        }
+                    });
+                }, 1000);
+            }
+        })
+
+
     }
     if(msg.id == RoomData.myself.id)
     {
         RoomData.myself = RoomData.players[msg.index];
-        backToMenu(false);
+        setTimeout(() => {
+            gameEndMenu(true);
+        }, 2000);
     }
 });
 socket.on('gameEnd', function(msg) // number winnerId
@@ -252,7 +359,9 @@ socket.on('gameEnd', function(msg) // number winnerId
     if(msg == RoomData.myself.id)
     {
         RoomData.myself.rank = 1;
-        backToMenu(true);
+        setTimeout(() => {
+            gameEndMenu(true);
+        }, 2000);
     }
 });
 
@@ -275,14 +384,19 @@ socket.on('userDisconnect', function(msg) // {num index , num id, str nickname}
     RoomData.aliveCount--;
 });
 
-var backToMenu = function(isWin)
+var gameEndMenu = function(isWin)
 {
+    WordSpace.isGameOver = true;
+    ScenesData.gameScene.warningImage.destroy();
+    ScenesData.gameScene.warningTween.remove();
     let earnedMoney = 0;
     if(isWin) earnedMoney += 20;
     earnedMoney += RoomData.myself.killCount * 3;
     earnedMoney += parseInt(WordSpace.playerTypingRate / 10);
     earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
     earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
+
+    Input.inputField.text.destroy();
 
     var temp = function(){
 
@@ -302,14 +416,14 @@ var backToMenu = function(isWin)
             x: game.config.width / 2,
             y: game.config.height / 2,
             choices: [
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 0, 'playerStand', 0.7, 'center'),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 150, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 10.2, 'playerStand', 0.7, 'center'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 150, 10.2, 
                     'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 50, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 50, 10.2, 
                     'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 10.2, 
                     'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 0, 
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 10.2, 
                     'button', 1, 'center', '획득 골드 : ' + earnedMoney + '원', 30).layout()
             ],
     
@@ -318,8 +432,8 @@ var backToMenu = function(isWin)
             }
         }),
         actions: [
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 20, 'button', 1, 'center', '나가기').layout(),
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 20, 'button', 1, 'center', '관전하기').layout()
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 10.2, 'button', 1, 'center', '나가기').layout(),
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 10.2, 'button', 1, 'center', '관전하기').layout()
         ],
 
         space: {
@@ -334,7 +448,7 @@ var backToMenu = function(isWin)
         align: {
             actions: 'center' // 'center'|'left'|'right'
         }
-    }).setDepth(20);
+    }).setDepth(10.2);
 
     ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {
@@ -342,7 +456,7 @@ var backToMenu = function(isWin)
             else
             {
                 ScenesData.gameScene.backToMenuDialog.setVisible(false);
-                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, temp);
+                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 10.2, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, temp);
             }
         }, ScenesData.gameScene)
         .on('button.over', function (button, groupName, index) {

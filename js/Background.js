@@ -13,17 +13,17 @@ BackGround.otherCharacters = [];
 
 BackGround.drawCharacter = function(scene)
 {
-    RoomData.myself.playerImage = scene.add.sprite(game.config.width / 2, game.config.height * 41 / 48, 'pyeongminWrite').setScale(0.45).setDepth(2);
+    RoomData.myself.playerImage = scene.add.sprite(game.config.width / 2, game.config.height * 41 / 48, 'pyeongminWrite').setScale(0.45).setDepth(5);
     RoomData.myself.position = new Phaser.Math.Vector2(RoomData.myself.playerImage.x, RoomData.myself.playerImage.y);
     BackGround.characterPos = BackGround.characterPos.sort(function(){return 0.5-Math.random()});
     RoomData.players.forEach(function(element){
         if(element.id != RoomData.myself.id)
         {
             element.position = BackGround.characterPos.pop();
-            element.playerImage = scene.add.sprite(element.position.x, element.position.y, 'pyeongminWrite').setScale(0.315).setDepth(1);
+            element.playerImage = scene.add.sprite(element.position.x, element.position.y, 'pyeongminWrite').setScale(0.315).setDepth(5);
             element.playerImage.flipX = element.position.x < game.config.width / 2 ? true : false;
             element.nicknameText = scene.add.text(element.position.x, element.position.y - 90, element.nickname)
-                .setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(1);
+                .setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(5.1);
 6        }
     });
 }
@@ -32,7 +32,7 @@ BackGround.gameBackground = null;
 
 BackGround.drawBrain = function(scene)
 {
-    BackGround.gameBackground = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'gameBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);
+    BackGround.gameBackground = scene.add.sprite(game.config.width / 2, game.config.height / 2, 'gameBackground').setDisplaySize(game.config.width, game.config.height).setDepth(3.1);
 }
 
 BackGround.drawBackground = function(scene)
@@ -42,10 +42,10 @@ BackGround.drawBackground = function(scene)
 
 BackGround.drawMenu = function(scene)
 {
-    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'menuBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);
+    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'menuBackground').setDisplaySize(game.config.width, game.config.height).setDepth(3);
 }
 
 BackGround.drawRoom = function(scene)
 {
-    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'roomBackground').setDisplaySize(game.config.width, game.config.height).setDepth(1);
+    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'roomBackground').setDisplaySize(game.config.width, game.config.height).setDepth(5.2);
 }

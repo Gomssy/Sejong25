@@ -20,7 +20,7 @@ class WordObject
         var random = WordSpace.getSpawnPoint(lenRate);
 
         this.physicsObj = scene.physics.add.sprite(random.x, random.y, spriteName).setMass(this.wordWeight * 10).setScale(this.scale)
-        .setFrictionX(0).setFrictionY(0).setBounce(0.5);
+        .setFrictionX(0).setFrictionY(0).setBounce(0.5).setDepth(1);
         this.physicsObj.wordCollider = null;
         let dist = Phaser.Math.Distance.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
         let angle = Phaser.Math.Angle.Between(this.physicsObj.x, this.physicsObj.y, WordSpace.gravityPoint.x, WordSpace.gravityPoint.y);
@@ -31,11 +31,10 @@ class WordObject
         
         this.wordObj = scene.add.text(random.x, random.y, this.wordText, 
             {
-                fontSize: (this.scale * this.fontScale) +'pt',
-                fontFamily: '"궁서", 궁서체, serif',
+                font: (this.scale * this.fontScale) +'pt sejongFont',
                 //fontStyle: (this.wordWeight > 5 ? 'bold' : '')
             });
-        this.wordObj.setColor(textColor).setOrigin(0.5,0.5);
+        this.wordObj.setColor(textColor).setOrigin(0.5,0.5).setDepth(1);
         this.createdTime = WordSpace.gameTimer.now;
         WordSpace.totalWeight += this.wordWeight;
         WordSpace.totalWordNum += 1;
@@ -54,7 +53,7 @@ class WordObject
         const forceIdx = WordSpace.wordForcedGroup.findIndex(function(item) {return this.isEqualObject(item.generationCode)}, this);
         if (forceIdx > -1) WordSpace.wordForcedGroup.splice(forceIdx, 1);
         WordSpace.wordPhysicsGroup.remove(this.physicsObj);
-        let breakAnim = ScenesData.gameScene.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBreak').setScale(0.5).setDepth(3).play('wordBreakAnim');
+        let breakAnim = ScenesData.gameScene.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBreak').setScale(0.5).setDepth(1.1).play('wordBreakAnim');
         setTimeout(function() {
             breakAnim.destroy();
         }, 200);
@@ -261,8 +260,7 @@ class NameWord extends WordObject
             {
                 this.physicsObj.setScale(this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale);
                 this.wordObj.setFont({
-                    fontSize: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt',
-                    fontFamily: '"궁서", 궁서체, serif',
+                    font: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt sejongFont',
                     fontStyle: (this.wordWeight > 5 ? 'bold' : '')
                 });
             }
@@ -285,8 +283,8 @@ class NameWord extends WordObject
             if(!this.isStrong) WordSpace.attackGauge.add(this.wordTyping * 0.1);
             WordSpace.nameGroup.push(this);
             this.isActive = false;
-            this.physicsObj.setVelocity(0, 0).setDepth(20);
-            this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(20);
+            this.physicsObj.setVelocity(0, 0).setDepth(10.2);
+            this.wordObj.setPosition(this.physicsObj.x, this.physicsObj.y).setDepth(10.2);
             this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
             this.path = new Phaser.Curves.Spline([
                 this.physicsObj.x, this.physicsObj.y,
@@ -363,8 +361,10 @@ class ItemWord extends WordObject
             {
                 case Enums.item.invincible:
                     WordSpace.isInvincible = true;
+                    socket.emit('itemStart', {id: RoomData.myself.id, itemType: Enums.item.invincible});
                     setTimeout(() => {
                         WordSpace.isInvincible = false;
+                        socket.emit('itemEnd', {id: RoomData.myself.id, itemType: Enums.item.invincible});
                     }, 5000);
                     break;
                 case Enums.item.nameList:
