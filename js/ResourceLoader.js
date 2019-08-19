@@ -42,13 +42,17 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('pyeongminStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
-    scene.load.spritesheet('phase1', 'assets/image/etc/scroll/startPhase/startPhase.png', { frameWidth: 280, frameHeight: 920 });
-    scene.load.spritesheet('phase2', 'assets/image/etc/scroll/bonPhase/bonPhase.png', { frameWidth: 280, frameHeight: 920 });
-    scene.load.spritesheet('phase3', 'assets/image/etc/scroll/poongPhase/poongPhase.png', { frameWidth: 280, frameHeight: 920 });
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
     scene.load.image('panel', 'assets/placeholder/panel.png');
     scene.load.image('button', 'assets/placeholder/button.png');
     scene.load.image('itemBag', 'assets/image/etc/itembag2.png');
+    scene.load.image('helpBtn', 'assets/image/UI/main/help.png');
+
+    
+    scene.load.spritesheet('phase1', 'assets/image/etc/scroll/startPhase/startPhase.png', { frameWidth: 280, frameHeight: 920 });
+    scene.load.spritesheet('phase2', 'assets/image/etc/scroll/bonPhase/bonPhase.png', { frameWidth: 280, frameHeight: 920 });
+    scene.load.spritesheet('phase3', 'assets/image/etc/scroll/poongPhase/poongPhase.png', { frameWidth: 280, frameHeight: 920 });
+    scene.load.spritesheet('tutorialImage', 'assets/image/UI/tutorial/tutorialImages.png', { frameWidth: 1000, frameHeight: 800 });
 }
 
 ResourceLoader.loadAnimation = function(scene)

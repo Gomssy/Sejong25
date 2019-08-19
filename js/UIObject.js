@@ -58,27 +58,31 @@ UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, d
     .on('pointerover', () => {
         if(temp.enabled)
         {
-            buttonGameObject.setFrame(overFrame);
+            if(overFrame != -1) buttonGameObject.setFrame(overFrame);
         }
     })
     .on('pointerdown', () => {
         if(temp.enabled)
         {
-            buttonGameObject.setFrame(downFrame);
+            if(downFrame != -1) buttonGameObject.setFrame(downFrame);
             clickCallback();
         }
     })
     .on('pointerup', () => {
-        buttonGameObject.setFrame(overFrame);
+        if(temp.enabled)
+        {
+            if(overFrame != -1) buttonGameObject.setFrame(overFrame);
+        }
     })
     .on('pointerout', () => {
-        buttonGameObject.setFrame(outFrame);
+        if(outFrame != -1) buttonGameObject.setFrame(outFrame);
     })
     temp.setEnable = function(isEnable)
     {
         temp.enabled = isEnable;
         return temp;
     }
+    temp.getBackground = function() { return buttonGameObject; }
 
     return temp;
 }
