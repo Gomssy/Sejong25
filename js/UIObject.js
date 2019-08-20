@@ -52,37 +52,41 @@ UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, d
             clickInterval: 100
         }
     });
-    buttonGameObject = buttonGameObject.getElement('background');
+    let buttonGameObjectBackground = buttonGameObject.getElement('background');
     temp.enabled = true;    
-    buttonGameObject.setFrame(outFrame).setInteractive()
+    buttonGameObjectBackground.setFrame(outFrame).setInteractive()
     .on('pointerover', () => {
         if(temp.enabled)
         {
-            if(overFrame != -1) buttonGameObject.setFrame(overFrame);
+            if(overFrame != -1) buttonGameObjectBackground.setFrame(overFrame);
+            else buttonGameObject.setScale(1.1);
         }
     })
     .on('pointerdown', () => {
         if(temp.enabled)
         {
-            if(downFrame != -1) buttonGameObject.setFrame(downFrame);
+            if(downFrame != -1) buttonGameObjectBackground.setFrame(downFrame);
+            else buttonGameObject.setScale(0.9);
             clickCallback();
         }
     })
     .on('pointerup', () => {
         if(temp.enabled)
         {
-            if(overFrame != -1) buttonGameObject.setFrame(overFrame);
+            if(overFrame != -1) buttonGameObjectBackground.setFrame(overFrame);
+            else buttonGameObject.setScale(1.1);
         }
     })
     .on('pointerout', () => {
-        if(outFrame != -1) buttonGameObject.setFrame(outFrame);
+        if(outFrame != -1) buttonGameObjectBackground.setFrame(outFrame);
+        else buttonGameObject.setScale(1);
     })
     temp.setEnable = function(isEnable)
     {
         temp.enabled = isEnable;
         return temp;
     }
-    temp.getBackground = function() { return buttonGameObject; }
+    temp.getBackground = function() { return buttonGameObjectBackground; }
 
     return temp;
 }

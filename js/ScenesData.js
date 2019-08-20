@@ -34,7 +34,7 @@ var menuScene = new Phaser.Class(
     
     create: function()
     {
-        BackGround.drawBackground(this);
+        BackGround.drawMenu(this);
         Audio.loopSound(this, 'login');
         ScenesData.menuScene.tutorialFrame = 0;
         ScenesData.menuScene.tutorialImage = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 11,
@@ -66,8 +66,8 @@ var menuScene = new Phaser.Class(
             PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
             PlayerData.nickname = PlayerData.currentHopae.name;
 
-            this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFontSize(40);
-            this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFontSize(40);
+            this.userName = this.add.text(250, 75, PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+            this.money = this.add.text(950, 70, PlayerData.userData.money).setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
 
             this.organizeHopae = function()
             {
@@ -187,7 +187,7 @@ var menuScene = new Phaser.Class(
             });
 
             
-            this.gameStartBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
+            this.gameStartBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 950, 5, 'friendlyPlayBtn', 1, 'center', '게임 시작', 50), -1, -1, -1, 
                 function()
                 {
                     ScenesData.menuScene.gameStartBtn.setEnable(false);
@@ -195,18 +195,18 @@ var menuScene = new Phaser.Class(
                     ScenesData.menuScene.roomEnterDialog.popUp(200);
                 })
             
-            this.shopBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
+            this.shopBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 950, 5, 'shopBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     console.log('상점 입장');
                 })
             
-            this.hopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
+            this.hopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 950, 5, 'hopaeManageBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     ScenesData.changeScene('hopaeScene');
                 })
-            this.helpBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 100, 5, 'helpBtn', 0.5, 'center'), 0, 0, 0, 
+            this.helpBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 75, 5, 'helpBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     ScenesData.menuScene.tutorialImage.setVisible(true).popUp(200);
