@@ -243,12 +243,23 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 
 document.addEventListener('DOMContentLoaded', function()
 {
-	window.fbClient = new FirebaseClient();
-	document.onkeydown = function(e)
-	{
-		if (!fbClient.isGameStarted && e.keyCode === 13)
+	var filter = "win16|win32|win64|mac|macintel";
+	if ( navigator.platform ){
+		if ( filter.indexOf(navigator.platform.toLowerCase())<0 ){
+			document.getElementById('dvLogin').style.display = 'none';
+			document.getElementById('notSupport').style.display = 'block';
+		}
+		else 
 		{
-			fbClient.onEmailBtnClick();
+			window.fbClient = new FirebaseClient();	
+			
+			document.onkeydown = function(e)
+			{
+				if (!fbClient.isGameStarted && e.keyCode === 13)
+				{
+					fbClient.onEmailBtnClick();
+				}
+			}
 		}
 	}
     console.log('done load');

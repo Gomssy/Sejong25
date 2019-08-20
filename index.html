@@ -31,6 +31,7 @@
     <style>
         img { position: relative; width: 100%; height: 100%; z-index: 0;}
         #dvLogin { position: absolute; left: 65%; top: 35%; width: 30%; height: 30%; padding: 10px; background: black; z-index: 1;}
+        #notSupport { position: absolute; left: 25%; top: 25%; background: white; z-index: 1; width: 50%; height: 50%; display: none;}
     </style>
 </head>
 <body>
@@ -43,6 +44,7 @@
             <button id="emailBtn" style="width: 100%; height: 10%;">이메일로 로그인</button></br>
             <button id="googleBtn" style="width: 10%; height: 10%;"><img src="/assets/title/googleBtn.png" style="object-fit: contain"></button></br>
         </div>
+        <p id="notSupport">해당하는 환경에서는 지원되지 않습니다. PC에서 이용 부탁드립니다.</p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
