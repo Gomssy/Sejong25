@@ -14,9 +14,9 @@ app.get('/', function(req, res) {
 
 // http 기본 포트(80)에 서버 열기
 server.listen(80, function() {
-    console.log('[SERVER] Listening on port ' + server.address().port);
+    console.log(new Date().toLocaleTimeString('ko-KR') + ' [SERVER] Listening on port ' + server.address().port);
     GameServer.serverNumber = Math.floor(Math.random() * 1000 + 1);
-    console.log('[SERVER] server number is ' + GameServer.serverNumber);
+    console.log(new Date().toLocaleTimeString('ko-KR') + ' [SERVER] server number is ' + GameServer.serverNumber);
 
 });
 
@@ -34,7 +34,7 @@ io.on('connection', function(socket)
             isReceivable: false
         };
         GameServer.currentPlayer.push(socket);
-        console.log('['+socket.playerData.id+'] client request');
+        console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] client request');
         socket.emit('setId', 
         {
             str: 'your number is ' + socket.playerData.id,
@@ -49,7 +49,7 @@ io.on('connection', function(socket)
         else
         {
             socket.playerData.nickname = msg;
-            console.log('['+socket.playerData.id+'] nickname set to ' + msg);
+            console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] nickname set to ' + msg);
             GameServer.enterEmptyRoom(socket);
         }
     });
@@ -100,7 +100,7 @@ io.on('connection', function(socket)
             }, 1000);
         }
         catch (e) {
-            console.error('[ERR] error catched on setPlayerTyping (' + e + ')');
+            console.error(new Date().toLocaleTimeString('ko-KR') + ' [ERR] error catched on setPlayerTyping (' + e + ')');
             socket.disconnect();
         }
     });
@@ -123,7 +123,7 @@ io.on('connection', function(socket)
                 let deads = room.currentPlayer.filter(element => !element.isAlive);
                 if (room.aliveCount != 0 && room.currentPlayer.length - deads.length >= room.startCount)
                 {
-                    console.error('[ROOM#'+room.roomId+'] FORCE START!!!');
+                    console.error(new Date().toLocaleTimeString('ko-KR') + ' [ROOM#'+room.roomId+'] FORCE START!!!');
                     room.startRoom();
                     deads.forEach(function(element)
                     {
@@ -202,7 +202,7 @@ io.on('connection', function(socket)
         let data = socket.playerData;
         if (data === undefined)
         {
-            console.error('[ERROR] data is undefined');
+            console.error(new Date().toLocaleTimeString('ko-KR') + ' [ERROR] data is undefined');
             console.table(GameServer.currentPlayer);
             GameServer.disconnectCount--;
         }
@@ -223,7 +223,7 @@ io.on('connection', function(socket)
 
 var disconnectUser = function(data, reason)
 {
-    console.log('['+ data.id +'] client disconnected, reason: ' + reason);
+    console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+ data.id +'] client disconnected, reason: ' + reason);
     let idxToDel = GameServer.currentPlayer.findIndex(function(element)
     {
         return element.playerData.id === data.id;
@@ -245,5 +245,5 @@ var disconnectUser = function(data, reason)
         }
         GameServer.currentPlayer.splice(idxToDel, 1);
     }
-    console.log('['+ data.id +'] disconnect complete');
+    //console.log('['+ data.id +'] disconnect complete');
 }
