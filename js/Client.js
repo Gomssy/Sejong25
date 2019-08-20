@@ -203,10 +203,12 @@ socket.on('defeat', function(msg) // object player
     let playerImage = RoomData.findPlayer(msg.id).playerImage;
     let position = RoomData.findPlayer(msg.id).position;
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
+    let earnedStrongHopae = RoomData.findPlayer(msg.id).earnedStrongHopae;
     RoomData.players[msg.index] = msg;
     RoomData.players[msg.index].playerImage = playerImage;
     RoomData.players[msg.index].position = position;
     RoomData.players[msg.index].nicknameText = nicknameText;
+    RoomData.players[msg.index].earnedStrongHopae = earnedStrongHopae;
 
     let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
@@ -341,8 +343,6 @@ socket.on('defeat', function(msg) // object player
                 }, 1000);
             }
         })
-
-
     }
     if(msg.id == RoomData.myself.id)
     {
