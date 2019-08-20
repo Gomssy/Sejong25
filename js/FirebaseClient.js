@@ -1,7 +1,8 @@
 function FirebaseClient()
 {
     this.init();
-    this.initEvent();
+	this.initEvent();
+	this.isGameStarted = false;
 }
 
 FirebaseClient.prototype.init = function()
@@ -69,6 +70,7 @@ FirebaseClient.prototype.setLogin = function()
 	.then(function()
 	{
 		game = new Phaser.Game(config);
+		fbClient.isGameStarted = true;
 	});
 	
 	document.getElementById('mainTitle').style.display = 'none';
@@ -77,7 +79,10 @@ FirebaseClient.prototype.setLogin = function()
 
 FirebaseClient.prototype.setLogOut = function()
 {
-
+	if (game != null) game.destroy(true);
+	this.isGameStarted = false;
+	document.getElementById('mainTitle').style.display = 'block';
+	document.getElementById('titleImg').style.display = 'block';
 }
 
 FirebaseClient.prototype.onEmailBtnClick = function()
@@ -225,6 +230,9 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 			if (beforeData.item != null) beforeData.item.push(valueChanged);
 			else beforeData.item = [valueChanged];
 			break;
+		case 'killCount':
+			beforeData.killCount = replace ? (valueChanged) : (beforeData.killCount + valueChanged);
+			break;
 		default:
 			console.log('[ERROR] database has no key for ' + key);
 			break;
@@ -235,9 +243,21 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 
 document.addEventListener('DOMContentLoaded', function()
 {
-    window.fbClient = new FirebaseClient();
+	window.fbClient = new FirebaseClient();
+	document.onkeydown = function(e)
+	{
+		if (!fbClient.isGameStarted && e.keyCode === 13)
+		{
+			fbClient.onEmailBtnClick();
+		}
+	}
     console.log('done load');
 });
+
+document.onkeydown = function(e)
+{
+	if (fbClient.isGameStarted && e.keyCode === 27) fbClient.logOut();
+}
 
 class UserData
 {
@@ -246,13 +266,11 @@ class UserData
         this.userName = prompt("유저의 이름을 입력해주세요.");
         this.exp = 0;
         this.rank = -1;
-        this.hopae = 
-        [
-            {name: prompt("첫번째 호패의 닉네임을 입력해주세요.\n(반드시 한글만 사용해주세요 띄어쓰기도 금지)"), type: 'wood'}
-		];
+        this.hopae = [];
 		this.recentHopae = null;
 		this.title = [];
 		this.money = 0;
 		this.item = [];
+		this.killCount = 0;
     }
 }

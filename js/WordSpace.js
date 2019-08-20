@@ -1,25 +1,23 @@
 var WordSpace = WordSpace || {};
 
-// for test
-WordSpace.weightTextObjForTest = null;
 WordSpace.nameWordTextForTest = null;
-WordSpace.killLogTextForTest = null;
-WordSpace.killLogForTest = '';
 
 WordSpace.nextWordCode = 0;
 WordSpace.totalWeight = 0; //현재 단어 무게 총합
 WordSpace.totalWordNum = 0;
 WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
 WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
+WordSpace.isGameOver = false;
 WordSpace.isTimerOn = false;
 WordSpace.isInvincible = false;
 WordSpace.pyeongminAnims = [];
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
-WordSpace.attackPaperGroup = [];
+WordSpace.attackPaperGroup = null;
 WordSpace.wordForcedGroup = [];
 WordSpace.wordPhysicsGroup = null;
+WordSpace.lastAttackGroup = [];
 
 WordSpace.GradeProb = [0.35, 0.6, 0.8];
 WordSpace.Phase = {READY: 0, START: 1, MAIN: 2, MUSIC: 3};
@@ -65,34 +63,34 @@ WordSpace.spaceInitiate = function(scene)
     });
 }
 
-WordSpace.AdjustVarByPhase = function(typingRate, phase)
+WordSpace.adjustVarByPhase = function()
 {
-    if(phase == WordSpace.Phase.START)
+    if(WordSpace.CurrentPhase == WordSpace.Phase.START)
     {
         WordSpace.delay.WordSpawn = 3000;
         WordSpace.delay.NameSpawn = 15000;
         WordSpace.NameSpawnReduce = 1000;
         WordSpace.GradeProb[0] = 0.35;
-        WordSpace.GradeProb[1] = 1 - 0.4 * typingRate;
+        WordSpace.GradeProb[1] = 1 - 0.4 * WordSpace.playerTypingRate;
         WordSpace.GradeProb[2] = 1;
     }
-    else if(phase == WordSpace.Phase.MAIN)
+    else if(WordSpace.CurrentPhase == WordSpace.Phase.MAIN)
     {
-        WordSpace.delay.WordSpawn = 3000 - typingRate * 1000;
+        WordSpace.delay.WordSpawn = 3000 - WordSpace.playerTypingRate * 1000;
         WordSpace.delay.NameSpawn = 12000;
         WordSpace.NameSpawnReduce = 1000;
-        WordSpace.GradeProb[0] = 0.5 - 0.5 * typingRate;
-        WordSpace.GradeProb[1] = 1 - 0.5 * typingRate;
-        WordSpace.GradeProb[2] = 1 - 0.15 * typingRate;
+        WordSpace.GradeProb[0] = 0.5 - 0.5 * WordSpace.playerTypingRate;
+        WordSpace.GradeProb[1] = 1 - 0.5 * WordSpace.playerTypingRate;
+        WordSpace.GradeProb[2] = 1 - 0.15 * WordSpace.playerTypingRate;
     }
-    else if(phase == WordSpace.Phase.MUSIC)
+    else if(WordSpace.CurrentPhase == WordSpace.Phase.MUSIC)
     {
         WordSpace.delay.WordSpawn = 1500;
         WordSpace.delay.NameSpawn = 8000;
         WordSpace.NameSpawnReduce = 400;
-        WordSpace.GradeProb[0] = 0.2 - 0.2 * typingRate;
-        WordSpace.GradeProb[1] = 0.8 - 0.45 * typingRate;
-        WordSpace.GradeProb[2] = 0.9 - 0.15 * typingRate;
+        WordSpace.GradeProb[0] = 0.2 - 0.2 * WordSpace.playerTypingRate;
+        WordSpace.GradeProb[1] = 0.8 - 0.45 * WordSpace.playerTypingRate;
+        WordSpace.GradeProb[2] = 0.9 - 0.15 * WordSpace.playerTypingRate;
     }
     WordSpace.wordCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.WordSpawn, WordSpace.wordCycle.currentCycle.getElapsed(), true);
     WordSpace.nameCycle.resetCycle(ScenesData.gameScene, WordSpace.delay.NameSpawn, WordSpace.nameCycle.currentCycle.getElapsed(), true);
@@ -112,7 +110,7 @@ WordSpace.attackGauge =
     generate: function(scene)
     {
         //console.log("created");
-        this.rectUI = scene.add.rectangle(game.config.width / 2, game.config.height * 5 / 6, 0, game.config.height * 11 / 720).setDepth(11);
+        this.rectUI = scene.add.rectangle(game.config.width / 2, game.config.height * 5 / 6, 0, game.config.height * 11 / 720).setDepth(10.1);
     },
     add: function(plus)
     {
@@ -143,7 +141,7 @@ WordSpace.attackGauge =
         };
         this.currentCycle = scene.time.addEvent(option);
 
-        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setDepth(10).setColor('#000000');
+        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setDepth(9.9).setColor('#000000');
         //this.rectUI.setColor(this.gradeColor[0]);
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;},
@@ -222,10 +220,6 @@ function gameOver()
     
     socket.emit('defeated');
     console.log('defeat');
-    ScenesData.gameScene.add.text(game.config.width / 2, game.config.height / 2, '패배', {fontSize: '30pt'})
-    .setPadding(5,5,5,5).setOrigin(0.5, 0.5).setDepth(10)
-    .setColor('#000000').setBackgroundColor('#ffffff');
-    //alert('defeat');
 }
 
 //게임 오버 판정을 위한 타이머
@@ -347,7 +341,12 @@ WordSpace.setPlayerTyping =
     },
     initiate: function(scene)
     {
-        this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(10).setColor('#000000');
+        this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(9.9).setColor('#000000');
+    },
+    reset: function()
+    {
+        this.totalTyping = 0;
+        this.writeWord = false;
     }
 }
 
@@ -416,14 +415,17 @@ WordSpace.attack = function(wordText, grade)
 
 WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
 {
-    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPaper').setScale(0.5 * multiple).setDepth(3);
+    let size = attackTo == RoomData.myself.position ? 1 : 0.7;
+    let xOffset = attackTo != RoomData.myself.position && attackTo.x < game.config.width / 2 ? -1 : 1;
+    
+    var attackPaper = scene.add.sprite(attackFrom.x, attackFrom.y, 'attackPaper').setScale(0.5 * multiple).setDepth(5.2);
     attackPaper.mask = new Phaser.Display.Masks.BitmapMask(scene, BackGround.gameBackground);
     attackPaper.throwTarget = attackTo;
     attackPaper.follower = { t: 0, vec: new Phaser.Math.Vector2() };
     attackPaper.path = new Phaser.Curves.Spline([
         attackFrom.x, attackFrom.y,
         (attackFrom.x + attackPaper.throwTarget.x) / 2, Math.min(attackFrom.y, attackPaper.throwTarget.y) - 100,
-        attackPaper.throwTarget.x, attackPaper.throwTarget.y - 10
+        attackPaper.throwTarget.x + 20 * size * xOffset, attackPaper.throwTarget.y - 50 * size
     ]);
     scene.tweens.add({
         targets: attackPaper.follower,
@@ -431,9 +433,8 @@ WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
         ease: 'Linear',
         duration: 4000,
         repeat: 0,
-        onComplete: function() { 
-            attackPaper.destroy();
-            WordSpace.attackPaperGroup = [];
+        onComplete: function() {
+            WordSpace.attackPaperGroup.remove(attackPaper, true);
         }
     });
     attackPaper.moveObject = function(obj)
@@ -442,7 +443,7 @@ WordSpace.makeAttackPaper = function(scene, attackFrom, attackTo, multiple)
         obj.setPosition(obj.follower.vec.x, obj.follower.vec.y);
         obj.angle = 720 * obj.follower.t;
     }
-    WordSpace.attackPaperGroup.push(attackPaper);
+    WordSpace.attackPaperGroup.add(attackPaper);
 }
 
 WordSpace.nameQueue = 
@@ -486,4 +487,71 @@ WordSpace.nameQueue =
         this.shuffle();
         this.shuffle();
     }
+}
+WordSpace.changePhase = function(newPhase)
+{
+    console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + newPhase);
+    WordSpace.CurrentPhase = newPhase;
+
+    //WordSpace.pauseCycle(true);
+    // 여기서 종이 드르륵 열면됨
+    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phase' + newPhase).setOrigin(0.5, 0.5).setDepth(9.9).play('phase' + newPhase + 'Anim');
+    //ScenesData.gameScene.scene.pause('gameScene');
+    setTimeout(function()
+    {
+        //ScenesData.gameScene.scene.resume('gameScene');
+        // 여기서 종이 닫으면됨
+        phaseChangeBgr.anims.playReverse('phase' + newPhase + 'Anim');
+        phaseChangeBgr.on('animationcomplete', function(currentAnim, currentFrame, sprite){sprite.destroy()});
+        Audio.playSound(ScenesData.gameScene, 'startGame');
+        //WordSpace.pauseCycle(false);
+        //console.log('start again');
+    }, 5000);
+}
+WordSpace.resetGame = function()
+{
+    WordSpace.nextWordCode = 0;
+    WordSpace.totalWeight = 0; //현재 단어 무게 총합
+    WordSpace.totalWordNum = 0;
+    WordSpace.brainCapacity = 200; //수용 가능한 단어 무게 최대치
+    WordSpace.gameTimer = null; //현재 게임 플레이 시간 타이머
+    WordSpace.isGameOver = false;
+    WordSpace.isTimerOn = false;
+    WordSpace.isInvincible = false;
+    WordSpace.pyeongminAnims = [];
+
+    WordSpace.wordGroup = [];
+    WordSpace.nameGroup = [];
+    WordSpace.attackPaperGroup = null;
+    WordSpace.wordForcedGroup = [];
+    WordSpace.wordPhysicsGroup = null;
+
+    WordSpace.nameQueue.queue = [];
+    WordSpace.setPlayerTyping.reset();
+    WordSpace.isTimerOn = false;
+    WordSpace.attackGauge.resetValue();
+    WordSpace.CurrentPhase = WordSpace.Phase.START;
+    WordSpace.playerTyping = 0;
+    WordSpace.playerTypingRate = 0;
+
+    //단어 생성 사이클
+    WordSpace.wordCycle = new Cycle(function()
+    {
+        WordSpace.genWordByProb(this);
+    });
+    //게임 오버 사이클
+    WordSpace.gameOverCycle = new Cycle(gameOver);
+    //호패 생성 사이클
+    WordSpace.nameCycle = new Cycle(function()
+    {
+        WordSpace.generateWord.Name(ScenesData.gameScene, false, null);
+    });
+    // playerTypingRate 갱신용 사이클
+    WordSpace.playerTypingCycle = new Cycle(function()
+    {
+        socket.emit('setPlayerTyping', {playerTyping: WordSpace.playerTyping, isWord: WordSpace.setPlayerTyping.writeWord, isAttackMode: Input.attackMode} );
+        WordSpace.setPlayerTyping.writeWord = false;
+    });
+    // 공격받을때의 일회용 이벤트들
+    WordSpace.attackedEvents = [];
 }

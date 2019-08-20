@@ -21,7 +21,7 @@ Input.attackOption = {
 
 Input.gameSceneEnterReaction = function()
 {
-    if (!Input.isEntered)
+    if (RoomData.myself.isAlive && !Input.isEntered)
     {
         if (Input.attackMode) WordSpace.attack(Input.removeConVow(Input.finalInput), Input.attackOption.wordGrade);
         else WordSpace.findWord(Input.finalInput);
@@ -384,7 +384,7 @@ Input.inputField =
 
 Input.pushInput = function(inputKey)
 {
-    if (this.justPressed != inputKey)
+    if ((ScenesData.currentScene != 'gameScene' || RoomData.myself.isAlive) && this.justPressed != inputKey)
     {
         this.justPressed = inputKey;
         let output;
