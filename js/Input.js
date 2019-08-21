@@ -306,13 +306,15 @@ Input.inputField =
 {
     generate: function(scene, enterCallback, text, isHopaeScene = false)
     {
-        this.text = text;
+        this.text = text.getElement('text');
+        this.inputBackground = text.getElement('background');
 
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; 
             if(isHopaeScene)
             {
                 ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) || (Input.finalInput.length > 1) ? true : false);
                 ScenesData.hopaeScene.warningText.setVisible(Input.finalInput.length > 4 ? true : false);
+                if(Input.finalInput.length > 1) Input.inputField.inputBackground.setFrame(Input.finalInput.length - 2);
             }})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});

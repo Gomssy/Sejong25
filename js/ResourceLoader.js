@@ -42,6 +42,7 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('pyeongminStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
+    scene.load.spritesheet('hopaeSceneInput', 'assets/image/word/hopaeSceneInput.png', { frameWidth: 239, frameHeight: 45 });
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
     scene.load.image('button', 'assets/placeholder/button.png');
     scene.load.image('panel', 'assets/placeholder/panel.png');
@@ -52,11 +53,6 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('shopBtn', 'assets/image/UI/main/shop.png');
     scene.load.image('hopaeManageBtn', 'assets/image/UI/main/hopaeManage.png');
     scene.load.image('helpBtn', 'assets/image/UI/main/help.png');
-
-    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/spectate.png');
-    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/help.png');
-    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/help.png');
-    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/help.png');
     
 
     

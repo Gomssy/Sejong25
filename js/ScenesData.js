@@ -249,9 +249,10 @@ var hopaeScene = new Phaser.Class(
     create: function()
     {
         BackGround.drawBackground(this);
+
+        this.inputBackground = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'hopaeSceneInput', 2, 'center', '', 50, '#ffffff', 0.45, 0.5);
         
-        Input.inputField.generate(this, function(){}, 
-            UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, 'center', '', 50, '#ffffff').getElement('text').setOrigin(0.45,0.5), true);
+        Input.inputField.generate(this, function(){}, this.inputBackground, true);
             
         UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'noticeBackground', 1, 'center', 
             '호패는 오직 한글만 입력이 가능합니다.\n띄어쓰기도 사용할 수 없습니다.', 50, '#000000').layout();
@@ -467,7 +468,7 @@ var gameScene = new Phaser.Class(
         WordSpace.wordPhysicsGroup = this.physics.add.group();
             
         Input.inputField.generate(this, Input.gameSceneEnterReaction, 
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, 'center', '', 25, '#000000').getElement('text'));
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, 'center', '', 25, '#000000'));
         
         WordSpace.attackGauge.generate(this);
         WordSpace.spaceInitiate(this);
