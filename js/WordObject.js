@@ -109,8 +109,8 @@ class NormalWord extends WordObject
         if(isNormallyRemoved)
         {
             Audio.playSound(ScenesData.gameScene, 'killWord');
-            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -191,8 +191,8 @@ class AttackWord extends WordObject
         if(isNormallyRemoved)
         {
             Audio.playSound(ScenesData.gameScene, 'killWord');
-            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -273,8 +273,8 @@ class NameWord extends WordObject
         if(isNormallyRemoved)
         {
             Audio.playSound(ScenesData.gameScene, 'killWord');
-            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             ScenesData.gameScene.physics.world.removeCollider(this.physicsObj.wordCollider);
             WordSpace.wordGroup.forEach(function(element)
             {
@@ -357,8 +357,8 @@ class ItemWord extends WordObject
         if(isNormallyRemoved)
         {
             Audio.playSound(ScenesData.gameScene, 'killWord');
-            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             WordSpace.attackGauge.add(0.5);
             switch(this.itemType)
             {

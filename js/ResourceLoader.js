@@ -40,13 +40,13 @@ ResourceLoader.loadImage = function(scene)
     scene.load.spritesheet('pyeongminGameOver', 'assets/image/character/pyeongmin/balladang/pyeong_balladang.png', { frameWidth: 720, frameHeight: 700 });
     scene.load.image('pyeongminStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     
-    scene.load.spritesheet('yangbanSit', 'assets/image/character/pyeongmin/pyeong_sit.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.spritesheet('yangbanWrite', 'assets/image/character/pyeongmin/write/pyeong_write.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.spritesheet('yangbanThrow', 'assets/image/character/pyeongmin/throw/pyeong_throw.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.spritesheet('yangbanBurningSmall', 'assets/image/character/pyeongmin/burning/pyeong_burning_small.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.spritesheet('yangbanBurningBig', 'assets/image/character/pyeongmin/burning/pyeong_burning_big.png', { frameWidth: 521, frameHeight: 610 });
-    scene.load.spritesheet('yangbanGameOver', 'assets/image/character/pyeongmin/balladang/pyeong_balladang.png', { frameWidth: 720, frameHeight: 700 });
-    scene.load.image('yangbanStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
+    scene.load.spritesheet('sunbiSit', 'assets/image/character/sunbi/sunbi_sit.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiWrite', 'assets/image/character/sunbi/sunbi_write.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiThrow', 'assets/image/character/sunbi/sunbi_throw.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiBurningSmall', 'assets/image/character/sunbi/sunbi_burning_small.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiBurningBig', 'assets/image/character/sunbi/sunbi_burning_big.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiGameOver', 'assets/image/character/sunbi/sunbi_die.png', { frameWidth: 720, frameHeight: 700 });
+    scene.load.image('sunbiStand', 'assets/image/character/sunbi/sunbi_stand.png');
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.spritesheet('hopaeSceneInput', 'assets/image/word/hopaeSceneInput.png', { frameWidth: 239, frameHeight: 45 });

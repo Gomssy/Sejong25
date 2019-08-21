@@ -136,7 +136,7 @@ var menuScene = new Phaser.Class(
             this.organizeHopae();
             this.createCurrentHopae();
 
-            this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, Enums.characterSkin[WordSpace.myCharacterSkin] + 'Stand')
+            this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
                 .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
 
             this.roomEnterDialog = this.rexUI.add.dialog({
@@ -171,7 +171,7 @@ var menuScene = new Phaser.Class(
 
             this.roomEnterDialog
                 .on('button.click', function (button, groupName, index) {
-                    if(index == 0) socket.emit('enterRoom', PlayerData.nickname);
+                    if(index == 0) socket.emit('enterRoom', {nickname: PlayerData.nickname, skin: PlayerData.userData.skin});
                     else
                     {
                         this.roomEnterDialog.setVisible(false);

@@ -29,6 +29,7 @@ io.on('connection', function(socket)
         {
             id: GameServer.getPlayerNumber(),
             nickname: '게스트',
+            skin: 0,
             currentRoom: null,
             playingData: null,
             isReceivable: false
@@ -45,11 +46,12 @@ io.on('connection', function(socket)
 
     socket.on('enterRoom', function(msg) // string new_nickname
     {
-        if(msg.length < 1) socket.emit('alert' ,'errNicknameEmpty');
+        if(msg.nickname.length < 1) socket.emit('alert' ,'errNicknameEmpty');
         else
         {
-            socket.playerData.nickname = msg;
-            console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] nickname set to ' + msg);
+            socket.playerData.nickname = msg.nickname;
+            socket.playerData.skiin = msg.skin;
+            console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] nickname set to ' + msg.nickname);
             GameServer.enterEmptyRoom(socket);
         }
     });

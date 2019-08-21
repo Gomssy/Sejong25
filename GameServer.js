@@ -362,6 +362,7 @@ class Player
         this.killCount = 0;
         this.earnedStrongHopae = 0;
         this.attackSucceed = 0;
+        this.skin = playerData.skin;
 
         this.isAlive = false;
         this.isInThisRoom = true;

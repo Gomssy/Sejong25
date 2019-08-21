@@ -14,7 +14,6 @@ WordSpace.pyeongminAnims = [];
 
 WordSpace.characterAnims = Array(2).fill(null).map(() => Array());
 
-WordSpace.myCharacterSkin = 0;
 
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
@@ -280,16 +279,16 @@ WordSpace.findWord = function(wordText)
         switch(tempAttackOption.wordCount)
         {
             case 2:
-                RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.notBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.notBurning]);
                 break;
             case 3:
-                RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.smallBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.smallBurning]);
                 break;
             case 4:
-                RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.smallBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.smallBurning]);
                 break;
             case 5:
-                RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.bigBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.bigBurning]);
                 break;
             default:
                 console.log('Improper attack option.');
@@ -399,8 +398,8 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
-        RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.throw]);
-        RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
+        RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.throw]);
+        RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
         Input.attackOption.isHeavy = false;
         Input.attackOption.isDark = false;
     }

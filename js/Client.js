@@ -223,7 +223,7 @@ socket.on('defeat', function(msg) // object player
 
     let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
-    victim.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.gameOver]);
+    victim.playerImage.play(WordSpace.characterAnims[victim.skin][Enums.characterAnim.gameOver]);
 
     
     if (msg.lastAttack != null) 
@@ -442,7 +442,8 @@ var gameEndMenu = function(isWin)
             x: game.config.width / 2,
             y: game.config.height / 2,
             choices: [
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 150, game.config.height / 2 - 100, 10.2, 'playerStand', 0.7, 'center'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 150, game.config.height / 2 - 100, 10.2, 
+                    Enums.characterSkin[PlayerData.userData.skin] + 'Stand', 0.7, 'center'),
                 UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 150, game.config.height / 2 - 180, 10.2, 
                     'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 20).layout(),
                 UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 150, game.config.height / 2 - 60, 10.2, 
