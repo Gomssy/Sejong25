@@ -140,7 +140,7 @@ var menuScene = new Phaser.Class(
                 x: game.config.width / 2,
                 y: game.config.height / 2,
 
-                background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+                background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'noticeBackground').setOrigin(0.5, 0.5),
                 
                 content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
                     font: '50pt sejongFont'
@@ -253,14 +253,14 @@ var hopaeScene = new Phaser.Class(
         Input.inputField.generate(this, function(){}, 
             UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, 'center', '', 50, '#ffffff').getElement('text').setOrigin(0.45,0.5), true);
             
-        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'panel', 1, 'center', 
+        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'noticeBackground', 1, 'center', 
             '호패는 오직 한글만 입력이 가능합니다.\n띄어쓰기도 사용할 수 없습니다.', 50, '#000000').layout();
 
         this.checkDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
             y: game.config.height / 2,
 
-            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'noticeBackground').setOrigin(0.5, 0.5),
             
             content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 ? 
                 '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
@@ -294,7 +294,7 @@ var hopaeScene = new Phaser.Class(
                 else
                 {
                     this.checkDialog.setVisible(false);
-                    this.errorMsg = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'panel', 1, 'center', 
+                    this.errorMsg = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'noticeBackground', 1, 'center', 
                         '엽전이 부족합니다', 50, '#000000').layout().popUp(200), 0, 0, 0, 
                         function()
                         {
@@ -315,7 +315,7 @@ var hopaeScene = new Phaser.Class(
         .on('button.out', function (button, groupName, index) {
             //console.log('button out');
         });
-        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'panel', 1, 'center', 
+        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'noticeBackground', 1, 'center', 
             '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다', 40, '#000000').setVisible(false).layout();
             
         this.checkBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 

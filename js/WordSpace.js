@@ -473,12 +473,8 @@ WordSpace.nameQueue =
     getCount: function(player)
     {
         WordSpace.nameQueue.counter = 0;
-        WordSpace.nameGroup.forEach(function(element){
-            if(element.id == player.id) WordSpace.nameQueue.counter++;
-        })
-        WordSpace.wordGroup.forEach(function(element){
-            if(element instanceof NameWord && element.ownerId == player.id) WordSpace.nameQueue.counter++;
-        })
+        WordSpace.nameGroup.forEach(function(element){ if(element.ownerId == player.id) WordSpace.nameQueue.counter++; });
+        WordSpace.wordGroup.forEach(function(element){ if(element instanceof NameWord && element.ownerId == player.id) WordSpace.nameQueue.counter++; });
         return WordSpace.nameQueue.counter;
     },
     counter: 0,

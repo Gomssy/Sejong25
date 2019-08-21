@@ -54,7 +54,7 @@ UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, d
     });
     let buttonGameObjectBackground = buttonGameObject.getElement('background');
     temp.enabled = true;    
-    buttonGameObjectBackground.setFrame(outFrame).setInteractive()
+    buttonGameObjectBackground.setFrame(outFrame > 0 ? outFrame : 0).setInteractive()
     .on('pointerover', () => {
         if(temp.enabled)
         {

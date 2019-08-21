@@ -43,14 +43,20 @@ ResourceLoader.loadImage = function(scene)
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
-    scene.load.image('panel', 'assets/placeholder/panel.png');
     scene.load.image('button', 'assets/placeholder/button.png');
+    scene.load.image('panel', 'assets/placeholder/panel.png');
+    scene.load.image('noticeBackground', 'assets/image/UI/noticeWindow/background.png');
     scene.load.image('itemBag', 'assets/image/etc/itembag2.png');
     scene.load.image('friendlyPlayBtn', 'assets/image/UI/main/friendlyPlay.png');
     scene.load.image('rankPlayBtn', 'assets/image/UI/main/rankPlay.png');
     scene.load.image('shopBtn', 'assets/image/UI/main/shop.png');
     scene.load.image('hopaeManageBtn', 'assets/image/UI/main/hopaeManage.png');
     scene.load.image('helpBtn', 'assets/image/UI/main/help.png');
+
+    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/spectate.png');
+    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/help.png');
+    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/help.png');
+    scene.load.image('helpBtn', 'assets/image/UI/decisionBtn/help.png');
     
 
     

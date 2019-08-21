@@ -410,7 +410,7 @@ var gameEndMenu = function(isWin)
         x: game.config.width / 2,
         y: game.config.height / 2,
 
-        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'noticeBackground').setOrigin(0.5, 0.5),
 
         content: ScenesData.gameScene.rexUI.add.dialog({
             x: game.config.width / 2,

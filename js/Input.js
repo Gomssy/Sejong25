@@ -29,20 +29,6 @@ Input.gameSceneEnterReaction = function()
         Input.isEntered = true;
     }
 }
-Input.menuSceneEnterReaction = function()
-{
-    Input.finalInput = Input.removeConVow(Input.finalInput);
-    if (Input.finalInput.length > 1)
-    {
-        PlayerData.nickname = Input.finalInput;
-        Input.reset();
-    }
-    else 
-    {
-        alert('정확한 가명을 입력해주세요.');
-        Input.reset();
-    }
-}
 
 Input.reset = function()
 {
@@ -325,9 +311,8 @@ Input.inputField =
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; 
             if(isHopaeScene)
             {
-                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) ? true : false);
-                if(Input.finalInput.length > 4) ScenesData.hopaeScene.warningText.setVisible(true);
-                else ScenesData.hopaeScene.warningText.setVisible(false);
+                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) || (Input.finalInput.length > 1) ? true : false);
+                ScenesData.hopaeScene.warningText.setVisible(Input.finalInput.length > 4 ? true : false);
             }})
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});
