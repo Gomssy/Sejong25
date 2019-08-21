@@ -117,14 +117,12 @@ WordSpace.attackGauge =
         if (this.value + plus > 11) this.value = 11;
         else this.value += plus;
         this.setRect();
-        this.text.setText('게이지: ' + this.value.toFixed(1));
     },
     sub: function(minus)
     {
         if (this.value - minus < 0) this.value = 0;
         else this.value -= minus;
         this.setRect();
-        this.text.setText('게이지: ' + this.value.toFixed(1));
     },
     resetValue: function() {this.value = 0;},
     cutValue: function(cutOut) {this.value *= (1-cutOut);},
@@ -141,7 +139,6 @@ WordSpace.attackGauge =
         };
         this.currentCycle = scene.time.addEvent(option);
 
-        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setDepth(9.9).setColor('#000000');
         //this.rectUI.setColor(this.gradeColor[0]);
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;},
@@ -337,12 +334,7 @@ WordSpace.setPlayerTyping =
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
         WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 60 * 1000;
-        this.text.setText('현재 타수 : ' + WordSpace.playerTyping.toFixed(1));
         this.writeWord = wordText != '' ? true : false;
-    },
-    initiate: function(scene)
-    {
-        this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(9.9).setColor('#000000');
     },
     reset: function()
     {
