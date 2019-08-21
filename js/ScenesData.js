@@ -35,7 +35,7 @@ var menuScene = new Phaser.Class(
     create: function()
     {
         BackGround.drawBackground(this);
-        Audio.loopSound(this, 'login');
+        Audio.playSound(this, 'login');
         if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0)
         {
             PlayerData.userData.money += 1;
