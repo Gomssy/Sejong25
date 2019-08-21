@@ -153,7 +153,9 @@ socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
     WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos, msg.multiple);
 });
 socket.on('attacked', function(msg) // object attackData
-{
+{   
+    Audio.playSound(ScenesData.gameScene, 'Bagazi');
+    
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
@@ -225,6 +227,9 @@ socket.on('defeat', function(msg) // object player
     {
         let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId);
         let attackWord = msg.lastAttack.word;
+
+        Audio.playSound(ScenesData.gameScene, 'killLog');
+
         console.log(victim.nickname + ' defeated by ' + lastAttacker.nickname + ', with ' + msg.lastAttack.word);
         if(WordSpace.lastAttackGroup.length != 0)
         {
