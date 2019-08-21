@@ -38,7 +38,7 @@ var menuScene = new Phaser.Class(
         Audio.loopSound(this, 'login');
         ScenesData.menuScene.tutorialFrame = 0;
         ScenesData.menuScene.tutorialImage = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 11,
-            'tutorialImage', 1, 'center'), -1, -1, -1,
+            'tutorialImage', 1, 'center'), -2, -2, -2,
             function()  
             {
                 ScenesData.menuScene.tutorialFrame = (ScenesData.menuScene.tutorialFrame + 1) % 9;
@@ -140,25 +140,21 @@ var menuScene = new Phaser.Class(
                 x: game.config.width / 2,
                 y: game.config.height / 2,
 
-                background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'noticeBackground').setOrigin(0.5, 0.5),
+                background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'dialog1').setOrigin(0.5, 0.5),
                 
-                content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
+                content: this.add.text(game.config.width / 2, game.config.height / 2, '대기실에 참가하시겠습니까?', {
                     font: '50pt sejongFont'
-                }),
+                }).setColor('#000000'),
 
                 actions: [
-                    UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '예', 50),
-                    UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '아니오', 50)
+                    UIObject.createLabel(this, 0, 0, 0, 'yesBtn', 1, 'center', '                      '),
+                    UIObject.createLabel(this, 0, 0, 0, 'noBtn', 1, 'center', '                      ')
                 ],
 
                 space: {
-                    content: 25,
-                    action: 100,
+                    content: 25, action: 100,
 
-                    left: 20,
-                    right: 20,
-                    top: 20,
-                    bottom: 20,
+                    left: 50, right: 50, top: 50, bottom: 50,
                 },
 
                 align: {
@@ -204,7 +200,8 @@ var menuScene = new Phaser.Class(
             this.hopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 950, 5, 'hopaeManageBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
-                    ScenesData.changeScene('hopaeScene');
+                    if(PlayerData.userData.hopae.length > 4) console.log('호패가 5개입니다.');
+                    else ScenesData.changeScene('hopaeScene');
                 })
             this.helpBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 75, 5, 'helpBtn', 1, 'center'), -1, -1, -1, 
                 function()
@@ -254,14 +251,14 @@ var hopaeScene = new Phaser.Class(
         
         Input.inputField.generate(this, function(){}, this.inputBackground);
             
-        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'noticeBackground', 1, 'center', 
+        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'dialog2', 1, 'center', 
             '호패는 오직 한글만 입력이 가능합니다.\n띄어쓰기도 사용할 수 없습니다.', 50, '#000000').layout();
 
         this.checkDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
             y: game.config.height / 2,
 
-            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'noticeBackground').setOrigin(0.5, 0.5),
+            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'dialog1').setOrigin(0.5, 0.5),
             
             content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 ? 
                 '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
@@ -269,13 +266,13 @@ var hopaeScene = new Phaser.Class(
             }),
 
             actions: [
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '예', 50),
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '아니오', 50)
+                UIObject.createLabel(this, 0, 0, 0, 'yesBtn', 1, 'center', '                      '),
+                UIObject.createLabel(this, 0, 0, 0, 'noBtn', 1, 'center', '                      ')
             ],
 
             space: {
                 content: 25, action: 100,
-                left: 20, right: 20, top: 20, bottom: 20,
+                left: 50, right: 50, top: 50, bottom: 50,
             },
 
             align: { actions: 'center' },
@@ -289,13 +286,13 @@ var hopaeScene = new Phaser.Class(
                 if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 || PlayerData.userData.money > 0)
                 {
                     fbClient.updateUserData('hopae', {name: Input.inputField.text.text, type: 'wood'});
-                    fbClient.updateUserData('money', PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 ? 0 : -1);
+                    if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0) fbClient.updateUserData('money', -1);
                     ScenesData.changeScene('menuScene');
                 }
                 else
                 {
                     this.checkDialog.setVisible(false);
-                    this.errorMsg = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'noticeBackground', 1, 'center', 
+                    this.errorMsg = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'dialog1', 1, 'center', 
                         '엽전이 부족합니다', 50, '#000000').layout().popUp(200), 0, 0, 0, 
                         function()
                         {
@@ -316,7 +313,7 @@ var hopaeScene = new Phaser.Class(
         .on('button.out', function (button, groupName, index) {
             //console.log('button out');
         });
-        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'noticeBackground', 1, 'center', 
+        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'dialog1', 1, 'center', 
             '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다', 40, '#000000').setVisible(false).layout();
             
         this.checkBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
@@ -327,7 +324,7 @@ var hopaeScene = new Phaser.Class(
                     ScenesData.hopaeScene.checkBtn.setEnable(false);
                     ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
                 }
-            })
+            }).setEnable(false);
         if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0))
         {
             this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
@@ -475,8 +472,6 @@ var gameScene = new Phaser.Class(
         WordSpace.attackGauge.resetCycle(this);
 
         WordSpace.startCycle(this);
-        
-        WordSpace.setPlayerTyping.initiate(this);
         
         WordSpace.nameQueue.initiate();
         

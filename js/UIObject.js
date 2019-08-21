@@ -12,7 +12,7 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, align, text = 
         text: scene.add.text(x, y, text, {
             font: textSize + 'pt sejongFont',
             align: 'center'
-        }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor),
+        }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor).setPadding(30, 30, 30, 30),
 
         space: {
             left: 10,
@@ -58,28 +58,28 @@ UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, d
     .on('pointerover', () => {
         if(temp.enabled)
         {
-            if(overFrame != -1) buttonGameObjectBackground.setFrame(overFrame);
-            else buttonGameObject.setScale(1.1);
+            if(overFrame > 0) buttonGameObjectBackground.setFrame(overFrame);
+            if(overFrame != -2) buttonGameObject.setScale(1.1);
         }
     })
     .on('pointerdown', () => {
         if(temp.enabled)
         {
-            if(downFrame != -1) buttonGameObjectBackground.setFrame(downFrame);
-            else buttonGameObject.setScale(0.9);
+            if(downFrame > 0) buttonGameObjectBackground.setFrame(downFrame);
+            if(downFrame != -2) buttonGameObject.setScale(0.9);
             clickCallback();
         }
     })
     .on('pointerup', () => {
         if(temp.enabled)
         {
-            if(overFrame != -1) buttonGameObjectBackground.setFrame(overFrame);
-            else buttonGameObject.setScale(1.1);
+            if(overFrame > 0) buttonGameObjectBackground.setFrame(overFrame);
+            if(overFrame != -2) buttonGameObject.setScale(1.1);
         }
     })
     .on('pointerout', () => {
-        if(outFrame != -1) buttonGameObjectBackground.setFrame(outFrame);
-        else buttonGameObject.setScale(1);
+        if(outFrame > 0) buttonGameObjectBackground.setFrame(outFrame);
+        if(outFrame != -2) buttonGameObject.setScale(1);
     })
     temp.setEnable = function(isEnable)
     {
