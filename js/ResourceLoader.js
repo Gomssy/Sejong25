@@ -70,7 +70,7 @@ ResourceLoader.loadImage = function(scene)
     scene.load.spritesheet('phase1', 'assets/image/etc/scroll/startPhase/startPhase.png', { frameWidth: 280, frameHeight: 920 });
     scene.load.spritesheet('phase2', 'assets/image/etc/scroll/bonPhase/bonPhase.png', { frameWidth: 280, frameHeight: 920 });
     scene.load.spritesheet('phase3', 'assets/image/etc/scroll/poongPhase/poongPhase.png', { frameWidth: 280, frameHeight: 920 });
-    scene.load.spritesheet('tutorialImage', 'assets/image/UI/tutorial/tutorialImages.png', { frameWidth: 1000, frameHeight: 800 });
+    scene.load.spritesheet('tutorialImage', 'assets/image/UI/tutorial/tutorialImages.png', { frameWidth: 1080, frameHeight: 615 });
 }
 
 ResourceLoader.loadAnimation = function(scene)
