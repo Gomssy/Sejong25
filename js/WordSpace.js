@@ -117,14 +117,12 @@ WordSpace.attackGauge =
         if (this.value + plus > 11) this.value = 11;
         else this.value += plus;
         this.setRect();
-        this.text.setText('게이지: ' + this.value.toFixed(1));
     },
     sub: function(minus)
     {
         if (this.value - minus < 0) this.value = 0;
         else this.value -= minus;
         this.setRect();
-        this.text.setText('게이지: ' + this.value.toFixed(1));
     },
     resetValue: function() {this.value = 0;},
     cutValue: function(cutOut) {this.value *= (1-cutOut);},
@@ -141,7 +139,6 @@ WordSpace.attackGauge =
         };
         this.currentCycle = scene.time.addEvent(option);
 
-        this.text = scene.add.text(100,100,'게이지: ' + this.value.toFixed(1)).setDepth(9.9).setColor('#000000');
         //this.rectUI.setColor(this.gradeColor[0]);
     },
     pauseCycle: function(bool) {this.currentCycle.paused = bool;},
@@ -265,7 +262,7 @@ WordSpace.findWord = function(wordText)
         }
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else if (wordText === '공격' && WordSpace.attackGauge.value >= 3 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
+    else if (wordText === '공격' && WordSpace.attackGauge.value >= 2 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
     {
         console.log('attack mode');
         let tempAttackOption = this.attackGauge.getAttackOption();
@@ -273,6 +270,7 @@ WordSpace.findWord = function(wordText)
         Input.attackOption.wordGrade = tempAttackOption.wordGrade;
         Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
+        Input.inputField.inputBackground.setFrame(Input.maxInput - 2);
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
         switch(tempAttackOption.wordCount)
@@ -336,12 +334,7 @@ WordSpace.setPlayerTyping =
     {
         this.totalTyping += wordText != null ? WordReader.getWordTyping(wordText) : 0;
         WordSpace.playerTyping = this.totalTyping / WordSpace.gameTimer.now * 60 * 1000;
-        this.text.setText('현재 타수 : ' + WordSpace.playerTyping.toFixed(1));
         this.writeWord = wordText != '' ? true : false;
-    },
-    initiate: function(scene)
-    {
-        this.text = scene.add.text(100,200,'현재 타수 : ' + WordSpace.playerTyping.toFixed(1)).setDepth(9.9).setColor('#000000');
     },
     reset: function()
     {
@@ -473,12 +466,8 @@ WordSpace.nameQueue =
     getCount: function(player)
     {
         WordSpace.nameQueue.counter = 0;
-        WordSpace.nameGroup.forEach(function(element){
-            if(element.id == player.id) WordSpace.nameQueue.counter++;
-        })
-        WordSpace.wordGroup.forEach(function(element){
-            if(element instanceof NameWord && element.ownerId == player.id) WordSpace.nameQueue.counter++;
-        })
+        WordSpace.nameGroup.forEach(function(element){ if(element.ownerId == player.id) WordSpace.nameQueue.counter++; });
+        WordSpace.wordGroup.forEach(function(element){ if(element instanceof NameWord && element.ownerId == player.id) WordSpace.nameQueue.counter++; });
         return WordSpace.nameQueue.counter;
     },
     counter: 0,

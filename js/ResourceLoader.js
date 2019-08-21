@@ -5,13 +5,12 @@ ResourceLoader.loadBackGround = function(scene)
     scene.load.image('weightWarning', 'assets/image/background/weightWarning.png');
     scene.load.image('baseBackground', 'assets/image/background/yellowBack.png');
     scene.load.image('gameBackground', 'assets/image/background/background_brain.png');
-    scene.load.image('menuBackground', 'assets/placeholder/menuBackground.png');
+    scene.load.image('menuBackground', 'assets/image/UI/main/mainBackground.png');
     scene.load.image('roomBackground', 'assets/placeholder/roomBackground.png');
 }
 
 ResourceLoader.loadImage = function(scene)
 {
-    scene.load.image('inputfield', 'assets/image/etc/wordspace.png');
     for (let i = 0; i < 4; i++)
     {
         for (let j = 2; j < 7; j++)
@@ -42,13 +41,36 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('pyeongminStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
+    scene.load.spritesheet('hopaeSceneInput', 'assets/image/word/hopaeSceneInput.png', { frameWidth: 239, frameHeight: 45 });
+    scene.load.spritesheet('gameSceneInput', 'assets/image/etc/wordSpace/wordspace.png', { frameWidth: 253, frameHeight: 67 });
+    scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
+    scene.load.image('itemBag', 'assets/image/etc/itembag2.png');
+
+    scene.load.image('button', 'assets/placeholder/button.png');
+    scene.load.image('panel', 'assets/placeholder/panel.png');
+    
+    scene.load.image('dialog1', 'assets/image/UI/dialog/dialog1.png');
+    scene.load.image('dialog2', 'assets/image/UI/dialog/dialog2.png');
+    scene.load.image('friendlyPlayBtn', 'assets/image/UI/main/friendlyPlay.png');
+    scene.load.image('rankPlayBtn', 'assets/image/UI/main/rankPlay.png');
+    scene.load.image('shopBtn', 'assets/image/UI/main/shop.png');
+    scene.load.image('hopaeManageBtn', 'assets/image/UI/main/hopaeManage.png');
+    scene.load.image('helpBtn', 'assets/image/UI/main/help.png');
+
+    
+    scene.load.image('cancelBtn', 'assets/image/UI/decisionBtn/cancel.png');
+    scene.load.image('confirmBtn', 'assets/image/UI/decisionBtn/confirm.png');
+    scene.load.image('exitBtn', 'assets/image/UI/decisionBtn/exit.png');
+    scene.load.image('noBtn', 'assets/image/UI/decisionBtn/no.png');
+    scene.load.image('spectateBtn', 'assets/image/UI/decisionBtn/spectate.png');
+    scene.load.image('yesBtn', 'assets/image/UI/decisionBtn/yes.png');
+    
+
+    
     scene.load.spritesheet('phase1', 'assets/image/etc/scroll/startPhase/startPhase.png', { frameWidth: 280, frameHeight: 920 });
     scene.load.spritesheet('phase2', 'assets/image/etc/scroll/bonPhase/bonPhase.png', { frameWidth: 280, frameHeight: 920 });
     scene.load.spritesheet('phase3', 'assets/image/etc/scroll/poongPhase/poongPhase.png', { frameWidth: 280, frameHeight: 920 });
-    scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
-    scene.load.image('panel', 'assets/placeholder/panel.png');
-    scene.load.image('button', 'assets/placeholder/button.png');
-    scene.load.image('itemBag', 'assets/image/etc/itembag2.png');
+    scene.load.spritesheet('tutorialImage', 'assets/image/UI/tutorial/tutorialImages.png', { frameWidth: 1000, frameHeight: 800 });
 }
 
 ResourceLoader.loadAnimation = function(scene)

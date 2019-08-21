@@ -34,157 +34,186 @@ var menuScene = new Phaser.Class(
     
     create: function()
     {
-        BackGround.drawBackground(this);
+        BackGround.drawMenu(this);
         Audio.loopSound(this, 'login');
-        if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0)
-        {
-            PlayerData.userData.money += 1;
-            ScenesData.changeScene('hopaeScene');
-            return;
-        }
-        PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
-        PlayerData.nickname = PlayerData.currentHopae.name;
-
-        this.userName = this.add.text(100, 100, '내 이름 : ' + PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFontSize(40);
-        this.money = this.add.text(100, 200, '소지 엽전 : ' + PlayerData.userData.money).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFontSize(40);
-
-        this.organizeHopae = function()
-        {
-            this.myHopae = [];
-            this.myHopae.push({
-                    name: PlayerData.currentHopae.name,
-                    type: PlayerData.currentHopae.type,
-                });
-            for(let i = 0; i < PlayerData.userData.hopae.length; i++)
-                if(PlayerData.userData.hopae[i].name != PlayerData.currentHopae.name)
-                    this.myHopae.push({
-                            name: PlayerData.userData.hopae[i].name,
-                            type: PlayerData.userData.hopae[i].type,
-                        });
-        }
-
-        this.createHopaeMenu = function()
-        {
-            this.hopaeMenuObject = [];
-            for(let i = 0; i < this.myHopae.length; i++)
+        ScenesData.menuScene.tutorialFrame = 0;
+        ScenesData.menuScene.tutorialImage = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 11,
+            'tutorialImage', 1, 'center'), -2, -2, -2,
+            function()  
             {
-                let temp = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 5,
-                    'nameBgr' + ScenesData.menuScene.myHopae[i].name.length, 1, 'left', ScenesData.menuScene.myHopae[i].name, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
-                    function()
+                ScenesData.menuScene.tutorialFrame = (ScenesData.menuScene.tutorialFrame + 1) % 9;
+                if(ScenesData.menuScene.tutorialFrame >= 8)
+                {
+                    ScenesData.menuScene.tutorialImage.getBackground().setFrame(0);
+                    if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0) ScenesData.changeScene('hopaeScene');
+                    else
                     {
-                        PlayerData.currentHopae = ScenesData.menuScene.myHopae[i];
-                        PlayerData.nickname = ScenesData.menuScene.myHopae[i].name;
-                        ScenesData.menuScene.organizeHopae();
-                        ScenesData.menuScene.currentHopaeBtn.destroy();
-                        ScenesData.menuScene.createCurrentHopae();
-                        ScenesData.menuScene.hopaeMenuObject.forEach(function(element){
-                            ScenesData.menuScene.tweens.add({
-                                targets: element,
-                                y: 0,
-                                duration: 200,
-                                ease: 'Linear',
-                                loop: 0,
-                                onComplete: function(){element.destroy();}
+                        ScenesData.menuScene.tutorialFrame = 0;
+                        ScenesData.menuScene.tutorialImage.setVisible(false);
+                        ScenesData.menuScene.helpBtn.setEnable(true);
+                        ScenesData.menuScene.gameStartBtn.setEnable(true);
+                        ScenesData.menuScene.shopBtn.setEnable(true);
+                        ScenesData.menuScene.hopaeBtn.setEnable(true);
+                        ScenesData.menuScene.currentHopaeBtn.setEnable(true);
+                    }
+                }
+                ScenesData.menuScene.tutorialImage.getBackground().setFrame(ScenesData.menuScene.tutorialFrame);
+            }).setVisible(false);
+            
+        if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0) ScenesData.menuScene.tutorialImage.setVisible(true).popUp(1000);
+        else
+        {
+            PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
+            PlayerData.nickname = PlayerData.currentHopae.name;
+
+            this.userName = this.add.text(250, 75, PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+            this.money = this.add.text(950, 70, PlayerData.userData.money).setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+
+            this.organizeHopae = function()
+            {
+                this.myHopae = [];
+                this.myHopae.push({
+                        name: PlayerData.currentHopae.name,
+                        type: PlayerData.currentHopae.type,
+                    });
+                for(let i = 0; i < PlayerData.userData.hopae.length; i++)
+                    if(PlayerData.userData.hopae[i].name != PlayerData.currentHopae.name)
+                        this.myHopae.push({
+                                name: PlayerData.userData.hopae[i].name,
+                                type: PlayerData.userData.hopae[i].type,
+                            });
+            }
+
+            this.createHopaeMenu = function()
+            {
+                this.hopaeMenuObject = [];
+                for(let i = 0; i < this.myHopae.length; i++)
+                {
+                    let temp = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 5,
+                        'nameBgr' + ScenesData.menuScene.myHopae[i].name.length, 1, 'left', ScenesData.menuScene.myHopae[i].name, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
+                        function()
+                        {
+                            PlayerData.currentHopae = ScenesData.menuScene.myHopae[i];
+                            PlayerData.nickname = ScenesData.menuScene.myHopae[i].name;
+                            ScenesData.menuScene.organizeHopae();
+                            ScenesData.menuScene.currentHopaeBtn.destroy();
+                            ScenesData.menuScene.createCurrentHopae();
+                            ScenesData.menuScene.hopaeMenuObject.forEach(function(element){
+                                ScenesData.menuScene.tweens.add({
+                                    targets: element,
+                                    y: 0,
+                                    duration: 200,
+                                    ease: 'Linear',
+                                    loop: 0,
+                                    onComplete: function(){element.destroy();}
+                                });
                             });
                         });
+                    ScenesData.menuScene.tweens.add({
+                        targets: temp,
+                        y: 50 * i,
+                        duration: 500,
+                        ease: 'Bounce',
+                        loop: 0
                     });
-                ScenesData.menuScene.tweens.add({
-                    targets: temp,
-                    y: 50 * i,
-                    duration: 500,
-                    ease: 'Bounce',
-                    loop: 0
-                });
-                this.hopaeMenuObject.push(temp);
+                    this.hopaeMenuObject.push(temp);
+                }
             }
-        }
 
-        this.createCurrentHopae = function()
-        {
-            this.currentHopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 5,
-                'nameBgr' + PlayerData.nickname.length, 1, 'left', PlayerData.nickname, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
+            this.createCurrentHopae = function()
+            {
+                this.currentHopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 300, 5,
+                    'nameBgr' + PlayerData.nickname.length, 1, 'left', PlayerData.nickname, 25, '#ffffff', 0.45, 0.5), 0, 0, 0, 
+                    function()
+                    {
+                        ScenesData.menuScene.currentHopaeBtn.destroy();
+                        ScenesData.menuScene.createHopaeMenu();
+                    })
+            }
+
+            this.organizeHopae();
+            this.createCurrentHopae();
+
+            this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
+
+            this.roomEnterDialog = this.rexUI.add.dialog({
+                x: game.config.width / 2,
+                y: game.config.height / 2,
+
+                background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'dialog1').setOrigin(0.5, 0.5),
+                
+                content: this.add.text(game.config.width / 2, game.config.height / 2, '대기실에 참가하시겠습니까?', {
+                    font: '50pt sejongFont'
+                }).setColor('#000000'),
+
+                actions: [
+                    UIObject.createLabel(this, 0, 0, 0, 'yesBtn', 1, 'center', '                      '),
+                    UIObject.createLabel(this, 0, 0, 0, 'noBtn', 1, 'center', '                      ')
+                ],
+
+                space: {
+                    content: 25, action: 100,
+
+                    left: 50, right: 50, top: 50, bottom: 50,
+                },
+
+                align: {
+                    actions: 'center' // 'center'|'left'|'right'
+                },
+
+                expand: {
+                    content: false, // Content is a pure text object
+                }
+            }).layout().setDepth(11).setVisible(false);
+
+            this.roomEnterDialog
+                .on('button.click', function (button, groupName, index) {
+                    if(index == 0) socket.emit('enterRoom', PlayerData.nickname);
+                    else
+                    {
+                        this.roomEnterDialog.setVisible(false);
+                        this.gameStartBtn.setEnable(true);
+                    }
+                }, this)
+                .on('button.over', function (button, groupName, index) {
+                    //console.log('button over');
+                })
+                .on('button.out', function (button, groupName, index) {
+                    //console.log('button out');
+            });
+
+            
+            this.gameStartBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 950, 5, 'friendlyPlayBtn', 1, 'center', '게임 시작', 50), -1, -1, -1, 
                 function()
                 {
-                    ScenesData.menuScene.currentHopaeBtn.destroy();
-                    ScenesData.menuScene.createHopaeMenu();
+                    ScenesData.menuScene.gameStartBtn.setEnable(false);
+                    ScenesData.menuScene.roomEnterDialog.setVisible(true);
+                    ScenesData.menuScene.roomEnterDialog.popUp(200);
+                })
+            
+            this.shopBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 950, 5, 'shopBtn', 1, 'center'), -1, -1, -1, 
+                function()
+                {
+                    console.log('상점 입장');
+                })
+            
+            this.hopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 950, 5, 'hopaeManageBtn', 1, 'center'), -1, -1, -1, 
+                function()
+                {
+                    if(PlayerData.userData.hopae.length > 4) console.log('호패가 5개입니다.');
+                    else ScenesData.changeScene('hopaeScene');
+                })
+            this.helpBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 75, 5, 'helpBtn', 1, 'center'), -1, -1, -1, 
+                function()
+                {
+                    ScenesData.menuScene.tutorialImage.setVisible(true).popUp(200);
+                    ScenesData.menuScene.helpBtn.setEnable(false);
+                    ScenesData.menuScene.gameStartBtn.setEnable(false);
+                    ScenesData.menuScene.shopBtn.setEnable(false);
+                    ScenesData.menuScene.hopaeBtn.setEnable(false);
+                    ScenesData.menuScene.currentHopaeBtn.setEnable(false);
                 })
         }
-
-        this.organizeHopae();
-        this.createCurrentHopae();
-
-        this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
-
-        this.roomEnterDialog = this.rexUI.add.dialog({
-            x: game.config.width / 2,
-            y: game.config.height / 2,
-
-            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
-            
-            content: this.add.text(0, 0, '대기실에 참가하시겠습니까?', {
-                font: '50pt sejongFont'
-            }),
-
-            actions: [
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '예', 50),
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '아니오', 50)
-            ],
-
-            space: {
-                content: 25,
-                action: 100,
-
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: 20,
-            },
-
-            align: {
-                actions: 'center' // 'center'|'left'|'right'
-            },
-
-            expand: {
-                content: false, // Content is a pure text object
-            }
-        }).layout().setDepth(11).setVisible(false);
-
-        this.roomEnterDialog
-            .on('button.click', function (button, groupName, index) {
-                if(index == 0) socket.emit('enterRoom', PlayerData.nickname);
-                else
-                {
-                    this.roomEnterDialog.setVisible(false);
-                    this.gameStartBtn.setEnable(true);
-                }
-            }, this)
-            .on('button.over', function (button, groupName, index) {
-                //console.log('button over');
-            })
-            .on('button.out', function (button, groupName, index) {
-                //console.log('button out');
-        });
-
-        
-        this.gameStartBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
-            function()
-            {
-                ScenesData.menuScene.gameStartBtn.setEnable(false);
-                ScenesData.menuScene.roomEnterDialog.setVisible(true);
-                ScenesData.menuScene.roomEnterDialog.popUp(200);
-            })
-        
-        this.shopBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
-            function()
-            {
-                console.log('상점 입장');
-            })
-        
-        this.hopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, 
-            function()
-            {
-                ScenesData.changeScene('hopaeScene');
-            })
     }
 });
 
@@ -217,64 +246,53 @@ var hopaeScene = new Phaser.Class(
     create: function()
     {
         BackGround.drawBackground(this);
+
+        this.inputBackground = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'hopaeSceneInput', 2, 'center', '', 50, '#ffffff', 0.45, 0.5);
         
-        Input.inputField.generate(this, function(){}, 
-            UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'nameBgr6', 2, 'center', '', 50, '#ffffff').getElement('text').setOrigin(0.45,0.5), true);
+        Input.inputField.generate(this, function(){}, this.inputBackground);
             
-        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'panel', 1, 'center', 
+        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'dialog2', 1, 'center', 
             '호패는 오직 한글만 입력이 가능합니다.\n띄어쓰기도 사용할 수 없습니다.', 50, '#000000').layout();
 
         this.checkDialog = this.rexUI.add.dialog({
             x: game.config.width / 2,
             y: game.config.height / 2,
 
-            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+            background: this.add.sprite(game.config.width / 2, game.config.height / 2, 'dialog1').setOrigin(0.5, 0.5),
             
-            content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae.length == 0 ? '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
-                font: '50pt sejongFont',
-                color: '#000000',
-                align: 'center'
+            content: this.add.text(0, 0, '이 이름으로 하시겠습니까?' + (PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 ? 
+                '\n(최초 호패는 비용이 들지 않습니다.)' : '\n변경에는 엽전이 소모됩니다.'), {
+                font: '50pt sejongFont', color: '#000000', align: 'center'
             }),
 
             actions: [
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '예', 50),
-                UIObject.createLabel(this, 0, 0, 0, 'button', 1, 'center', '아니오', 50)
+                UIObject.createLabel(this, 0, 0, 0, 'yesBtn', 1, 'center', '                      '),
+                UIObject.createLabel(this, 0, 0, 0, 'noBtn', 1, 'center', '                      ')
             ],
 
             space: {
-                content: 25,
-                action: 100,
-
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: 20,
+                content: 25, action: 100,
+                left: 50, right: 50, top: 50, bottom: 50,
             },
 
-            align: {
-                actions: 'center' // 'center'|'left'|'right'
-            },
-
-            expand: {
-                content: false, // Content is a pure text object
-            }
+            align: { actions: 'center' },
+            expand: { content: false }
         }).layout().setDepth(11).setVisible(false);
 
         this.checkDialog
         .on('button.click', function (button, groupName, index) {
             if(index == 0)
             {
-                if(PlayerData.userData.money > 0)
+                if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 || PlayerData.userData.money > 0)
                 {
                     fbClient.updateUserData('hopae', {name: Input.inputField.text.text, type: 'wood'});
-                    fbClient.updateUserData('money', -1);
+                    if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0) fbClient.updateUserData('money', -1);
                     ScenesData.changeScene('menuScene');
                 }
                 else
                 {
                     this.checkDialog.setVisible(false);
-
-                    this.errorMsg = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'panel', 1, 'center', 
+                    this.errorMsg = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'dialog1', 1, 'center', 
                         '엽전이 부족합니다', 50, '#000000').layout().popUp(200), 0, 0, 0, 
                         function()
                         {
@@ -295,7 +313,7 @@ var hopaeScene = new Phaser.Class(
         .on('button.out', function (button, groupName, index) {
             //console.log('button out');
         });
-        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'panel', 1, 'center', 
+        this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'dialog1', 1, 'center', 
             '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다', 40, '#000000').setVisible(false).layout();
             
         this.checkBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
@@ -306,7 +324,7 @@ var hopaeScene = new Phaser.Class(
                     ScenesData.hopaeScene.checkBtn.setEnable(false);
                     ScenesData.hopaeScene.checkDialog.setVisible(true).popUp(200);
                 }
-            })
+            }).setEnable(false);
         if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0))
         {
             this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
@@ -447,15 +465,13 @@ var gameScene = new Phaser.Class(
         WordSpace.wordPhysicsGroup = this.physics.add.group();
             
         Input.inputField.generate(this, Input.gameSceneEnterReaction, 
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, game.config.height * 25 / 36, 10, 'inputfield', 1, 'center', '', 25, '#000000').getElement('text'));
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2, game.config.height * 25 / 36, 10, 'gameSceneInput', 1, 'center', '', 25, '#000000'));
         
         WordSpace.attackGauge.generate(this);
         WordSpace.spaceInitiate(this);
         WordSpace.attackGauge.resetCycle(this);
 
         WordSpace.startCycle(this);
-        
-        WordSpace.setPlayerTyping.initiate(this);
         
         WordSpace.nameQueue.initiate();
         
@@ -479,17 +495,9 @@ var gameScene = new Phaser.Class(
         if(ScenesData.currentScene == ScenesData.gameScene && WordSpace.gameTimer != null)
         {
             WordSpace.deltaTime = this.sys.game.loop.delta;
-            WordSpace.wordForcedGroup.forEach(function(element)
-            {
-                element.attract();
-            });
-            WordSpace.nameGroup.forEach(function(element)
-            {
-                element.attract();
-            })
-            WordSpace.attackPaperGroup.getChildren().forEach(function(element){
-                element.moveObject(element);
-            });
+            WordSpace.wordForcedGroup.forEach(function(element) { element.attract(); });
+            WordSpace.nameGroup.forEach(function(element) { element.attract(); });
+            WordSpace.attackPaperGroup.getChildren().forEach(function(element) { element.moveObject(element); });
             
             WordSpace.setPlayerTyping.add('');
 

@@ -57,8 +57,6 @@ class WordObject
         setTimeout(function() {
             breakAnim.destroy();
         }, 200);
-        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
-        RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
     }
     
     attract()
@@ -110,6 +108,8 @@ class NormalWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -189,6 +189,8 @@ class AttackWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -271,6 +273,8 @@ class NameWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
             ScenesData.gameScene.physics.world.removeCollider(this.physicsObj.wordCollider);
             WordSpace.wordGroup.forEach(function(element)
             {
@@ -356,6 +360,8 @@ class ItemWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
             WordSpace.attackGauge.add(0.5);
             switch(this.itemType)
             {

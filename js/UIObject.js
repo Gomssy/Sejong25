@@ -12,7 +12,7 @@ UIObject.createLabel = function (scene, x, y, depth, image, size, align, text = 
         text: scene.add.text(x, y, text, {
             font: textSize + 'pt sejongFont',
             align: 'center'
-        }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor),
+        }).setDepth(depth).setOrigin(textOriginX, textOriginY).setColor(textColor).setPadding(30, 30, 30, 30),
 
         space: {
             left: 10,
@@ -52,33 +52,41 @@ UIObject.createButton = function(scene, buttonGameObject, overFrame, outFrame, d
             clickInterval: 100
         }
     });
-    buttonGameObject = buttonGameObject.getElement('background');
+    let buttonGameObjectBackground = buttonGameObject.getElement('background');
     temp.enabled = true;    
-    buttonGameObject.setFrame(outFrame).setInteractive()
+    buttonGameObjectBackground.setFrame(outFrame > 0 ? outFrame : 0).setInteractive()
     .on('pointerover', () => {
         if(temp.enabled)
         {
-            buttonGameObject.setFrame(overFrame);
+            if(overFrame > 0) buttonGameObjectBackground.setFrame(overFrame);
+            if(overFrame != -2) buttonGameObject.setScale(1.1);
         }
     })
     .on('pointerdown', () => {
         if(temp.enabled)
         {
-            buttonGameObject.setFrame(downFrame);
+            if(downFrame > 0) buttonGameObjectBackground.setFrame(downFrame);
+            if(downFrame != -2) buttonGameObject.setScale(0.9);
             clickCallback();
         }
     })
     .on('pointerup', () => {
-        buttonGameObject.setFrame(overFrame);
+        if(temp.enabled)
+        {
+            if(overFrame > 0) buttonGameObjectBackground.setFrame(overFrame);
+            if(overFrame != -2) buttonGameObject.setScale(1.1);
+        }
     })
     .on('pointerout', () => {
-        buttonGameObject.setFrame(outFrame);
+        if(outFrame > 0) buttonGameObjectBackground.setFrame(outFrame);
+        if(outFrame != -2) buttonGameObject.setScale(1);
     })
     temp.setEnable = function(isEnable)
     {
         temp.enabled = isEnable;
         return temp;
     }
+    temp.getBackground = function() { return buttonGameObjectBackground; }
 
     return temp;
 }
