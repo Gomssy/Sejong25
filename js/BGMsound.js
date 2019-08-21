@@ -12,7 +12,7 @@ Audio.loadSound = function(scene)
 
     // 게임 진행 중 효과음들
     scene.load.audio('attack', 'assets/sound/attackShort.ogg');
-    scene.load.audio('Bagazi', 'aassets/sound/Bagazi_ddak.ogg');
+    scene.load.audio('Bagazi', 'assets/sound/Bagazi_ddak.ogg');
     scene.load.audio('getItem', 'assets/sound/getItem.ogg');
     scene.load.audio('killLog', 'assets/sound/killLog.ogg');
     scene.load.audio('killWord', 'assets/sound/killWord.ogg');

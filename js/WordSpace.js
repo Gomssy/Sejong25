@@ -494,6 +494,13 @@ WordSpace.changePhase = function(newPhase)
     console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + newPhase);
     WordSpace.CurrentPhase = newPhase;
 
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound('gameScene', 'Phase1');
+    else if(WordSpace.CurrentPhase == 2)
+        Audio.killSound('gameScene', 'Phase2');
+    else
+        Audio.killSound('gameScene', 'Phase3');
+
     //WordSpace.pauseCycle(true);
     // 여기서 종이 드르륵 열면됨
     let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phase' + newPhase).setOrigin(0.5, 0.5).setDepth(9.9).play('phase' + newPhase + 'Anim');

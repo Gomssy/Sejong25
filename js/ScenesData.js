@@ -20,6 +20,7 @@ var menuScene = new Phaser.Class(
         ResourceLoader.loadImage(this);
         CSVParsing.loadText(this);
         Audio.loadSound(this);
+
         this.load.scenePlugin({
             key: 'rexuiplugin',
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
@@ -420,6 +421,7 @@ var gameScene = new Phaser.Class(
     preload: function()
     {
         ScenesData.gameScene = this;
+        Audio.loadSound(this);
         this.load.scenePlugin({
             key: 'rexuiplugin',
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
@@ -443,6 +445,14 @@ var gameScene = new Phaser.Class(
         BackGround.drawBrain(this);
         BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
+
+        if(WordSpace.CurrentPhase == 1)
+            Audio.loopSound(this, 'Phase1');
+        else if(WordSpace.CurrentPhase == 2)
+            Audio.loopSound(this, 'Phase2');
+        else
+            Audio.loopSound(this, 'Phase3');
+
         WordSpace.attackPaperGroup = this.physics.add.group();
         WordSpace.wordPhysicsGroup = this.physics.add.group();
             
@@ -506,6 +516,7 @@ var gameScene = new Phaser.Class(
 
 ScenesData.changeScene = function(sceneKey)
 {
+    Audio.killSound(ScenesData.menuScene, 'login');
     ScenesData.currentScene.scene.start(sceneKey);
     Input.input = [];
     Input.converted = '';

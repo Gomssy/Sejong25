@@ -124,7 +124,6 @@ socket.on('startGame', function()
 // in game
 socket.on('changePhase', function(msg) // number Phase
 {
-    // Audio.killSound('gameScene',) -> 여기다 게임 페이즈 bgm 넣으면 됨
     WordSpace.changePhase(msg);
 });
 socket.on('setPlayerTypingRate', function(msg) // number playerTypingRate
@@ -155,7 +154,7 @@ socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
 socket.on('attacked', function(msg) // object attackData
 {   
     Audio.playSound(ScenesData.gameScene, 'Bagazi');
-    
+
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
@@ -207,10 +206,12 @@ socket.on('defeat', function(msg) // object player
     let position = RoomData.findPlayer(msg.id).position;
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
 
-    // 이거 조건문으로 페이즈마다 다르게 해줘야 하는데 모르겠음
-    Audio.killSound(ScenesData.gameScene, 'Phase1');
-    Audio.killSound(ScenesData.gameScene, 'Phase2');
-    Audio.killSound(ScenesData.gameScene, 'Phase3');
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
 
     Audio.playSound(ScenesData.gameScene, 'defeat');
     RoomData.players[msg.index] = msg;
@@ -369,10 +370,12 @@ socket.on('gameEnd', function(msg) // number winnerId
 {
     const winner = RoomData.findPlayer(msg);
 
-    // 패배랑 같은 이유의 조건문 필요
-    Audio.killSound(ScenesData.gameScene, 'Phase1');
-    Audio.killSound(ScenesData.gameScene, 'Phase2');
-    Audio.killSound(ScenesData.gameScene, 'Phase3');
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
 
     Audio.playSound(ScenesData.gameScene, 'victory');
     console.log(winner.nickname + ' Win!!!!!!');
