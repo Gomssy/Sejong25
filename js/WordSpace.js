@@ -195,6 +195,7 @@ WordSpace.generateWord =
     Item: function(scene, itemType, lenRate)
     {
         word = new ItemWord(itemType);
+        Audio.playSound(ScenesData.gameScene, 'getItem');
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     }
