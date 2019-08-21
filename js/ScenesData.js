@@ -68,7 +68,7 @@ var menuScene = new Phaser.Class(
             PlayerData.nickname = PlayerData.currentHopae.name;
 
             this.userName = this.add.text(250, 75, PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
-            this.money = this.add.text(950, 70, PlayerData.userData.money).setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+            this.money = this.add.text(950, 70, PlayerData.userData.money).setOrigin(1, 0.5).setColor('#ffffff').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
 
             this.organizeHopae = function()
             {
@@ -246,12 +246,14 @@ var hopaeScene = new Phaser.Class(
 
     create: function()
     {
-        BackGround.drawBackground(this);
-
+        BackGround.drawMenu(this);
+        if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0))
+        {
+            this.userName = this.add.text(250, 75, PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+            this.money = this.add.text(950, 70, PlayerData.userData.money).setOrigin(1, 0.5).setColor('#ffffff').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+        }
         this.inputBackground = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'hopaeSceneInput', 2, 'center', '', 50, '#ffffff', 0.45, 0.5);
-        
         Input.inputField.generate(this, function(){}, this.inputBackground);
-            
         UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'dialog2', 1, 'center', 
             '호패는 오직 한글만 입력이 가능합니다.\n띄어쓰기도 사용할 수 없습니다.', 50, '#000000').layout();
 
