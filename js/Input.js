@@ -323,7 +323,7 @@ Input.inputField =
             if(ScenesData.currentScene == ScenesData.hopaeScene)
             {
                 ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) || (Input.finalInput.length > 1) ? true : false);
-                ScenesData.hopaeScene.warningText.setVisible(Input.finalInput.length > 4 ? true : false);
+                ScenesData.hopaeScene.warningText.setVisible(WordReader.getWordTyping(Input.finalInput) > 9 ? true : false);
             }
         })
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});

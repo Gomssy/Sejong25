@@ -135,7 +135,7 @@ var menuScene = new Phaser.Class(
             this.organizeHopae();
             this.createCurrentHopae();
 
-            this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2 - 200, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
+            this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
 
             this.roomEnterDialog = this.rexUI.add.dialog({
                 x: game.config.width / 2,
@@ -316,8 +316,7 @@ var hopaeScene = new Phaser.Class(
         });
         this.warningText = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 100, 5, 'dialog1', 1, 'center', 
             '이름 타수가 많아 플레이에 패널티가 있을 수 있습니다', 40, '#000000').setVisible(false).layout();
-            
-        this.checkBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
+        this.checkBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, 900, 5, 'confirmBtn', 1, 'center', '                      '), -2, -2, -2, 
             function()
             {
                 if(Input.checkProperInput(Input.inputField.text.text))
@@ -328,7 +327,7 @@ var hopaeScene = new Phaser.Class(
             }).setEnable(false);
         if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0))
         {
-            this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 900, 5, 'pyeongminWrite', 0.5, 'center'), 1, 0, 2, 
+            this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 200, 900, 5, 'exitBtn', 1, 'center', '                      '), -2, -2, -2, 
             function()
             {
                 ScenesData.changeScene('menuScene');
