@@ -192,6 +192,7 @@ WordSpace.generateWord =
     Item: function(scene, itemType, lenRate)
     {
         word = new ItemWord(itemType);
+        Audio.playSound(ScenesData.gameScene, 'getItem');
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     }
@@ -481,6 +482,13 @@ WordSpace.changePhase = function(newPhase)
 {
     console.log('phase changed from ' + WordSpace.CurrentPhase + ' to ' + newPhase);
     WordSpace.CurrentPhase = newPhase;
+
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound('gameScene', 'Phase1');
+    else if(WordSpace.CurrentPhase == 2)
+        Audio.killSound('gameScene', 'Phase2');
+    else
+        Audio.killSound('gameScene', 'Phase3');
 
     //WordSpace.pauseCycle(true);
     // 여기서 종이 드르륵 열면됨

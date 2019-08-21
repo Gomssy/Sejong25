@@ -57,6 +57,7 @@ class WordObject
         setTimeout(function() {
             breakAnim.destroy();
         }, 200);
+        Audio.playSound(ScenesData.gameScene, 'killWord');
     }
     
     attract()

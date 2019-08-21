@@ -152,7 +152,9 @@ socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
     WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos, msg.multiple);
 });
 socket.on('attacked', function(msg) // object attackData
-{
+{   
+    Audio.playSound(ScenesData.gameScene, 'Bagazi');
+
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
@@ -204,6 +206,15 @@ socket.on('defeat', function(msg) // object player
     let position = RoomData.findPlayer(msg.id).position;
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
     let earnedStrongHopae = RoomData.findPlayer(msg.id).earnedStrongHopae;
+
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
+
+    Audio.playSound(ScenesData.gameScene, 'defeat');
     RoomData.players[msg.index] = msg;
     RoomData.players[msg.index].playerImage = playerImage;
     RoomData.players[msg.index].position = position;
@@ -219,6 +230,9 @@ socket.on('defeat', function(msg) // object player
     {
         let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId);
         let attackWord = msg.lastAttack.word;
+
+        Audio.playSound(ScenesData.gameScene, 'killLog');
+
         console.log(victim.nickname + ' defeated by ' + lastAttacker.nickname + ', with ' + msg.lastAttack.word);
         if(WordSpace.lastAttackGroup.length != 0)
         {
@@ -355,6 +369,15 @@ socket.on('defeat', function(msg) // object player
 socket.on('gameEnd', function(msg) // number winnerId
 {
     const winner = RoomData.findPlayer(msg);
+
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
+
+    Audio.playSound(ScenesData.gameScene, 'victory');
     console.log(winner.nickname + ' Win!!!!!!');
     if(msg == RoomData.myself.id)
     {
