@@ -13,7 +13,7 @@ app.get('/', function(req, res) {
 });
 
 // http 기본 포트(80)에 서버 열기
-server.listen(80, function() {
+server.listen(8080, function() {
     console.log(new Date().toLocaleTimeString('ko-KR') + ' [SERVER] Listening on port ' + server.address().port);
     GameServer.serverNumber = Math.floor(Math.random() * 1000 + 1);
     console.log(new Date().toLocaleTimeString('ko-KR') + ' [SERVER] server number is ' + GameServer.serverNumber);

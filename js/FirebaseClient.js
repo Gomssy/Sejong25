@@ -281,7 +281,7 @@ class UserData
 		this.recentHopae = null;
 		this.title = [];
 		this.money = 0;
-		this.item = [];
+		this.item = [0];
 		this.killCount = 0;
     }
 }

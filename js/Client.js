@@ -223,7 +223,7 @@ socket.on('defeat', function(msg) // object player
 
     let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
-    victim.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
+    victim.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.gameOver]);
 
     
     if (msg.lastAttack != null) 
@@ -313,6 +313,7 @@ socket.on('defeat', function(msg) // object player
         {
             var keys = Object.keys(Enums.item);
             WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
+            Audio.playSound(ScenesData.gameScene, 'getItem');
             RoomData.myself.killCount++;
         }
     }
@@ -392,6 +393,7 @@ socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.findPlayer(msg.victimId));
+    tempWord.instantiate(ScenesData.gameScene);
     let victimPos = RoomData.findPlayer(msg.victimId).position;
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
@@ -415,9 +417,10 @@ var gameEndMenu = function(isWin)
     let earnedMoney = 0;
     if(isWin) earnedMoney += 20;
     earnedMoney += RoomData.myself.killCount * 3;
-    earnedMoney += parseInt(WordSpace.playerTypingRate / 10);
+    earnedMoney += parseInt(WordSpace.playerTyping / 10);
     earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
     earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
+    earnedMoney = parseInt(earnedMoney / 40);
 
     Input.inputField.text.destroy();
 

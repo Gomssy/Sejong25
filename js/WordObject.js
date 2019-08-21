@@ -57,7 +57,6 @@ class WordObject
         setTimeout(function() {
             breakAnim.destroy();
         }, 200);
-        Audio.playSound(ScenesData.gameScene, 'killWord');
     }
     
     attract()
@@ -109,8 +108,9 @@ class NormalWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
-            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -190,8 +190,9 @@ class AttackWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
-            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -262,10 +263,7 @@ class NameWord extends WordObject
             if(this.isStrong)
             {
                 this.physicsObj.setScale(this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale);
-                this.wordObj.setFont({
-                    font: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt sejongFont',
-                    fontStyle: (this.wordWeight > 5 ? 'bold' : '')
-                });
+                this.wordObj.setScale((this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale) * 0.9);
             }
         }
     }
@@ -274,8 +272,9 @@ class NameWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
-            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
             ScenesData.gameScene.physics.world.removeCollider(this.physicsObj.wordCollider);
             WordSpace.wordGroup.forEach(function(element)
             {
@@ -303,10 +302,6 @@ class NameWord extends WordObject
                 duration: 2000,
                 repeat: 0
             });
-            //이동경로 디버그
-            /*var graphics = ScenesData.gameScene.add.graphics();
-            graphics.lineStyle(2, 0xffffff, 1);
-            this.path.draw(graphics);*/
         }
     }
 }
@@ -361,8 +356,9 @@ class ItemWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
-            RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
-            RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[WordSpace.myCharacterSkin][Enums.characterAnim.sit]);
             WordSpace.attackGauge.add(0.5);
             switch(this.itemType)
             {

@@ -35,6 +35,7 @@ var menuScene = new Phaser.Class(
     
     create: function()
     {
+        ResourceLoader.loadAnimation(this);
         BackGround.drawMenu(this);
         Audio.playSound(this, 'login');
         ScenesData.menuScene.tutorialFrame = 0;
@@ -135,7 +136,8 @@ var menuScene = new Phaser.Class(
             this.organizeHopae();
             this.createCurrentHopae();
 
-            this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, 'pyeongminStand').setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
+            this.myCharacter = this.add.sprite(game.config.width / 2, game.config.height / 2, Enums.characterSkin[WordSpace.myCharacterSkin] + 'Stand')
+                .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
 
             this.roomEnterDialog = this.rexUI.add.dialog({
                 x: game.config.width / 2,
@@ -456,7 +458,6 @@ var gameScene = new Phaser.Class(
     {
         WordSpace.gameTimer = new Phaser.Time.Clock(this);
         WordSpace.gameTimer.start();
-        ResourceLoader.loadAnimation(this);
         CSVParsing.CSVParse(this);
         BackGround.drawBackground(this);
         BackGround.drawBrain(this);
