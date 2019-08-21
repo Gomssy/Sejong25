@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8"/>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/phaser.js"></script>
-    <script src="js/ScenesData.js"></script>
-    <script src="js/Background.js"></script>
-    <script src="js/Input.js"></script>
-    <script src="js/WordSpace.js"></script>
-    <script src="js/GameCycle.js"></script>
-    <script src="js/WordObject.js"></script>
-    <script src="js/WordReader.js"></script>
-    <script src="js/CSVParsing.js"></script>
-    <script src="js/SelectWord.js"></script>
-    <script src="js/BGMsound.js"></script>
-    <script src="js/Enums.js"></script>
-    <script src="js/ResourceLoader.js"></script>
-    <script src="js/UIObject.js"></script>
+    <script src="/js/phaser.js"></script>
+    <script src="/js/ScenesData.js"></script>
+    <script src="/js/Background.js"></script>
+    <script src="/js/Input.js"></script>
+    <script src="/js/WordSpace.js"></script>
+    <script src="/js/GameCycle.js"></script>
+    <script src="/js/WordObject.js"></script>
+    <script src="/js/WordReader.js"></script>
+    <script src="/js/CSVParsing.js"></script>
+    <script src="/js/SelectWord.js"></script>
+    <script src="/js/BGMsound.js"></script>
+    <script src="/js/Enums.js"></script>
+    <script src="/js/ResourceLoader.js"></script>
+    <script src="/js/UIObject.js"></script>
     <style media='screen' type='text/css'>
         @font-face {
           font-family: sejongFont;
@@ -31,18 +31,20 @@
     <style>
         img { position: relative; width: 100%; height: 100%; z-index: 0;}
         #dvLogin { position: absolute; left: 65%; top: 35%; width: 30%; height: 30%; padding: 10px; background: black; z-index: 1;}
+        #notSupport { position: absolute; left: 25%; top: 25%; background: white; z-index: 1; width: 50%; height: 50%; display: none;}
     </style>
 </head>
 <body>
     <div id="mainTitle">
-        <img id="titleImg" src="assets/image/background/title.png" alt="title">
+        <img id="titleImg" src="/assets/image/background/title.png" alt="title">
         <div id="dvLogin">
             <input id="userEmail" type="email" placeholder="email" style="width: 100%; height: 10%;"></br>
             <input id="userPassword" type="password" placeholder="password" maxlength="17" style="width: 100%; height: 10%;"></br>
             <button id="joinBtn" style="width: 100%; height: 10%;">이메일로 가입하기</button></br>
             <button id="emailBtn" style="width: 100%; height: 10%;">이메일로 로그인</button></br>
-            <button id="googleBtn" style="width: 10%; height: 10%;"><img src="assets/title/googleBtn.png" style="object-fit: contain"></button></br>
+            <button id="googleBtn" style="width: 10%; height: 10%;"><img src="/assets/title/googleBtn.png" style="object-fit: contain"></button></br>
         </div>
+        <p id="notSupport">해당하는 환경에서는 지원되지 않습니다. PC에서 이용 부탁드립니다.</p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
@@ -64,8 +66,8 @@
     firebase.initializeApp(firebaseConfig);
     </script>
 
-    <script src="js/Client.js"></script>
-    <script src="js/Main.js"></script>
-    <script src="js/FirebaseClient.js"></script>
+    <script src="/js/Client.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/FirebaseClient.js"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ GameServer.findRoom = function(roomId)
     {
         if (GameServer.playingRoom[i].roomId === roomId) return GameServer.playingRoom[i];
     }
-    console.log('[ERR] no room with num ' + roomId);
+    console.log(new Date().toLocaleTimeString('ko-KR') + ' [ERR] no room with num ' + roomId);
 }
 GameServer.findPlayerSocket = function(playerId)
 {
@@ -26,7 +26,7 @@ GameServer.findPlayerSocket = function(playerId)
     if (idx != -1) return this.currentPlayer[idx];
     else
     {
-        console.log('[ERR] wrong playerId('+ playerId +') to find');
+        console.log(new Date().toLocaleTimeString('ko-KR') + ' [ERR] wrong playerId('+ playerId +') to find');
         return null;
     }
 }
@@ -115,7 +115,7 @@ class GameRoom
         {
             GameServer.playingRoom[this.roomIndex] = this;
         }
-        console.log('[LOG] new room #'+this.roomId+' made, roomCount: ' + GameServer.playingRoom.length);
+        console.log(new Date().toLocaleTimeString('ko-KR') + ' [LOG] new room #'+this.roomId+' made, roomCount: ' + GameServer.playingRoom.length);
     }
 
     checkHopae(newHopae)
@@ -136,7 +136,7 @@ class GameRoom
         this.announceToTarget(playerInst.id, 'syncRoomScene', this.currentPlayer);
         this.currentPlayer.push(playerInst);
 
-        console.log('[' + playerInst.id + '] entered to room #' + this.roomId);
+        console.log(new Date().toLocaleTimeString('ko-KR') + ' [' + playerInst.id + '] entered to room #' + this.roomId);
 
         this.aliveCount++;
         if (this.currentPlayer.length >= this.startCount)
@@ -202,7 +202,7 @@ class GameRoom
                 return;
             }
         }
-        console.log('[ERR] No player who have ' + playerId);
+        console.log(new Date().toLocaleTimeString('ko-KR') + ' [ERR] No player who have ' + playerId);
         return;
     }
 
@@ -223,7 +223,7 @@ class GameRoom
                 isEnable: false, endTime: 0, playerCount: this.currentPlayer.length,
                 isEnter: false, player: {id: -1}
             });
-            console.error('[ROOM#' + this.roomId + '] room Refreshed');
+            console.error(new Date().toLocaleTimeString('ko-KR') + ' [ROOM#' + this.roomId + '] room Refreshed');
         }
         else
         {
@@ -238,7 +238,7 @@ class GameRoom
             this.rateArrangePoint = 300;
             this.maxTypingPlayer = null;
             this.minTypingPlayer = null;
-            console.log('[ROOM#' + this.roomId + '] room Refreshed with End of Game');
+            console.log(new Date().toLocaleTimeString('ko-KR') + ' [ROOM#' + this.roomId + '] room Refreshed with End of Game');
         }
     }
     
@@ -261,7 +261,7 @@ class GameRoom
         };
         this.announceToRoom('syncRoomData', toSync);
 
-        console.log('[ROOM#'+this.roomId+'] Game Start with ' + this.currentPlayer.length + ' players');
+        console.log(new Date().toLocaleTimeString('ko-KR') + ' [ROOM#'+this.roomId+'] Game Start with ' + this.currentPlayer.length + ' players');
         console.table(this.currentPlayer);
         this.announceToRoom('startGame');
         this.startTime = Date.now();
@@ -309,7 +309,7 @@ class GameRoom
     {
         if (this.aliveCount > 0)
         {
-            console.log('[ERR] can not destroy room#' + this.roomId + ', cause player left');
+            console.log(new Date().toLocaleTimeString('ko-KR') + ' [ERR] can not destroy room#' + this.roomId + ', cause player left');
         }
         else
         {
@@ -406,7 +406,7 @@ class Player
             }
 
             room.announceToRoom('defeat', this);
-            console.log('[' + this.id + '] defeated, rank: ' + this.rank + ', ' + room.aliveCount + ' player left');
+            console.log(new Date().toLocaleTimeString('ko-KR') + ' [' + this.id + '] defeated, rank: ' + this.rank + ', ' + room.aliveCount + ' player left');
 
             if (room.aliveCount === 1)
             {
@@ -418,7 +418,7 @@ class Player
                 room.announceToRoom('gameEnd', winner.id);
                 room.announceToTarget(winner.id, 'alert', 'gameWin');
                 room.currentPhase = GameServer.Phase.GAMEEND;
-                console.log('['+winner.id+']' + ' winner! ' + winner.nickname);
+                console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+winner.id+']' + ' winner! ' + winner.nickname);
             }
         }
     }
