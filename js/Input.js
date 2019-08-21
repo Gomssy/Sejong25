@@ -23,7 +23,11 @@ Input.gameSceneEnterReaction = function()
 {
     if (RoomData.myself.isAlive && !Input.isEntered)
     {
-        if (Input.attackMode) WordSpace.attack(Input.removeConVow(Input.finalInput), Input.attackOption.wordGrade);
+        if (Input.attackMode)
+        {
+            WordSpace.attack(Input.removeConVow(Input.finalInput), Input.attackOption.wordGrade);
+            Input.inputField.inputBackground.setFrame(4);
+        }
         else WordSpace.findWord(Input.finalInput);
         Input.reset();
         Input.isEntered = true;
@@ -304,18 +308,24 @@ Input.removeConVow = function(_wordText)
 
 Input.inputField = 
 {
-    generate: function(scene, enterCallback, text, isHopaeScene = false)
+    generate: function(scene, enterCallback, text)
     {
         this.text = text.getElement('text');
         this.inputBackground = text.getElement('background');
 
-        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; 
-            if(isHopaeScene)
+        if(ScenesData.currentScene == ScenesData.gameScene) Input.inputField.inputBackground.setFrame(4);
+
+        scene.input.keyboard.on('keydown', function() {
+            if(ScenesData.currentScene == ScenesData.hopaeScene && Input.finalInput.length > 1) Input.inputField.inputBackground.setFrame(Input.finalInput.length - 2);
+        })
+
+        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = '';
+            if(ScenesData.currentScene == ScenesData.hopaeScene)
             {
                 ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) || (Input.finalInput.length > 1) ? true : false);
                 ScenesData.hopaeScene.warningText.setVisible(Input.finalInput.length > 4 ? true : false);
-                if(Input.finalInput.length > 1) Input.inputField.inputBackground.setFrame(Input.finalInput.length - 2);
-            }})
+            }
+        })
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});
         scene.input.keyboard.on('keydown-DELETE', function() {Input.reset()});

@@ -265,7 +265,7 @@ WordSpace.findWord = function(wordText)
         }
         WordSpace.setPlayerTyping.add(wordText);
     }
-    else if (wordText === '공격' && WordSpace.attackGauge.value >= 3 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
+    else if (wordText === '공격' && WordSpace.attackGauge.value >= 2 && WordSpace.nameGroup.length > 0) // 공격모드 진입.
     {
         console.log('attack mode');
         let tempAttackOption = this.attackGauge.getAttackOption();
@@ -273,6 +273,7 @@ WordSpace.findWord = function(wordText)
         Input.attackOption.wordGrade = tempAttackOption.wordGrade;
         Input.maxInput = Input.attackOption.wordCount;
         Input.attackMode = true;
+        Input.inputField.inputBackground.setFrame(Input.maxInput - 2);
         WordSpace.attackGauge.pauseCycle(true);
         WordSpace.setPlayerTyping.add(wordText);
         switch(tempAttackOption.wordCount)

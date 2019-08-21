@@ -11,7 +11,6 @@ ResourceLoader.loadBackGround = function(scene)
 
 ResourceLoader.loadImage = function(scene)
 {
-    scene.load.image('inputfield', 'assets/image/etc/wordspace.png');
     for (let i = 0; i < 4; i++)
     {
         for (let j = 2; j < 7; j++)
@@ -43,6 +42,7 @@ ResourceLoader.loadImage = function(scene)
     
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.spritesheet('hopaeSceneInput', 'assets/image/word/hopaeSceneInput.png', { frameWidth: 239, frameHeight: 45 });
+    scene.load.spritesheet('gameSceneInput', 'assets/image/etc/wordSpace/wordspace.png', { frameWidth: 253, frameHeight: 67 });
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
     scene.load.image('button', 'assets/placeholder/button.png');
     scene.load.image('panel', 'assets/placeholder/panel.png');
