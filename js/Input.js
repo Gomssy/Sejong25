@@ -4,6 +4,7 @@ Input.input = [];
 Input.converted = '';
 Input.convInput = ''; // converted input
 Input.finalInput = '';
+Input.lastSuccess = '';
 
 Input.isShifted = false;
 Input.isEntered = false;
@@ -199,7 +200,12 @@ Input.convert = function()
         this.convInput = this.convInput.slice(1, 2);
     }
     Input.finalInput = Input.converted + Input.convInput;
-    return true;
+    if (Input.finalInput.length > 6) return false;
+    else 
+    {
+        this.lastSuccess = this.finalInput;
+        return true;
+    }
     //console.log('_____end_convert_____');    
 }
 
@@ -400,11 +406,14 @@ Input.pushInput = function(inputKey)
             }
         }
         else output = inputKey.charCodeAt(0);
-        this.input.push(output);
+        if (this.finalInput.length <= this.maxInput) this.input.push(output);
         //console.log(Input.input);
         if (!this.convert() || this.finalInput.length > this.maxInput) 
         {
-            this.input.pop();
+            this.converted = this.lastSuccess;
+            this.finalInput = this.lastSuccess;
+            this.convInput = '';
+            this.input = [];
             this.convert();
         }
         this.inputField.text.setText(Input.finalInput);
