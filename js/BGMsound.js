@@ -23,8 +23,8 @@ Audio.loadSound = function(scene)
     scene.load.audio('Phase3', 'assets/sound/Phase3.ogg');
     
     // 승패 BGM
-    scene.load.audio('victory', 'assets/sound/victory.ogg');
-    scene.load.audio('defeat', 'assets/sound/defeat.ogg');
+    scene.load.audio('defeat', 'assets/sound/victory.ogg');
+    scene.load.audio('victory', 'assets/sound/defeat.ogg');
 }
 
 Audio.playSound = function(scene, title) // 한 번만 재생할 때 사용
