@@ -110,6 +110,7 @@ io.on('connection', function(socket)
         socket.playerData.currentRoom.aliveCount--;
         //console.log('counted, ' + socket.playerData.currentRoom.aliveCount);
         socket.playerData.playingData.isAlive = true;
+        if (socket.playerData.currentRoom.currentPhase != GameServer.Phase.COUNT) socket.disconnect();
         if (socket.playerData.currentRoom.aliveCount === 0 && socket.playerData.currentRoom.currentPlayer.length >= socket.playerData.currentRoom.startCount)
         {
             socket.playerData.currentRoom.startRoom();
@@ -121,25 +122,21 @@ io.on('connection', function(socket)
             room.startTimer = setTimeout(function()
             {
                 let deads = room.currentPlayer.filter(element => !element.isAlive);
-                if (room.aliveCount != 0 && room.currentPlayer.length - deads.length >= room.startCount)
-                {
-                    console.error(new Date().toLocaleTimeString('ko-KR') + ' [ROOM#'+room.roomId+'] FORCE START!!!');
-                    room.startRoom();
-                    deads.forEach(function(element)
-                    {
-                        element.defeat();
-                    });
-                    clearTimeout(room.startTimer);
-                }
-                else if (deads.length > 0)
-                {
-                    deads.forEach(function(element)
+                deads.forEach(function(element)
                     {
                         room.currentSocket[element.index].disconnect();
                         room.exitRoom(element.id);
                     });
+                if (room.aliveCount != 0 && room.currentPlayer.length >= room.startCount)
+                {
+                    console.error(new Date().toLocaleTimeString('ko-KR') + ' [ROOM#'+room.roomId+'] FORCE START!!!');
+                    room.startRoom();
+                }
+                else if (deads.length > 0)
+                {
                     room.refreshRoom();
                 }
+                clearTimeout(room.startTimer);
             }, 2000);
         }
     });

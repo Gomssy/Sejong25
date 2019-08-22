@@ -85,7 +85,7 @@ socket.on('setRoomCount', function(msg)
             }
             ScenesData.roomScene.players.push(playerSet);
         }
-        else // remove character
+        else if (msg.id != -1) // remove character
         {
             let idx = ScenesData.roomScene.players.findIndex(function(element)
             {
