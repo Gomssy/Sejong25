@@ -387,7 +387,7 @@ Input.inputField =
 
 Input.pushInput = function(inputKey)
 {
-    if (!WordSpace.isGameOver && RoomData.myself.isAlive && this.justPressed != inputKey)
+    if ((ScenesData.currentScene != ScenesData.gameScene || RoomData.myself.isAlive) && this.justPressed != inputKey)
     {
         this.justPressed = inputKey;
         let output;
