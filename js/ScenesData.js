@@ -20,7 +20,6 @@ var menuScene = new Phaser.Class(
         ResourceLoader.loadImage(this);
         CSVParsing.loadText(this);
         Audio.loadSound(this);
-
         this.load.scenePlugin({
             key: 'rexuiplugin',
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
@@ -517,6 +516,8 @@ var gameScene = new Phaser.Class(
 ScenesData.changeScene = function(sceneKey)
 {
     Audio.killSound(ScenesData.menuScene, 'login');
+    Audio.killSound(ScenesData.gameScene, 'victory');
+    Audio.killSound(ScenesData.gameScene, 'defeat');
     ScenesData.currentScene.scene.start(sceneKey);
     Input.input = [];
     Input.converted = '';
