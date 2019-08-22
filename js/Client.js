@@ -70,7 +70,7 @@ socket.on('setRoomCount', function(msg)
     setTimeout(function()
     {
         ScenesData.roomScene.isCounting = msg.isEnable;
-        ScenesData.roomScene.endTime = msg.endTime;
+        ScenesData.roomScene.endTime = Date.now() + msg.endTime;
         ScenesData.roomScene.peopleCount = msg.playerCount;
 
         if (msg.isEnter) // generate character

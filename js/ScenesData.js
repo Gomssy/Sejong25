@@ -67,7 +67,7 @@ var menuScene = new Phaser.Class(
             PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
             PlayerData.nickname = PlayerData.currentHopae.name;
 
-            this.userName = this.add.text(250, 75, PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+            this.userName = this.add.text(250, 75, PlayerData.userData.userName.length < 10 ? PlayerData.userData.userName : PlayerData.userData.userName.substr(0, 8) + '...').setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
             this.money = this.add.text(950, 70, PlayerData.userData.money + '냥').setOrigin(1, 0.5).setColor('#ffffff').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
 
             this.organizeHopae = function()
