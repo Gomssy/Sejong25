@@ -36,7 +36,9 @@ var menuScene = new Phaser.Class(
     {
         ResourceLoader.loadAnimation(this);
         BackGround.drawMenu(this);
-        Audio.playSound(this, 'login');
+        Audio.killSound(ScenesData.gameScene, 'defeat');
+        Audio.killSound(ScenesData.gameScene, 'victory');
+        Audio.loopSound(this, 'login');
         ScenesData.menuScene.tutorialFrame = 0;
         ScenesData.menuScene.tutorialImage = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 11,
             'tutorialImage', 1, 'center'), -2, -2, -2,

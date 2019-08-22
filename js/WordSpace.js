@@ -218,6 +218,15 @@ function gameOver()
 {
     WordSpace.pauseCycle(true);
     
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
+
+    Audio.playSound(ScenesData.gameScene, 'defeat');
+    
     socket.emit('defeated');
     console.log('defeat');
 }
