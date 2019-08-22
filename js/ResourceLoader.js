@@ -45,6 +45,7 @@ ResourceLoader.loadImage = function(scene)
     scene.load.spritesheet('gameSceneInput', 'assets/image/etc/wordSpace/wordspace.png', { frameWidth: 253, frameHeight: 67 });
     scene.load.image('attackPaper', 'assets/image/etc/paper_crumbled.png');
     scene.load.image('itemBag', 'assets/image/etc/itembag2.png');
+    scene.load.image('mat', 'assets/image/etc/mat.png');
 
     scene.load.image('button', 'assets/placeholder/button.png');
     scene.load.image('panel', 'assets/placeholder/panel.png');
