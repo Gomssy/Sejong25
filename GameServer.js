@@ -82,7 +82,7 @@ class GameRoom
     {
         this.roomId = GameServer.getRoomNumber();
         this.roomIndex = -1;
-        this.startCount = 5;
+        this.startCount = 2;
         this.maxPlayer = 100;
         this.nextRank = 100;
 
@@ -143,7 +143,8 @@ class GameRoom
         {
             if (this.currentPhase === GameServer.Phase.READY)
             {
-                this.endTime = Date.now() + 30000; // 방 대기 시간
+                this.countStartTime = Date.now();
+                this.endTime = 10000; // 방 대기 시간
                 this.announceToRoom('setRoomCount', 
                 {
                     isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
@@ -153,6 +154,7 @@ class GameRoom
             }
             else if (this.currentPhase === GameServer.Phase.COUNT)
             {
+                this.endTime = this.endTime - (Time.now() - this.countStartTime);
                 this.announceToRoom('setRoomCount', 
                 {
                     isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
@@ -266,8 +268,8 @@ class GameRoom
         this.startTime = Date.now();
         setTimeout(function()
         {
-            checkPhase(Date.now());
-        }, 6000);
+            this.checkPhase(Date.now());
+        }.bind(this), 6000);
     }
 
     checkPhase(checkTime)
