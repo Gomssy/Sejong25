@@ -82,7 +82,7 @@ class GameRoom
     {
         this.roomId = GameServer.getRoomNumber();
         this.roomIndex = -1;
-        this.startCount = 2;
+        this.startCount = 5;
         this.maxPlayer = 100;
         this.nextRank = 100;
 
@@ -144,7 +144,7 @@ class GameRoom
             if (this.currentPhase === GameServer.Phase.READY)
             {
                 this.countStartTime = Date.now();
-                this.endTime = 10000; // 방 대기 시간
+                this.endTime = 30000; // 방 대기 시간
                 this.announceToRoom('setRoomCount', 
                 {
                     isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
