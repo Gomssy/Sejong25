@@ -264,13 +264,17 @@ class GameRoom
         console.table(this.currentPlayer);
         this.announceToRoom('startGame');
         this.startTime = Date.now();
+        setTimeout(function()
+        {
+            checkPhase(Date.now());
+        }, 6000);
     }
 
     checkPhase(checkTime)
     {
         if (this.currentPhase === GameServer.Phase.START)
         {
-            if (this.phaseChanger < 0 && checkTime - this.startTime > 1000)
+            if (checkTime - this.startTime > 6000)
             {
                 this.currentPhase = GameServer.Phase.MAIN;
                 this.rateArrangePoint = 150;
@@ -289,7 +293,7 @@ class GameRoom
         }
         else if (this.currentPhase === GameServer.Phase.MAIN)
         {
-            let playerLimit = Math.min(Math.round(this.currentPlayer.length / 5), 3);
+            let playerLimit = Math.max(Math.round(this.currentPlayer.length / 5), 3);
             if (this.aliveCount <= playerLimit)
             {
                 this.currentPhase = GameServer.Phase.MUSIC;
