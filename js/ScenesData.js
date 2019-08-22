@@ -661,8 +661,11 @@ var gameScene = new Phaser.Class(
 ScenesData.changeScene = function(sceneKey)
 {
     Audio.killSound(ScenesData.menuScene, 'login');
-    Audio.killSound(ScenesData.gameScene, 'victory');
-    Audio.killSound(ScenesData.gameScene, 'defeat');
+    Audio.killSound(ScenesData.currentScene, 'victory');
+    Audio.killSound(ScenesData.currentScene, 'defeat');
+
+    // Audio.killSound(ScenesData.gameScene, 'victory');
+    // Audio.killSound(ScenesData.gameScene, 'defeat');
     ScenesData.currentScene.scene.start(sceneKey);
     Input.input = [];
     Input.converted = '';
