@@ -285,6 +285,6 @@ class UserData
 		this.money = 0;
 		this.item = [0];
 		this.killCount = 0;
-		this.skin = 1;
+		this.skin = 0;
     }
 }
