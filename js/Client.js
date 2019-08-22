@@ -393,7 +393,6 @@ socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.findPlayer(msg.victimId));
-    tempWord.instantiate(ScenesData.gameScene);
     let victimPos = RoomData.findPlayer(msg.victimId).position;
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
@@ -417,10 +416,9 @@ var gameEndMenu = function(isWin)
     let earnedMoney = 0;
     if(isWin) earnedMoney += 20;
     earnedMoney += RoomData.myself.killCount * 3;
-    earnedMoney += parseInt(WordSpace.playerTyping / 10);
+    earnedMoney += parseInt(WordSpace.playerTyping / 40);
     earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
     earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
-    earnedMoney = parseInt(earnedMoney / 40);
 
     Input.inputField.text.destroy();
 
@@ -431,7 +429,6 @@ var gameEndMenu = function(isWin)
         fbClient.updateUserData('money', earnedMoney);
         ScenesData.changeScene('menuScene');
     }
-
 
     ScenesData.gameScene.backToMenuDialog = ScenesData.gameScene.rexUI.add.dialog({
         x: game.config.width / 2,
