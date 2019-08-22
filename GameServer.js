@@ -269,14 +269,14 @@ class GameRoom
         setTimeout(function()
         {
             if (this.currentPhase === GameServer.Phase.START) this.checkPhase(Date.now());
-        }.bind(this), 6000);
+        }.bind(this), 60000);
     }
 
     checkPhase(checkTime)
     {
         if (this.currentPhase === GameServer.Phase.START)
         {
-            if (checkTime - this.startTime > 6000)
+            if (checkTime - this.startTime > 60000)
             {
                 this.currentPhase = GameServer.Phase.MAIN;
                 this.rateArrangePoint = 150;
