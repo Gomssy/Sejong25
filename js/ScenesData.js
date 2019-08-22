@@ -20,7 +20,6 @@ var menuScene = new Phaser.Class(
         ResourceLoader.loadImage(this);
         CSVParsing.loadText(this);
         Audio.loadSound(this);
-
         this.load.scenePlugin({
             key: 'rexuiplugin',
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
@@ -37,7 +36,7 @@ var menuScene = new Phaser.Class(
     {
         ResourceLoader.loadAnimation(this);
         BackGround.drawMenu(this);
-        Audio.playSound(this, 'login');
+        Audio.loopSound(this, 'login');
         ScenesData.menuScene.tutorialFrame = 0;
         ScenesData.menuScene.tutorialImage = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 11,
             'tutorialImage', 1, 'center'), -2, -2, -2,
@@ -662,6 +661,8 @@ var gameScene = new Phaser.Class(
 ScenesData.changeScene = function(sceneKey)
 {
     Audio.killSound(ScenesData.menuScene, 'login');
+    Audio.killSound(ScenesData.gameScene, 'victory');
+    Audio.killSound(ScenesData.gameScene, 'defeat');
     ScenesData.currentScene.scene.start(sceneKey);
     Input.input = [];
     Input.converted = '';

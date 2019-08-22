@@ -207,14 +207,7 @@ socket.on('defeat', function(msg) // object player
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
     let earnedStrongHopae = RoomData.findPlayer(msg.id).earnedStrongHopae;
 
-    if(WordSpace.CurrentPhase == 1)
-        Audio.killSound(ScenesData.gameScene, 'Phase1');
-    if(WordSpace.CurrentPhase == 2)
-        Audio.killSound(ScenesData.gameScene, 'Phase2');
-    if(WordSpace.CurrentPhase == 3)
-        Audio.killSound(ScenesData.gameScene, 'Phase3');
-
-    Audio.playSound(ScenesData.gameScene, 'defeat');
+    
     RoomData.players[msg.index] = msg;
     RoomData.players[msg.index].playerImage = playerImage;
     RoomData.players[msg.index].position = position;
