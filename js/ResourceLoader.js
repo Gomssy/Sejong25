@@ -7,6 +7,7 @@ ResourceLoader.loadBackGround = function(scene)
     scene.load.image('gameBackground', 'assets/image/background/background_brain.png');
     scene.load.image('menuBackground', 'assets/image/UI/main/mainBackground.png');
     scene.load.image('roomBackground', 'assets/placeholder/roomBackground.png');
+    scene.load.image('shopBackground', 'assets/image/UI/shop/shop_background.png');
 }
 
 ResourceLoader.loadImage = function(scene)
@@ -65,6 +66,7 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('friendlyPlayBtn', 'assets/image/UI/main/friendlyPlay.png');
     scene.load.image('rankPlayBtn', 'assets/image/UI/main/rankPlay.png');
     scene.load.image('shopBtn', 'assets/image/UI/main/shop.png');
+    scene.load.image('boughtItem', 'assets/image/UI/shop/bought_item.png');
     scene.load.image('hopaeManageBtn', 'assets/image/UI/main/hopaeManage.png');
     scene.load.image('helpBtn', 'assets/image/UI/main/help.png');
 
@@ -75,6 +77,7 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('noBtn', 'assets/image/UI/decisionBtn/no.png');
     scene.load.image('spectateBtn', 'assets/image/UI/decisionBtn/spectate.png');
     scene.load.image('yesBtn', 'assets/image/UI/decisionBtn/yes.png');
+    scene.load.image('buyBtn', 'assets/image/UI/decisionBtn/buy.png');
     
 
     
@@ -156,6 +159,4 @@ ResourceLoader.loadAnimation = function(scene)
             repeat: 0
         });
     }
-    
-    
 }
