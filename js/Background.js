@@ -14,7 +14,9 @@ BackGround.otherCharacters = [];
 BackGround.drawCharacter = function(scene)
 {
     RoomData.myself.playerImage = scene.add.sprite(game.config.width / 2, game.config.height * 41 / 48, 'pyeongminWrite').setScale(0.45).setDepth(5);
-    RoomData.myself.position = new Phaser.Math.Vector2(RoomData.myself.playerImage.x, RoomData.myself.playerImage.y);
+    RoomData.myself.position = new Phaser.Math.Vector2(RoomData.myself.playerImage.x - 20, RoomData.myself.playerImage.y - 20);
+    RoomData.myself.mat = scene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'mat')
+        .setScale(0.45).setDepth(4);
     BackGround.characterPos = BackGround.characterPos.sort(function(){return 0.5-Math.random()});
     RoomData.players.forEach(function(element){
         if(element.id != RoomData.myself.id)
@@ -22,6 +24,9 @@ BackGround.drawCharacter = function(scene)
             element.position = BackGround.characterPos.pop();
             element.playerImage = scene.add.sprite(element.position.x, element.position.y, 'pyeongminWrite').setScale(0.315).setDepth(5);
             element.playerImage.flipX = element.position.x < game.config.width / 2 ? true : false;
+            element.mat = scene.add.sprite(element.position.x - 14 * (element.position.x < game.config.width / 2 ? -1 : 1), element.position.y - 14, 'mat')
+                .setScale(0.315).setDepth(4);
+            element.mat.flipX = element.position.x < game.config.width / 2 ? true : false;
             element.nicknameText = scene.add.text(element.position.x, element.position.y - 90, element.nickname)
                 .setOrigin(0.5,0.5).setColor('#000000').setPadding(0.5,0.5,0.5,0.5).setDepth(5.1);
 6        }

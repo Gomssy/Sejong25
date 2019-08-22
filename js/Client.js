@@ -272,7 +272,7 @@ socket.on('defeat', function(msg) // object player
                         duration: 500,
                         repeat: 0, // -1: infinity
                         yoyo: false });
-                }, 1000);
+                }, 5000);
             },
         })
 

@@ -358,6 +358,7 @@ class Player
         this.index = gameRoom.currentPlayer.length;
         this.nickname = playerData.nickname;
         this.playerImage = null;
+        this.mat = null;
         this.position = null;
         this.killCount = 0;
         this.earnedStrongHopae = 0;
