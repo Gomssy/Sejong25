@@ -197,7 +197,7 @@ var menuScene = new Phaser.Class(
             this.shopBtn = UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 100, 950, 5, 'shopBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
-                    console.log('상점 입장');
+                    ScenesData.changeScene('shopScene');
                 })
             
             this.hopaeBtn = UIObject.createButton(this, UIObject.createLabel(this, 100, 950, 5, 'hopaeManageBtn', 1, 'center'), -1, -1, -1, 
@@ -337,6 +337,135 @@ var hopaeScene = new Phaser.Class(
         }
     }
 });
+
+var shopScene = new Phaser.Class(
+{
+    Extends: Phaser.Scene,
+
+    initialize: 
+
+    function shopScene ()
+    {
+        Phaser.Scene.call(this, {key: 'shopScene'});
+    },
+
+    preload: function()
+    {
+        ScenesData.shopScene = this;
+        this.load.scenePlugin({
+            key: 'rexuiplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
+            sceneKey: 'rexUI'
+        });
+        this.load.scenePlugin({
+            key: 'rexbuttonplugin',
+            url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexbuttonplugin.min.js',
+            sceneKey: 'button'
+        });
+    },
+
+    create: function()
+    {
+        BackGround.drawBackground(this);
+
+        this.currentSkin = this.add.sprite(500, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
+            .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
+        this.money = this.add.text(200, 70, PlayerData.userData.money + "냥").setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+
+
+
+        this.pyeongminItem = {
+            price: 0,
+            itemName: this.add.text(game.config.width - 500, 300, '평민').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
+            itemPrice: this.add.text(game.config.width - 200, 300, '0냥').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
+            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 600, 300, 5, 'button', 1, 'center', '구매하기'), -1, -1, -1, 
+                function()
+                {
+                    if(PlayerData.userData.money >= ScenesData.shopScene.pyeongminItem.price)
+                    {
+                        ScenesData.shopScene.pyeongminItem.buyBtn.setVisible(false);
+                        ScenesData.shopScene.pyeongminItem.itemPrice.setText('보유중');
+                        fbClient.updateUserData('item', 0);
+                        fbClient.updateUserData('money', -ScenesData.shopScene.pyeongminItem.price);
+                        ScenesData.shopScene.money.setText(PlayerData.userData.money + '냥');
+                        ScenesData.shopScene.pyeongminItem.useBtn.setVisible(true);
+                    }
+                }),
+            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 300, 5, 'button', 1, 'center', '사용하기'), -1, -1, -1, 
+                function()
+                {
+                    if(PlayerData.userData.item.includes(0))
+                    {
+                        ScenesData.shopScene.pyeongminItem.useBtn.setVisible(false);
+                        ScenesData.shopScene.sunbiItem.useBtn.setVisible(true);
+                        fbClient.updateUserData('skin', 0);
+                        ScenesData.shopScene.currentSkin.destroy();
+                        ScenesData.shopScene.currentSkin = ScenesData.shopScene.add.sprite(500, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
+                            .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
+                    }
+                })
+        }
+        
+        this.pyeongminItem.buyBtn.setEnable(PlayerData.userData.money < ScenesData.shopScene.pyeongminItem.price ? false : true);
+        if(PlayerData.userData.item.includes(0))
+        {
+            this.pyeongminItem.buyBtn.setVisible(false);
+            this.pyeongminItem.itemPrice.setText('보유중');
+        }
+        if(PlayerData.userData.skin == 0 || !PlayerData.userData.item.includes(0)) this.pyeongminItem.useBtn.setVisible(false);
+        
+
+
+        this.sunbiItem = {
+            price: 100,
+            itemName: this.add.text(game.config.width - 500, 400, '선비').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
+            itemPrice: this.add.text(game.config.width - 200, 400, '100냥').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
+            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'button', 1, 'center', '구매하기'), -1, -1, -1, 
+                function()
+                {
+                    if(PlayerData.userData.money >= ScenesData.shopScene.sunbiItem.price)
+                    {
+                        ScenesData.shopScene.sunbiItem.buyBtn.setVisible(false);
+                        ScenesData.shopScene.sunbiItem.itemPrice.setText('보유중');
+                        fbClient.updateUserData('item', 1);
+                        fbClient.updateUserData('money', -ScenesData.shopScene.sunbiItem.price);
+                        ScenesData.shopScene.money.setText(PlayerData.userData.money + '냥');
+                        ScenesData.shopScene.sunbiItem.useBtn.setVisible(true);
+                    }
+                }),
+            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'button', 1, 'center', '사용하기'), -1, -1, -1, 
+                function()
+                {
+                    if(PlayerData.userData.item.includes(1))
+                    {
+                        ScenesData.shopScene.sunbiItem.useBtn.setVisible(false);
+                        ScenesData.shopScene.pyeongminItem.useBtn.setVisible(true);
+                        fbClient.updateUserData('skin', 1);
+                        ScenesData.shopScene.currentSkin.destroy();
+                        ScenesData.shopScene.currentSkin = ScenesData.shopScene.add.sprite(500, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
+                            .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
+                    }
+                })
+        }
+        
+        this.sunbiItem.buyBtn.setEnable(PlayerData.userData.money < ScenesData.shopScene.sunbiItem.price ? false : true);
+        if(PlayerData.userData.item.includes(1))
+        {
+            this.sunbiItem.buyBtn.setVisible(false);
+            this.sunbiItem.itemPrice.setText('보유중');
+        }
+        if(PlayerData.userData.skin == 1 || !PlayerData.userData.item.includes(1)) this.sunbiItem.useBtn.setVisible(false);
+
+        
+            
+        this.backBtn = UIObject.createButton(this, UIObject.createLabel(this, 200, 900, 5, 'exitBtn', 1, 'center', '                      '), -2, -2, -2, 
+        function()
+        {
+            ScenesData.changeScene('menuScene');
+        });
+    }
+});
+
 
 var roomScene = new Phaser.Class(
 {
