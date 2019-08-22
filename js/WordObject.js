@@ -57,8 +57,6 @@ class WordObject
         setTimeout(function() {
             breakAnim.destroy();
         }, 200);
-        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.write]);
-        RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
     }
     
     attract()
@@ -110,6 +108,9 @@ class NormalWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -148,8 +149,8 @@ class AttackWord extends WordObject
         let textColor = '#000000'
         super.instantiate(scene, spriteName, textColor, lenRate);
         this.maskBackground = scene.physics.add.sprite(this.physicsObj.x, this.physicsObj.y, 'wordBgr' + this.wordGrade + '_' + Math.min(Math.max(2, this.wordText.length), 6))
-        .setTint(Phaser.Display.Color.GetColor(120, 120, 120)).setScale(this.scale);
-        this.maskBackground.alpha = this.isDark ? 1 : 0.5;
+        .setTint(Phaser.Display.Color.GetColor(40, 40, 40)).setScale(this.scale).setDepth(1.1);
+        this.maskBackground.alpha = this.isDark ? 1 : 0.7;
         this.shape = scene.make.graphics();
         var rect = new Phaser.Geom.Rectangle(0, 0, this.maskBackground.width * this.scale, this.maskBackground.height * this.scale);
         this.shape.fillStyle(0xffffff).fillRectShape(rect);
@@ -189,6 +190,9 @@ class AttackWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             switch(this.wordGrade)
             {
                 case 0: WordSpace.attackGauge.add(2.5); break;
@@ -259,10 +263,7 @@ class NameWord extends WordObject
             if(this.isStrong)
             {
                 this.physicsObj.setScale(this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale);
-                this.wordObj.setFont({
-                    font: (this.follower.t < 0.2 ? 0.05 : this.follower.t * this.scale * this.fontScale) +'pt sejongFont',
-                    fontStyle: (this.wordWeight > 5 ? 'bold' : '')
-                });
+                this.wordObj.setScale((this.follower.t < 0.2 ? 0.2 : this.follower.t * this.scale) * 0.9);
             }
         }
     }
@@ -271,6 +272,9 @@ class NameWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             ScenesData.gameScene.physics.world.removeCollider(this.physicsObj.wordCollider);
             WordSpace.wordGroup.forEach(function(element)
             {
@@ -298,10 +302,6 @@ class NameWord extends WordObject
                 duration: 2000,
                 repeat: 0
             });
-            //이동경로 디버그
-            /*var graphics = ScenesData.gameScene.add.graphics();
-            graphics.lineStyle(2, 0xffffff, 1);
-            this.path.draw(graphics);*/
         }
     }
 }
@@ -356,6 +356,9 @@ class ItemWord extends WordObject
         super.destroy();
         if(isNormallyRemoved)
         {
+            Audio.playSound(ScenesData.gameScene, 'killWord');
+            RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.write]);
+            RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
             WordSpace.attackGauge.add(0.5);
             switch(this.itemType)
             {

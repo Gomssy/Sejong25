@@ -85,7 +85,7 @@ socket.on('setRoomCount', function(msg)
             }
             ScenesData.roomScene.players.push(playerSet);
         }
-        else // remove character
+        else if (msg.id != -1) // remove character
         {
             let idx = ScenesData.roomScene.players.findIndex(function(element)
             {
@@ -152,7 +152,9 @@ socket.on('someoneAttacked', function(msg) // {Id attackerId, Id victimId}
     WordSpace.makeAttackPaper(ScenesData.gameScene, attackerPos, victimPos, msg.multiple);
 });
 socket.on('attacked', function(msg) // object attackData
-{
+{   
+    Audio.playSound(ScenesData.gameScene, 'Bagazi');
+
     let attackedEvent = new Cycle(function()
     {
         if(!WordSpace.isInvincible)
@@ -203,20 +205,34 @@ socket.on('defeat', function(msg) // object player
     let playerImage = RoomData.findPlayer(msg.id).playerImage;
     let position = RoomData.findPlayer(msg.id).position;
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
+    let earnedStrongHopae = RoomData.findPlayer(msg.id).earnedStrongHopae;
+
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
+
+    Audio.playSound(ScenesData.gameScene, 'defeat');
     RoomData.players[msg.index] = msg;
     RoomData.players[msg.index].playerImage = playerImage;
     RoomData.players[msg.index].position = position;
     RoomData.players[msg.index].nicknameText = nicknameText;
+    RoomData.players[msg.index].earnedStrongHopae = earnedStrongHopae;
 
     let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
-    victim.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
+    victim.playerImage.play(WordSpace.characterAnims[victim.skin][Enums.characterAnim.gameOver]);
 
     
     if (msg.lastAttack != null) 
     {
         let lastAttacker = RoomData.findPlayer(msg.lastAttack.attackerId);
         let attackWord = msg.lastAttack.word;
+
+        Audio.playSound(ScenesData.gameScene, 'killLog');
+
         console.log(victim.nickname + ' defeated by ' + lastAttacker.nickname + ', with ' + msg.lastAttack.word);
         if(WordSpace.lastAttackGroup.length != 0)
         {
@@ -256,7 +272,7 @@ socket.on('defeat', function(msg) // object player
                         duration: 500,
                         repeat: 0, // -1: infinity
                         yoyo: false });
-                }, 1000);
+                }, 5000);
             },
         })
 
@@ -297,6 +313,7 @@ socket.on('defeat', function(msg) // object player
         {
             var keys = Object.keys(Enums.item);
             WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
+            Audio.playSound(ScenesData.gameScene, 'getItem');
             RoomData.myself.killCount++;
         }
     }
@@ -341,20 +358,27 @@ socket.on('defeat', function(msg) // object player
                 }, 1000);
             }
         })
-
-
     }
     if(msg.id == RoomData.myself.id)
     {
         RoomData.myself = RoomData.players[msg.index];
         setTimeout(() => {
-            gameEndMenu(true);
+            gameEndMenu(false);
         }, 2000);
     }
 });
 socket.on('gameEnd', function(msg) // number winnerId
 {
     const winner = RoomData.findPlayer(msg);
+
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
+
+    Audio.playSound(ScenesData.gameScene, 'victory');
     console.log(winner.nickname + ' Win!!!!!!');
     if(msg == RoomData.myself.id)
     {
@@ -369,6 +393,7 @@ socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.findPlayer(msg.victimId));
+    tempWord.instantiate(ScenesData.gameScene);
     let victimPos = RoomData.findPlayer(msg.victimId).position;
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
@@ -392,13 +417,14 @@ var gameEndMenu = function(isWin)
     let earnedMoney = 0;
     if(isWin) earnedMoney += 20;
     earnedMoney += RoomData.myself.killCount * 3;
-    earnedMoney += parseInt(WordSpace.playerTypingRate / 10);
+    earnedMoney += parseInt(WordSpace.playerTyping / 10);
     earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
     earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
+    earnedMoney = parseInt(earnedMoney / 40);
 
     Input.inputField.text.destroy();
 
-    var temp = function(){
+    var endGame = function(){
 
         socket.emit('exitFromRoom', RoomData.myself.id);
         fbClient.updateUserData('killCount', RoomData.myself.killCount);
@@ -406,25 +432,29 @@ var gameEndMenu = function(isWin)
         ScenesData.changeScene('menuScene');
     }
 
+
     ScenesData.gameScene.backToMenuDialog = ScenesData.gameScene.rexUI.add.dialog({
         x: game.config.width / 2,
         y: game.config.height / 2,
 
-        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'panel').setOrigin(0.5, 0.5),
+        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'resultDialog').setOrigin(0.5, 0.5),
 
         content: ScenesData.gameScene.rexUI.add.dialog({
             x: game.config.width / 2,
             y: game.config.height / 2,
             choices: [
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 100, game.config.height / 2 - 100, 10.2, 'playerStand', 0.7, 'center'),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 150, 10.2, 
-                    'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 - 50, 10.2, 
-                    'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 50, 10.2, 
-                    'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 30).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 150, 10.2, 
-                    'button', 1, 'center', '획득 골드 : ' + earnedMoney + '원', 30).layout()
+                ScenesData.gameScene.add.sprite(game.config.width / 2 - 200, game.config.height / 2 - 100, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
+                    .setOrigin(0.5, 0.5).setDepth(10.2).setScale(0.7),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 - 220, RoomData.myself.rank + '등')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 - 80, RoomData.myself.killCount + '회')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 + 80, RoomData.myself.earnedStrongHopae + '개')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 + 220, '+' + earnedMoney + '냥')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 250, game.config.height / 2 + 220, 10.2, 'nameBgr' + RoomData.myself.nickname.length, 2, 
+                    'center', RoomData.myself.nickname, 50, '#ffffff', 0.45, 0.5)
             ],
     
             align: {
@@ -432,31 +462,33 @@ var gameEndMenu = function(isWin)
             }
         }),
         actions: [
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 120, game.config.height / 2 + 300, 10.2, 'button', 1, 'center', '나가기').layout(),
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 120, game.config.height / 2 + 300, 10.2, 'button', 1, 'center', '관전하기').layout()
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 200, game.config.height / 2 + 350, 10.2, 'exitBtn', 1, 'center', '                      ').layout(),
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 200, game.config.height / 2 + 350, 10.2, 'spectateBtn', 1, 'center', '                      ').layout()
         ],
 
         space: {
             action: 10,
 
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: 20,
+            left: 50, right: 50, top: 50, bottom: 50,
         },
 
         align: {
             actions: 'center' // 'center'|'left'|'right'
         }
     }).setDepth(10.2);
+    
+    if(isWin) ScenesData.gameScene.winMark = 
+        ScenesData.gameScene.add.sprite(game.config.width / 2 + 500, game.config.height / 2 + 400, 'resultStamp').setOrigin(0.5, 0.5).setDepth(10.2);
 
     ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {
-            if(index == 0) temp();
+            if(index == 0) endGame();
             else
             {
+                if(isWin) ScenesData.gameScene.winMark.destroy();
                 ScenesData.gameScene.backToMenuDialog.setVisible(false);
-                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, UIObject.createLabel(ScenesData.gameScene, 100, 900, 10.2, 'pyeongminThrow', 0.5, 'center'), 1, 0, 2, temp);
+                ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, 
+                    UIObject.createLabel(ScenesData.gameScene, 200, 900, 10.2, 'spectateBtn', 1, 'center'), -1, -1, -1, endGame);
             }
         }, ScenesData.gameScene)
         .on('button.over', function (button, groupName, index) {
