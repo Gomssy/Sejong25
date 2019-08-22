@@ -78,6 +78,7 @@ ResourceLoader.loadImage = function(scene)
     scene.load.image('spectateBtn', 'assets/image/UI/decisionBtn/spectate.png');
     scene.load.image('yesBtn', 'assets/image/UI/decisionBtn/yes.png');
     scene.load.image('buyBtn', 'assets/image/UI/decisionBtn/buy.png');
+    scene.load.image('equipBtn', 'assets/image/UI/decisionBtn/equip.png');
     
 
     

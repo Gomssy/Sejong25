@@ -380,7 +380,7 @@ var shopScene = new Phaser.Class(
             price: 0,
             itemName: this.add.text(game.config.width - 500, 300, '평민').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
             itemPrice: this.add.text(game.config.width - 200, 300, '0냥').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
-            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 600, 300, 5, 'button', 1, 'center', '구매하기'), -1, -1, -1, 
+            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 600, 300, 5, 'buyBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     if(PlayerData.userData.money >= ScenesData.shopScene.pyeongminItem.price)
@@ -394,7 +394,7 @@ var shopScene = new Phaser.Class(
                         ScenesData.shopScene.pyeongminItem.boughtSign.setVisible(true);
                     }
                 }),
-            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 300, 5, 'buyBtn', 1, 'center'), -1, -1, -1, 
+            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 300, 5, 'equipBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     if(PlayerData.userData.item.includes(0))
@@ -439,7 +439,7 @@ var shopScene = new Phaser.Class(
                         ScenesData.shopScene.sunbiItem.boughtSign.setVisible(true);
                     }
                 }),
-            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'button', 1, 'center', '사용하기'), -1, -1, -1, 
+            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'equipBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     if(PlayerData.userData.item.includes(1))
