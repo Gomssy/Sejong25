@@ -13,7 +13,8 @@ BackGround.otherCharacters = [];
 
 BackGround.drawCharacter = function(scene)
 {
-    RoomData.myself.playerImage = scene.add.sprite(game.config.width / 2, game.config.height * 41 / 48, 'pyeongminWrite').setScale(0.45).setDepth(5);
+    RoomData.myself.playerImage = scene.add.sprite(game.config.width / 2, game.config.height * 41 / 48, Enums.characterSkin[PlayerData.userData.skin] + 'Write')
+        .setScale(0.45).setDepth(5);
     RoomData.myself.position = new Phaser.Math.Vector2(RoomData.myself.playerImage.x - 20, RoomData.myself.playerImage.y - 20);
     RoomData.myself.mat = scene.add.sprite(RoomData.myself.position.x, RoomData.myself.position.y, 'mat')
         .setScale(0.45).setDepth(4);
@@ -22,7 +23,8 @@ BackGround.drawCharacter = function(scene)
         if(element.id != RoomData.myself.id)
         {
             element.position = BackGround.characterPos.pop();
-            element.playerImage = scene.add.sprite(element.position.x, element.position.y, 'pyeongminWrite').setScale(0.315).setDepth(5);
+            element.playerImage = scene.add.sprite(element.position.x, element.position.y, Enums.characterSkin[element.skin] + 'Write')
+                .setScale(0.315).setDepth(5);
             element.playerImage.flipX = element.position.x < game.config.width / 2 ? true : false;
             element.mat = scene.add.sprite(element.position.x - 14 * (element.position.x < game.config.width / 2 ? -1 : 1), element.position.y - 14, 'mat')
                 .setScale(0.315).setDepth(4);

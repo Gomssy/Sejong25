@@ -12,6 +12,9 @@ WordSpace.isTimerOn = false;
 WordSpace.isInvincible = false;
 WordSpace.pyeongminAnims = [];
 
+WordSpace.characterAnims = Array(2).fill(null).map(() => Array());
+
+
 WordSpace.wordGroup = [];
 WordSpace.nameGroup = [];
 WordSpace.attackPaperGroup = null;
@@ -192,7 +195,6 @@ WordSpace.generateWord =
     Item: function(scene, itemType, lenRate)
     {
         word = new ItemWord(itemType);
-        Audio.playSound(ScenesData.gameScene, 'getItem');
         WordSpace.pushWord(scene, word, lenRate);
         return word;
     }
@@ -277,16 +279,16 @@ WordSpace.findWord = function(wordText)
         switch(tempAttackOption.wordCount)
         {
             case 2:
-                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.notBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.notBurning]);
                 break;
             case 3:
-                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.smallBurning]);
                 break;
             case 4:
-                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.smallBurning]);
                 break;
             case 5:
-                RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.bigBurning]);
+                RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.bigBurning]);
                 break;
             default:
                 console.log('Improper attack option.');
@@ -396,8 +398,8 @@ WordSpace.attack = function(wordText, grade)
 
         WordSpace.attackGauge.resetValue();
         WordSpace.setPlayerTyping.add(wordText);
-        RoomData.myself.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.throw]);
-        RoomData.myself.playerImage.anims.chain(WordSpace.pyeongminAnims[Enums.characterAnim.sit]);
+        RoomData.myself.playerImage.play(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.throw]);
+        RoomData.myself.playerImage.anims.chain(WordSpace.characterAnims[PlayerData.userData.skin][Enums.characterAnim.sit]);
         Input.attackOption.isHeavy = false;
         Input.attackOption.isDark = false;
     }
@@ -492,7 +494,8 @@ WordSpace.changePhase = function(newPhase)
 
     //WordSpace.pauseCycle(true);
     // 여기서 종이 드르륵 열면됨
-    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phase' + newPhase).setOrigin(0.5, 0.5).setDepth(9.9).play('phase' + newPhase + 'Anim');
+    let phaseChangeBgr = ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'phase' + newPhase).setOrigin(0.5, 0.5).setDepth(9.9)
+        .play('phase' + newPhase + 'Anim');
     //ScenesData.gameScene.scene.pause('gameScene');
     setTimeout(function()
     {
@@ -515,7 +518,6 @@ WordSpace.resetGame = function()
     WordSpace.isGameOver = false;
     WordSpace.isTimerOn = false;
     WordSpace.isInvincible = false;
-    WordSpace.pyeongminAnims = [];
 
     WordSpace.wordGroup = [];
     WordSpace.nameGroup = [];

@@ -223,7 +223,7 @@ socket.on('defeat', function(msg) // object player
 
     let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
-    victim.playerImage.play(WordSpace.pyeongminAnims[Enums.characterAnim.gameOver]);
+    victim.playerImage.play(WordSpace.characterAnims[victim.skin][Enums.characterAnim.gameOver]);
 
     
     if (msg.lastAttack != null) 
@@ -313,6 +313,7 @@ socket.on('defeat', function(msg) // object player
         {
             var keys = Object.keys(Enums.item);
             WordSpace.generateWord.Item(ScenesData.gameScene, Enums.item[keys[keys.length * Math.random() << 0]]);
+            Audio.playSound(ScenesData.gameScene, 'getItem');
             RoomData.myself.killCount++;
         }
     }
@@ -362,7 +363,7 @@ socket.on('defeat', function(msg) // object player
     {
         RoomData.myself = RoomData.players[msg.index];
         setTimeout(() => {
-            gameEndMenu(true);
+            gameEndMenu(false);
         }, 2000);
     }
 });
@@ -392,6 +393,7 @@ socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.findPlayer(msg.victimId));
+    tempWord.instantiate(ScenesData.gameScene);
     let victimPos = RoomData.findPlayer(msg.victimId).position;
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
@@ -415,9 +417,10 @@ var gameEndMenu = function(isWin)
     let earnedMoney = 0;
     if(isWin) earnedMoney += 20;
     earnedMoney += RoomData.myself.killCount * 3;
-    earnedMoney += parseInt(WordSpace.playerTypingRate / 10);
+    earnedMoney += parseInt(WordSpace.playerTyping / 10);
     earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
     earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
+    earnedMoney = parseInt(earnedMoney / 40);
 
     Input.inputField.text.destroy();
 
@@ -429,25 +432,29 @@ var gameEndMenu = function(isWin)
         ScenesData.changeScene('menuScene');
     }
 
+
     ScenesData.gameScene.backToMenuDialog = ScenesData.gameScene.rexUI.add.dialog({
         x: game.config.width / 2,
         y: game.config.height / 2,
 
-        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'dialog1').setOrigin(0.5, 0.5),
+        background: ScenesData.gameScene.add.sprite(game.config.width / 2, game.config.height / 2, 'resultDialog').setOrigin(0.5, 0.5),
 
         content: ScenesData.gameScene.rexUI.add.dialog({
             x: game.config.width / 2,
             y: game.config.height / 2,
             choices: [
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 150, game.config.height / 2 - 100, 10.2, 'playerStand', 0.7, 'center'),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 150, game.config.height / 2 - 180, 10.2, 
-                    'button', 1, 'center', '등수 : ' + RoomData.myself.rank + '등', 20).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 150, game.config.height / 2 - 60, 10.2, 
-                    'button', 1, 'center', '킬 수 : ' + RoomData.myself.killCount + '킬', 20).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 150, game.config.height / 2 + 60, 10.2, 
-                    'button', 1, 'center', '획득 강호패 : ' + RoomData.myself.earnedStrongHopae + '개', 20).layout(),
-                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 150, game.config.height / 2 + 180, 10.2, 
-                    'button', 1, 'center', '획득 골드 : ' + earnedMoney + '원', 20).layout()
+                ScenesData.gameScene.add.sprite(game.config.width / 2 - 200, game.config.height / 2 - 100, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
+                    .setOrigin(0.5, 0.5).setDepth(10.2).setScale(0.7),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 - 220, RoomData.myself.rank + '등')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 - 80, RoomData.myself.killCount + '회')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 + 80, RoomData.myself.earnedStrongHopae + '개')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                ScenesData.gameScene.add.text(game.config.width / 2 + 400, game.config.height / 2 + 220, '+' + earnedMoney + '냥')
+                    .setOrigin(1, 0.5).setColor('#000000').setDepth(10.2).setPadding(5,5,5,5).setFont('50pt sejongFont'),
+                UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 250, game.config.height / 2 + 220, 10.2, 'nameBgr' + RoomData.myself.nickname.length, 2, 
+                    'center', RoomData.myself.nickname, 50, '#ffffff', 0.45, 0.5)
             ],
     
             align: {
@@ -455,32 +462,33 @@ var gameEndMenu = function(isWin)
             }
         }),
         actions: [
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 200, game.config.height / 2 + 300, 10.2, 'exitBtn', 1, 'center', '                      ').layout(),
-            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 200, game.config.height / 2 + 300, 10.2, 'spectateBtn', 1, 'center', '                      ').layout()
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 - 200, game.config.height / 2 + 350, 10.2, 'exitBtn', 1, 'center', '                      ').layout(),
+            UIObject.createLabel(ScenesData.gameScene, game.config.width / 2 + 200, game.config.height / 2 + 350, 10.2, 'spectateBtn', 1, 'center', '                      ').layout()
         ],
 
         space: {
             action: 10,
 
-            left: 50,
-            right: 50,
-            top: 50,
-            bottom: 50,
+            left: 50, right: 50, top: 50, bottom: 50,
         },
 
         align: {
             actions: 'center' // 'center'|'left'|'right'
         }
     }).setDepth(10.2);
+    
+    if(isWin) ScenesData.gameScene.winMark = 
+        ScenesData.gameScene.add.sprite(game.config.width / 2 + 500, game.config.height / 2 + 400, 'resultStamp').setOrigin(0.5, 0.5).setDepth(10.2);
 
     ScenesData.gameScene.backToMenuDialog
         .on('button.click', function (button, groupName, index) {
             if(index == 0) endGame();
             else
             {
+                if(isWin) ScenesData.gameScene.winMark.destroy();
                 ScenesData.gameScene.backToMenuDialog.setVisible(false);
                 ScenesData.gameScene.backToMenuBtn = UIObject.createButton(ScenesData.gameScene, 
-                    UIObject.createLabel(ScenesData.gameScene, 100, 900, 10.2, 'spectateBtn', 1, 'center'), 1, 0, 2, temp);
+                    UIObject.createLabel(ScenesData.gameScene, 200, 900, 10.2, 'spectateBtn', 1, 'center'), -1, -1, -1, endGame);
             }
         }, ScenesData.gameScene)
         .on('button.over', function (button, groupName, index) {

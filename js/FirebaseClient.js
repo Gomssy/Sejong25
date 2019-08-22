@@ -264,6 +264,8 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 		case 'killCount':
 			beforeData.killCount = replace ? (valueChanged) : (beforeData.killCount + valueChanged);
 			break;
+		case 'skin':
+			beforeData.skin = valueChanged;
 		default:
 			console.log('[ERROR] database has no key for ' + key);
 			break;
@@ -311,7 +313,8 @@ class UserData
 		this.recentHopae = null;
 		this.title = [];
 		this.money = 0;
-		this.item = [];
+		this.item = [0];
 		this.killCount = 0;
+		this.skin = 0;
     }
 }

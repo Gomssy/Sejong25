@@ -40,6 +40,14 @@ ResourceLoader.loadImage = function(scene)
     scene.load.spritesheet('pyeongminGameOver', 'assets/image/character/pyeongmin/balladang/pyeong_balladang.png', { frameWidth: 720, frameHeight: 700 });
     scene.load.image('pyeongminStand', 'assets/image/character/pyeongmin/pyeong_stand.png');
     
+    scene.load.spritesheet('sunbiSit', 'assets/image/character/sunbi/sunbi_sit.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiWrite', 'assets/image/character/sunbi/sunbi_write.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiThrow', 'assets/image/character/sunbi/sunbi_throw.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiBurningSmall', 'assets/image/character/sunbi/sunbi_burning_small.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiBurningBig', 'assets/image/character/sunbi/sunbi_burning_big.png', { frameWidth: 521, frameHeight: 610 });
+    scene.load.spritesheet('sunbiGameOver', 'assets/image/character/sunbi/sunbi_die.png', { frameWidth: 720, frameHeight: 700 });
+    scene.load.image('sunbiStand', 'assets/image/character/sunbi/sunbi_stand.png');
+    
     scene.load.spritesheet('wordBreak', 'assets/image/word/wordbreak.png', { frameWidth: 180, frameHeight: 180 });
     scene.load.spritesheet('hopaeSceneInput', 'assets/image/word/hopaeSceneInput.png', { frameWidth: 239, frameHeight: 45 });
     scene.load.spritesheet('gameSceneInput', 'assets/image/etc/wordSpace/wordspace.png', { frameWidth: 253, frameHeight: 67 });
@@ -52,6 +60,8 @@ ResourceLoader.loadImage = function(scene)
     
     scene.load.image('dialog1', 'assets/image/UI/dialog/dialog1.png');
     scene.load.image('dialog2', 'assets/image/UI/dialog/dialog2.png');
+    scene.load.image('resultDialog', 'assets/image/UI/dialog/result_background.png');
+    scene.load.image('resultStamp', 'assets/image/UI/dialog/result_stamp.png');
     scene.load.image('friendlyPlayBtn', 'assets/image/UI/main/friendlyPlay.png');
     scene.load.image('rankPlayBtn', 'assets/image/UI/main/rankPlay.png');
     scene.load.image('shopBtn', 'assets/image/UI/main/shop.png');
@@ -100,46 +110,52 @@ ResourceLoader.loadAnimation = function(scene)
         frameRate: 20,
         repeat: 0
     });
-    WordSpace.pyeongminAnims[Enums.characterAnim.sit] = scene.anims.create({
-        key: 'pyeongminSitAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminSit'),
-        frameRate: 10,
-        repeat: 0
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.write] = scene.anims.create({
-        key: 'pyeongminWriteAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
-        frameRate: 10,
-        repeat: 0
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.notBurning] = scene.anims.create({
-        key: 'pyeongminnotBurningAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminWrite'),
-        frameRate: 10,
-        repeat: -1
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.smallBurning] = scene.anims.create({
-        key: 'pyeongminsmallBurningAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminBurningSmall'),
-        frameRate: 10,
-        repeat: -1
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.bigBurning] = scene.anims.create({
-        key: 'pyeongminbigBurningAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminBurningBig'),
-        frameRate: 10,
-        repeat: -1
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.throw] = scene.anims.create({
-        key: 'pyeongminThrowAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminThrow'),
-        frameRate: 10,
-        repeat: 0
-    });
-    WordSpace.pyeongminAnims[Enums.characterAnim.gameOver] = scene.anims.create({
-        key: 'pyeongminGameOverAnim',
-        frames: scene.anims.generateFrameNumbers('pyeongminGameOver'),
-        frameRate: 10,
-        repeat: 0
-    });
+
+    for(let i = 0; i < 2; i++)
+    {
+        WordSpace.characterAnims[i][Enums.characterAnim.sit] = scene.anims.create({
+            key: Enums.characterSkin[i] + 'SitAnim',
+            frames: scene.anims.generateFrameNumbers(Enums.characterSkin[i] + 'Sit'),
+            frameRate: 10,
+            repeat: 0
+        });
+        WordSpace.characterAnims[i][Enums.characterAnim.write] = scene.anims.create({
+            key: Enums.characterSkin[i] + 'WriteAnim',
+            frames: scene.anims.generateFrameNumbers(Enums.characterSkin[i] + 'Write'),
+            frameRate: 10,
+            repeat: 0
+        });
+        WordSpace.characterAnims[i][Enums.characterAnim.notBurning] = scene.anims.create({
+            key: Enums.characterSkin[i] + 'notBurningAnim',
+            frames: scene.anims.generateFrameNumbers(Enums.characterSkin[i] + 'Write'),
+            frameRate: 10,
+            repeat: -1
+        });
+        WordSpace.characterAnims[i][Enums.characterAnim.smallBurning] = scene.anims.create({
+            key: Enums.characterSkin[i] + 'smallBurningAnim',
+            frames: scene.anims.generateFrameNumbers(Enums.characterSkin[i] + 'BurningSmall'),
+            frameRate: 10,
+            repeat: -1
+        });
+        WordSpace.characterAnims[i][Enums.characterAnim.bigBurning] = scene.anims.create({
+            key: Enums.characterSkin[i] + 'bigBurningAnim',
+            frames: scene.anims.generateFrameNumbers(Enums.characterSkin[i] + 'BurningBig'),
+            frameRate: 10,
+            repeat: -1
+        });
+        WordSpace.characterAnims[i][Enums.characterAnim.throw] = scene.anims.create({
+            key: Enums.characterSkin[i] + 'ThrowAnim',
+            frames: scene.anims.generateFrameNumbers(Enums.characterSkin[i] + 'Throw'),
+            frameRate: 10,
+            repeat: 0
+        });
+        WordSpace.characterAnims[i][Enums.characterAnim.gameOver] = scene.anims.create({
+            key: Enums.characterSkin[i] + 'GameOverAnim',
+            frames: scene.anims.generateFrameNumbers(Enums.characterSkin[i] + 'GameOver'),
+            frameRate: 10,
+            repeat: 0
+        });
+    }
+    
+    
 }

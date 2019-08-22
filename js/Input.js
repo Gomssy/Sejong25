@@ -322,7 +322,7 @@ Input.inputField =
         scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = '';
             if(ScenesData.currentScene == ScenesData.hopaeScene)
             {
-                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) || (Input.finalInput.length > 1) ? true : false);
+                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) && (Input.finalInput.length > 1) ? true : false);
                 ScenesData.hopaeScene.warningText.setVisible(WordReader.getWordTyping(Input.finalInput) > 9 ? true : false);
             }
         })
