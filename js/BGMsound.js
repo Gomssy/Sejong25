@@ -29,7 +29,7 @@ Audio.loadSound = function(scene)
 
 Audio.playSound = function(scene, title) // 한 번만 재생할 때 사용
 {
-    bgm = scene.sound.add(title);
+    bgm = scene.sound.add(title); // 추후 수정 예정
     bgm.play();
 }
 
@@ -56,3 +56,4 @@ Audio.killSound = function(scene, title)
     bgm.stop();
 }
 
+// 전반적으로 함수 수정 필요..
