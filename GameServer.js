@@ -268,7 +268,7 @@ class GameRoom
         this.startTime = Date.now();
         setTimeout(function()
         {
-            this.checkPhase(Date.now());
+            if (this.currentPhase === GameServer.Phase.START) this.checkPhase(Date.now());
         }.bind(this), 6000);
     }
 
@@ -281,16 +281,6 @@ class GameRoom
                 this.currentPhase = GameServer.Phase.MAIN;
                 this.rateArrangePoint = 150;
                 this.announceToRoom('changePhase', GameServer.Phase.MAIN);
-            }
-            else if (this.phaseChanger < 0)
-            {
-                this.phaseChanger = setTimeout(function(room)
-                {
-                    room.currentPhase = GameServer.Phase.MAIN;
-                    room.rateArrangePoint = 150;
-                    room.announceToRoom('changePhase', GameServer.Phase.MAIN);
-                    room.phaseChanger = -1;
-                }, 60000 - (checkTime - this.startTime), this);
             }
         }
         else if (this.currentPhase === GameServer.Phase.MAIN)
