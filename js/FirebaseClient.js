@@ -257,18 +257,17 @@ document.addEventListener('DOMContentLoaded', function()
 			{
 				if (!fbClient.isGameStarted && e.keyCode === 13)
 				{
-					fbClient.onEmailBtnClick();
+					fbClient.onEmailBtnClick().bind(fbClient);
+				}
+				else if (fbClient.isGameStarted && e.keyCode === 27)
+				{
+					fbClient.logOut().bind(fbClient);
 				}
 			}
 		}
 	}
     console.log('done load');
 });
-
-document.onkeydown = function(e)
-{
-	if (fbClient.isGameStarted && e.keyCode === 27) fbClient.logOut();
-}
 
 class UserData
 {
