@@ -4,6 +4,7 @@ Input.input = [];
 Input.converted = '';
 Input.convInput = ''; // converted input
 Input.finalInput = '';
+Input.lastSuccess = '';
 
 Input.isShifted = false;
 Input.isEntered = false;
@@ -23,24 +24,14 @@ Input.gameSceneEnterReaction = function()
 {
     if (RoomData.myself.isAlive && !Input.isEntered)
     {
-        if (Input.attackMode) WordSpace.attack(Input.removeConVow(Input.finalInput), Input.attackOption.wordGrade);
+        if (Input.attackMode)
+        {
+            WordSpace.attack(Input.removeConVow(Input.finalInput), Input.attackOption.wordGrade);
+            Input.inputField.inputBackground.setFrame(4);
+        }
         else WordSpace.findWord(Input.finalInput);
         Input.reset();
         Input.isEntered = true;
-    }
-}
-Input.menuSceneEnterReaction = function()
-{
-    Input.finalInput = Input.removeConVow(Input.finalInput);
-    if (Input.finalInput.length > 1)
-    {
-        PlayerData.nickname = Input.finalInput;
-        Input.reset();
-    }
-    else 
-    {
-        alert('정확한 가명을 입력해주세요.');
-        Input.reset();
     }
 }
 
@@ -209,7 +200,12 @@ Input.convert = function()
         this.convInput = this.convInput.slice(1, 2);
     }
     Input.finalInput = Input.converted + Input.convInput;
-    return true;
+    if (Input.finalInput.length > 6) return false;
+    else 
+    {
+        this.lastSuccess = this.finalInput;
+        return true;
+    }
     //console.log('_____end_convert_____');    
 }
 
@@ -318,17 +314,24 @@ Input.removeConVow = function(_wordText)
 
 Input.inputField = 
 {
-    generate: function(scene, enterCallback, text, isHopaeScene = false)
+    generate: function(scene, enterCallback, text)
     {
-        this.text = text;
+        this.text = text.getElement('text');
+        this.inputBackground = text.getElement('background');
 
-        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = ''; 
-            if(isHopaeScene)
+        if(ScenesData.currentScene == ScenesData.gameScene) Input.inputField.inputBackground.setFrame(4);
+
+        scene.input.keyboard.on('keydown', function() {
+            if(ScenesData.currentScene == ScenesData.hopaeScene && Input.finalInput.length > 1) Input.inputField.inputBackground.setFrame(Input.finalInput.length - 2);
+        })
+
+        scene.input.keyboard.on('keyup', function() {Input.pressCount--; Input.justPressed = '';
+            if(ScenesData.currentScene == ScenesData.hopaeScene)
             {
-                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) ? true : false);
-                if(Input.finalInput.length > 4) ScenesData.hopaeScene.warningText.setVisible(true);
-                else ScenesData.hopaeScene.warningText.setVisible(false);
-            }})
+                ScenesData.hopaeScene.checkBtn.setEnable(Input.checkProperInput(Input.inputField.text.text) && (Input.finalInput.length > 1) ? true : false);
+                ScenesData.hopaeScene.warningText.setVisible(WordReader.getWordTyping(Input.finalInput) > 9 ? true : false);
+            }
+        })
         scene.input.keyboard.on('keydown-SHIFT', function() {Input.isShifted = true});
         scene.input.keyboard.on('keyup-SHIFT', function() {Input.isShifted = false});
         scene.input.keyboard.on('keydown-DELETE', function() {Input.reset()});
@@ -403,11 +406,14 @@ Input.pushInput = function(inputKey)
             }
         }
         else output = inputKey.charCodeAt(0);
-        this.input.push(output);
+        if (this.finalInput.length <= this.maxInput) this.input.push(output);
         //console.log(Input.input);
         if (!this.convert() || this.finalInput.length > this.maxInput) 
         {
-            this.input.pop();
+            this.converted = this.lastSuccess;
+            this.finalInput = this.lastSuccess;
+            this.convInput = '';
+            this.input = [];
             this.convert();
         }
         this.inputField.text.setText(Input.finalInput);
