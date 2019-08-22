@@ -289,8 +289,8 @@ var hopaeScene = new Phaser.Class(
             {
                 if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 || PlayerData.userData.money > 0)
                 {
+                    if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0))fbClient.updateUserData('money', -1);
                     fbClient.updateUserData('hopae', {name: Input.inputField.text.text, type: 'wood'});
-                    if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0)) fbClient.updateUserData('money', -1);
                     ScenesData.changeScene('menuScene');
                 }
                 else
