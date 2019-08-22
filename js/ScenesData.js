@@ -20,7 +20,6 @@ var menuScene = new Phaser.Class(
         ResourceLoader.loadImage(this);
         CSVParsing.loadText(this);
         Audio.loadSound(this);
-
         this.load.scenePlugin({
             key: 'rexuiplugin',
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
@@ -37,7 +36,7 @@ var menuScene = new Phaser.Class(
     {
         ResourceLoader.loadAnimation(this);
         BackGround.drawMenu(this);
-        Audio.playSound(this, 'login');
+        Audio.loopSound(this, 'login');
         ScenesData.menuScene.tutorialFrame = 0;
         ScenesData.menuScene.tutorialImage = UIObject.createButton(this, UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 11,
             'tutorialImage', 1, 'center'), -2, -2, -2,
@@ -68,8 +67,8 @@ var menuScene = new Phaser.Class(
             PlayerData.currentHopae = (PlayerData.userData.recentHopae == null) ? PlayerData.userData.hopae[0] : PlayerData.userData.recentHopae;
             PlayerData.nickname = PlayerData.currentHopae.name;
 
-            this.userName = this.add.text(250, 75, PlayerData.userData.userName).setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
-            this.money = this.add.text(950, 70, PlayerData.userData.money).setOrigin(1, 0.5).setColor('#ffffff').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+            this.userName = this.add.text(250, 75, PlayerData.userData.userName.length < 10 ? PlayerData.userData.userName : PlayerData.userData.userName.substr(0, 8) + '...').setOrigin(0, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+            this.money = this.add.text(950, 70, PlayerData.userData.money + '냥').setOrigin(1, 0.5).setColor('#ffffff').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
 
             this.organizeHopae = function()
             {
@@ -290,8 +289,8 @@ var hopaeScene = new Phaser.Class(
             {
                 if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0 || PlayerData.userData.money > 0)
                 {
+                    if(!(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0))fbClient.updateUserData('money', -1);
                     fbClient.updateUserData('hopae', {name: Input.inputField.text.text, type: 'wood'});
-                    if(PlayerData.userData.hopae === undefined || PlayerData.userData.hopae.length == 0) fbClient.updateUserData('money', -1);
                     ScenesData.changeScene('menuScene');
                 }
                 else
@@ -368,11 +367,11 @@ var shopScene = new Phaser.Class(
 
     create: function()
     {
-        BackGround.drawBackground(this);
+        BackGround.drawShop(this);
 
         this.currentSkin = this.add.sprite(500, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
             .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
-        this.money = this.add.text(200, 70, PlayerData.userData.money + "냥").setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
+        this.money = this.add.text(400, 260, PlayerData.userData.money + "냥").setOrigin(1, 0.5).setColor('#ffffff').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont');
 
 
 
@@ -380,7 +379,7 @@ var shopScene = new Phaser.Class(
             price: 0,
             itemName: this.add.text(game.config.width - 500, 300, '평민').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
             itemPrice: this.add.text(game.config.width - 200, 300, '0냥').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
-            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 600, 300, 5, 'button', 1, 'center', '구매하기'), -1, -1, -1, 
+            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 600, 300, 5, 'buyBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     if(PlayerData.userData.money >= ScenesData.shopScene.pyeongminItem.price)
@@ -391,9 +390,10 @@ var shopScene = new Phaser.Class(
                         fbClient.updateUserData('money', -ScenesData.shopScene.pyeongminItem.price);
                         ScenesData.shopScene.money.setText(PlayerData.userData.money + '냥');
                         ScenesData.shopScene.pyeongminItem.useBtn.setVisible(true);
+                        ScenesData.shopScene.pyeongminItem.boughtSign.setVisible(true);
                     }
                 }),
-            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 300, 5, 'button', 1, 'center', '사용하기'), -1, -1, -1, 
+            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 300, 5, 'equipBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     if(PlayerData.userData.item.includes(0))
@@ -402,16 +402,18 @@ var shopScene = new Phaser.Class(
                         ScenesData.shopScene.sunbiItem.useBtn.setVisible(true);
                         fbClient.updateUserData('skin', 0);
                         ScenesData.shopScene.currentSkin.destroy();
-                        ScenesData.shopScene.currentSkin = ScenesData.shopScene.add.sprite(500, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
+                        ScenesData.shopScene.add.sprite(500, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
                             .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
                     }
-                })
+                }),
+            boughtSign: UIObject.createLabel(ScenesData.shopScene, game.config.width - 400, 300, 5, 'boughtItem', 1, 'center').setVisible(false)
         }
         
         this.pyeongminItem.buyBtn.setEnable(PlayerData.userData.money < ScenesData.shopScene.pyeongminItem.price ? false : true);
         if(PlayerData.userData.item.includes(0))
         {
             this.pyeongminItem.buyBtn.setVisible(false);
+            this.pyeongminItem.boughtSign.setVisible(true);
             this.pyeongminItem.itemPrice.setText('보유중');
         }
         if(PlayerData.userData.skin == 0 || !PlayerData.userData.item.includes(0)) this.pyeongminItem.useBtn.setVisible(false);
@@ -422,7 +424,7 @@ var shopScene = new Phaser.Class(
             price: 100,
             itemName: this.add.text(game.config.width - 500, 400, '선비').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
             itemPrice: this.add.text(game.config.width - 200, 400, '100냥').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
-            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'button', 1, 'center', '구매하기'), -1, -1, -1, 
+            buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'buyBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     if(PlayerData.userData.money >= ScenesData.shopScene.sunbiItem.price)
@@ -433,9 +435,10 @@ var shopScene = new Phaser.Class(
                         fbClient.updateUserData('money', -ScenesData.shopScene.sunbiItem.price);
                         ScenesData.shopScene.money.setText(PlayerData.userData.money + '냥');
                         ScenesData.shopScene.sunbiItem.useBtn.setVisible(true);
+                        ScenesData.shopScene.sunbiItem.boughtSign.setVisible(true);
                     }
                 }),
-            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'button', 1, 'center', '사용하기'), -1, -1, -1, 
+            useBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'equipBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
                     if(PlayerData.userData.item.includes(1))
@@ -447,13 +450,15 @@ var shopScene = new Phaser.Class(
                         ScenesData.shopScene.currentSkin = ScenesData.shopScene.add.sprite(500, game.config.height / 2, Enums.characterSkin[PlayerData.userData.skin] + 'Stand')
                             .setOrigin(0.5, 0.5).setDepth(5).setScale(0.8);
                     }
-                })
+                }),
+            boughtSign: UIObject.createLabel(ScenesData.shopScene, game.config.width - 400, 400, 5, 'boughtItem', 1, 'center').setVisible(false)
         }
         
         this.sunbiItem.buyBtn.setEnable(PlayerData.userData.money < ScenesData.shopScene.sunbiItem.price ? false : true);
         if(PlayerData.userData.item.includes(1))
         {
             this.sunbiItem.buyBtn.setVisible(false);
+            this.sunbiItem.boughtSign.setVisible(true);
             this.sunbiItem.itemPrice.setText('보유중');
         }
         if(PlayerData.userData.skin == 1 || !PlayerData.userData.item.includes(1)) this.sunbiItem.useBtn.setVisible(false);
@@ -595,13 +600,6 @@ var gameScene = new Phaser.Class(
         BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
 
-        if(WordSpace.CurrentPhase == 1)
-            Audio.loopSound(this, 'Phase1');
-        else if(WordSpace.CurrentPhase == 2)
-            Audio.loopSound(this, 'Phase2');
-        else
-            Audio.loopSound(this, 'Phase3');
-
         WordSpace.attackPaperGroup = this.physics.add.group();
         WordSpace.wordPhysicsGroup = this.physics.add.group();
             
@@ -656,6 +654,11 @@ var gameScene = new Phaser.Class(
 ScenesData.changeScene = function(sceneKey)
 {
     Audio.killSound(ScenesData.menuScene, 'login');
+    Audio.killSound(ScenesData.currentScene, 'victory');
+    Audio.killSound(ScenesData.currentScene, 'defeat');
+
+    // Audio.killSound(ScenesData.gameScene, 'victory');
+    // Audio.killSound(ScenesData.gameScene, 'defeat');
     ScenesData.currentScene.scene.start(sceneKey);
     Input.input = [];
     Input.converted = '';

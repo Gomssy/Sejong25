@@ -70,7 +70,7 @@ socket.on('setRoomCount', function(msg)
     setTimeout(function()
     {
         ScenesData.roomScene.isCounting = msg.isEnable;
-        ScenesData.roomScene.endTime = msg.endTime;
+        ScenesData.roomScene.endTime = Date.now() + msg.endTime;
         ScenesData.roomScene.peopleCount = msg.playerCount;
 
         if (msg.isEnter) // generate character
@@ -207,14 +207,7 @@ socket.on('defeat', function(msg) // object player
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
     let earnedStrongHopae = RoomData.findPlayer(msg.id).earnedStrongHopae;
 
-    if(WordSpace.CurrentPhase == 1)
-        Audio.killSound(ScenesData.gameScene, 'Phase1');
-    if(WordSpace.CurrentPhase == 2)
-        Audio.killSound(ScenesData.gameScene, 'Phase2');
-    if(WordSpace.CurrentPhase == 3)
-        Audio.killSound(ScenesData.gameScene, 'Phase3');
-
-    Audio.playSound(ScenesData.gameScene, 'defeat');
+    
     RoomData.players[msg.index] = msg;
     RoomData.players[msg.index].playerImage = playerImage;
     RoomData.players[msg.index].position = position;
@@ -361,6 +354,7 @@ socket.on('defeat', function(msg) // object player
     }
     if(msg.id == RoomData.myself.id)
     {
+        Audio.loopSound(ScenesData.gameScene, 'defeat');
         RoomData.myself = RoomData.players[msg.index];
         setTimeout(() => {
             gameEndMenu(false);
@@ -378,10 +372,10 @@ socket.on('gameEnd', function(msg) // number winnerId
     if(WordSpace.CurrentPhase == 3)
         Audio.killSound(ScenesData.gameScene, 'Phase3');
 
-    Audio.playSound(ScenesData.gameScene, 'victory');
     console.log(winner.nickname + ' Win!!!!!!');
     if(msg == RoomData.myself.id)
     {
+        Audio.loopSound(ScenesData.gameScene, 'victory');
         RoomData.myself.rank = 1;
         setTimeout(() => {
             gameEndMenu(true);
@@ -393,7 +387,6 @@ socket.on('attackSucceed', function(msg)
 {
     //console.log('client');
     let tempWord = WordSpace.generateWord.Name(ScenesData.gameScene, true, RoomData.findPlayer(msg.victimId));
-    tempWord.instantiate(ScenesData.gameScene);
     let victimPos = RoomData.findPlayer(msg.victimId).position;
     tempWord.physicsObj.setPosition(victimPos.x, victimPos.y);
     tempWord.wordObj.setPosition(tempWord.physicsObj.x, tempWord.physicsObj.y);
@@ -417,10 +410,9 @@ var gameEndMenu = function(isWin)
     let earnedMoney = 0;
     if(isWin) earnedMoney += 20;
     earnedMoney += RoomData.myself.killCount * 3;
-    earnedMoney += parseInt(WordSpace.playerTyping / 10);
+    earnedMoney += parseInt(WordSpace.playerTyping / 40);
     earnedMoney += Math.max(20, Math.pow(RoomData.myself.attackSucceed, 2));
     earnedMoney += parseInt(20 * (1 - (RoomData.myself.rank - 1) / (RoomData.players.length - 1)));
-    earnedMoney = parseInt(earnedMoney / 40);
 
     Input.inputField.text.destroy();
 
@@ -431,7 +423,6 @@ var gameEndMenu = function(isWin)
         fbClient.updateUserData('money', earnedMoney);
         ScenesData.changeScene('menuScene');
     }
-
 
     ScenesData.gameScene.backToMenuDialog = ScenesData.gameScene.rexUI.add.dialog({
         x: game.config.width / 2,

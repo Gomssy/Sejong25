@@ -266,6 +266,7 @@ FirebaseClient.prototype.updateUserData = function(key, valueChanged, replace = 
 			break;
 		case 'skin':
 			beforeData.skin = valueChanged;
+			break;
 		default:
 			console.log('[ERROR] database has no key for ' + key);
 			break;

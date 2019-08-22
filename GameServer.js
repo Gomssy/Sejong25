@@ -143,7 +143,8 @@ class GameRoom
         {
             if (this.currentPhase === GameServer.Phase.READY)
             {
-                this.endTime = Date.now() + 30000; // 방 대기 시간
+                this.countStartTime = Date.now();
+                this.endTime = 30000; // 방 대기 시간
                 this.announceToRoom('setRoomCount', 
                 {
                     isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
@@ -153,6 +154,7 @@ class GameRoom
             }
             else if (this.currentPhase === GameServer.Phase.COUNT)
             {
+                this.endTime = this.endTime - (Time.now() - this.countStartTime);
                 this.announceToRoom('setRoomCount', 
                 {
                     isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
@@ -264,32 +266,26 @@ class GameRoom
         console.table(this.currentPlayer);
         this.announceToRoom('startGame');
         this.startTime = Date.now();
+        setTimeout(function()
+        {
+            if (this.currentPhase === GameServer.Phase.START) this.checkPhase(Date.now());
+        }.bind(this), 6000);
     }
 
     checkPhase(checkTime)
     {
         if (this.currentPhase === GameServer.Phase.START)
         {
-            if (this.phaseChanger < 0 && checkTime - this.startTime > 1000)
+            if (checkTime - this.startTime > 6000)
             {
                 this.currentPhase = GameServer.Phase.MAIN;
                 this.rateArrangePoint = 150;
                 this.announceToRoom('changePhase', GameServer.Phase.MAIN);
             }
-            else if (this.phaseChanger < 0)
-            {
-                this.phaseChanger = setTimeout(function(room)
-                {
-                    room.currentPhase = GameServer.Phase.MAIN;
-                    room.rateArrangePoint = 150;
-                    room.announceToRoom('changePhase', GameServer.Phase.MAIN);
-                    room.phaseChanger = -1;
-                }, 60000 - (checkTime - this.startTime), this);
-            }
         }
         else if (this.currentPhase === GameServer.Phase.MAIN)
         {
-            let playerLimit = Math.min(Math.round(this.currentPlayer.length / 5), 3);
+            let playerLimit = Math.max(Math.round(this.currentPlayer.length / 5), 3);
             if (this.aliveCount <= playerLimit)
             {
                 this.currentPhase = GameServer.Phase.MUSIC;

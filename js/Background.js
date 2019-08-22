@@ -52,6 +52,11 @@ BackGround.drawMenu = function(scene)
     scene.add.sprite(game.config.width / 2, game.config.height / 2, 'menuBackground').setDisplaySize(game.config.width, game.config.height).setDepth(3);
 }
 
+BackGround.drawShop = function(scene)
+{
+    scene.add.sprite(game.config.width / 2, game.config.height / 2, 'shopBackground').setDisplaySize(game.config.width, game.config.height).setDepth(3);
+}
+
 BackGround.drawRoom = function(scene)
 {
     scene.add.sprite(game.config.width / 2, game.config.height / 2, 'roomBackground').setDisplaySize(game.config.width, game.config.height).setDepth(5.2);

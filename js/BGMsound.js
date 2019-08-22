@@ -29,12 +29,13 @@ Audio.loadSound = function(scene)
 
 Audio.playSound = function(scene, title) // 한 번만 재생할 때 사용
 {
-    bgm = scene.sound.add(title);
-    bgm.play();
+    let sound = scene.sound.add(title);
+    sound.play();
 }
 
 Audio.loopSound = function(scene, title) // 반복재생할 때 사용
 {
+    if (bgm != null) this.killSound(scene, title);
     bgm = scene.sound.add(title);
     bgm.setLoop(true);
     bgm.play();
@@ -56,3 +57,4 @@ Audio.killSound = function(scene, title)
     bgm.stop();
 }
 
+// 전반적으로 함수 수정 필요..

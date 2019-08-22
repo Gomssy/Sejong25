@@ -218,6 +218,13 @@ function gameOver()
 {
     WordSpace.pauseCycle(true);
     
+    if(WordSpace.CurrentPhase == 1)
+        Audio.killSound(ScenesData.gameScene, 'Phase1');
+    if(WordSpace.CurrentPhase == 2)
+        Audio.killSound(ScenesData.gameScene, 'Phase2');
+    if(WordSpace.CurrentPhase == 3)
+        Audio.killSound(ScenesData.gameScene, 'Phase3');
+    
     socket.emit('defeated');
     console.log('defeat');
 }
@@ -486,11 +493,11 @@ WordSpace.changePhase = function(newPhase)
     WordSpace.CurrentPhase = newPhase;
 
     if(WordSpace.CurrentPhase == 1)
-        Audio.killSound('gameScene', 'Phase1');
+        Audio.loopSound(ScenesData.currentScene, 'Phase1');
     else if(WordSpace.CurrentPhase == 2)
-        Audio.killSound('gameScene', 'Phase2');
+        Audio.loopSound(ScenesData.currentScene, 'Phase2');
     else
-        Audio.killSound('gameScene', 'Phase3');
+        Audio.loopSound(ScenesData.currentScene, 'Phase3');
 
     //WordSpace.pauseCycle(true);
     // 여기서 종이 드르륵 열면됨
