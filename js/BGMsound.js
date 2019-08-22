@@ -23,18 +23,19 @@ Audio.loadSound = function(scene)
     scene.load.audio('Phase3', 'assets/sound/Phase3.ogg');
     
     // 승패 BGM
-    scene.load.audio('defeat', 'assets/sound/victory.ogg');
-    scene.load.audio('victory', 'assets/sound/defeat.ogg');
+    scene.load.audio('victory', 'assets/sound/victory.ogg');
+    scene.load.audio('defeat', 'assets/sound/defeat.ogg');
 }
 
 Audio.playSound = function(scene, title) // 한 번만 재생할 때 사용
 {
-    bgm = scene.sound.add(title); // 추후 수정 예정
-    bgm.play();
+    let sound = scene.sound.add(title);
+    sound.play();
 }
 
 Audio.loopSound = function(scene, title) // 반복재생할 때 사용
 {
+    if (bgm != null) this.killSound(scene, title);
     bgm = scene.sound.add(title);
     bgm.setLoop(true);
     bgm.play();

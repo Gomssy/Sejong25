@@ -354,6 +354,7 @@ socket.on('defeat', function(msg) // object player
     }
     if(msg.id == RoomData.myself.id)
     {
+        Audio.loopSound(ScenesData.gameScene, 'defeat');
         RoomData.myself = RoomData.players[msg.index];
         setTimeout(() => {
             gameEndMenu(false);
@@ -371,10 +372,10 @@ socket.on('gameEnd', function(msg) // number winnerId
     if(WordSpace.CurrentPhase == 3)
         Audio.killSound(ScenesData.gameScene, 'Phase3');
 
-    Audio.playSound(ScenesData.gameScene, 'victory');
     console.log(winner.nickname + ' Win!!!!!!');
     if(msg == RoomData.myself.id)
     {
+        Audio.loopSound(ScenesData.gameScene, 'victory');
         RoomData.myself.rank = 1;
         setTimeout(() => {
             gameEndMenu(true);

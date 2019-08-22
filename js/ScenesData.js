@@ -600,13 +600,6 @@ var gameScene = new Phaser.Class(
         BackGround.drawCharacter(this);
         Audio.playSound(this, 'startGame');
 
-        if(WordSpace.CurrentPhase == 1)
-            Audio.loopSound(this, 'Phase1');
-        else if(WordSpace.CurrentPhase == 2)
-            Audio.loopSound(this, 'Phase2');
-        else
-            Audio.loopSound(this, 'Phase3');
-
         WordSpace.attackPaperGroup = this.physics.add.group();
         WordSpace.wordPhysicsGroup = this.physics.add.group();
             
