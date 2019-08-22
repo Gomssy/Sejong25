@@ -31,7 +31,8 @@
     <style>
         img { position: relative; width: 100%; height: 100%; z-index: 0;}
         #dvLogin { position: absolute; left: 65%; top: 35%; width: 30%; height: 30%; padding: 10px; background: black; z-index: 1;}
-        #notSupport { position: absolute; left: 25%; top: 25%; background: white; z-index: 1; width: 50%; height: 50%; display: none;}
+        #dvNewEmail { position:absolute; left: 35%; top: 35%; width: 30%; height: 30%; padding: 10px; background: black; z-index: 1; display: none; }
+        #notSupport { position: absolute; left: 25%; top: 25%; background: white; z-index: 2; width: 50%; height: 50%; display: none;}
     </style>
 </head>
 <body>
@@ -40,9 +41,17 @@
         <div id="dvLogin">
             <input id="userEmail" type="email" placeholder="email" style="width: 100%; height: 10%;"></br>
             <input id="userPassword" type="password" placeholder="password" maxlength="17" style="width: 100%; height: 10%;"></br>
-            <button id="joinBtn" style="width: 100%; height: 10%;">이메일로 가입하기</button></br>
+            <button id="joinOpenBtn" style="width: 100%; height: 10%;">이메일로 가입하기</button></br>
             <button id="emailBtn" style="width: 100%; height: 10%;">이메일로 로그인</button></br>
             <button id="googleBtn" style="width: 10%; height: 10%;"><img src="/assets/title/googleBtn.png" style="object-fit: contain"></button></br>
+        </div>
+        <div id="dvNewEmail">
+            <input id="newEmail" type="email" placeholder="email" style="width: 100%; height: 10%;"></br>
+            <input id="newPassword" type="password" placeholder="password" maxlength="17" style="width: 100%; height: 10%;"></br>
+            <input id="newPasswordCheck" type="password" placeholder="password again" maxlength="17" style="width: 100%; height: 10%;"></br>
+            <input id="newName" placeholder="user name" maxlength="8" style="width: 100%; height: 10%;"></br>
+            <button id="joinBtn" style="width: 50%; height: 10%;">가입하기</button>
+            <button id="joinCancelBtn" style="width: 50%; height: 10%;">취소</button>
         </div>
         <p id="notSupport">해당하는 환경에서는 지원되지 않습니다. PC에서 이용 부탁드립니다.</p>
     </div>

@@ -20,6 +20,17 @@ FirebaseClient.prototype.initEvent = function()
 	this.googleBtn.addEventListener('click', this.onGoogleBtnClick.bind(this));
 	this.emailBtn.addEventListener('click', this.onEmailBtnClick.bind(this));
 	this.joinBtn.addEventListener('click', this.createEmailUser.bind(this));
+	
+	document.getElementById('joinOpenBtn').addEventListener('click', function()
+	{
+		document.getElementById('dvNewEmail').style.display = 'block';
+		document.getElementById('dvLogin').style.display = 'none';
+	});
+	document.getElementById('joinCancelBtn').addEventListener('click', function()
+	{
+		document.getElementById('dvNewEmail').style.display = 'none';
+		document.getElementById('dvLogin').style.display = 'block';
+	})
 }
 
 FirebaseClient.prototype.logOut = function()
@@ -125,56 +136,76 @@ FirebaseClient.prototype.onEmailBtnClick = function()
 
 FirebaseClient.prototype.createEmailUser = function()
 {
-	var email = document.getElementById('userEmail').value.trim();
-	var password = document.getElementById('userPassword').value.trim();
+	var email = document.getElementById('newEmail').value.trim();
+	var password = document.getElementById('newPassword').value.trim();
+	var passCheck = document.getElementById('newPasswordCheck').value.trim();
+	var newUserName = document.getElementById('newName').value.trim();
 	// 유효성 검증
-	if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
+	if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)))
 	{
+		alert('잘못된 이메일입니다.');
+		return;
+	}
+	else if (password != passCheck)
+	{
+		alert('비밀번호와 비밀번호 확인이 다릅니다.')
+		return;
+	}
+	else if (newUserName.length === 0)
+	{
+		alert('닉네임을 작성해주세요.')
+		return;
+	}
+	else
+	{
+
 		var cbCreateUserWithEmail = function(user){
 			console.log('이메일 가입 성공 : ', JSON.stringify(user));
 			//프로필 업데이트 - 이메일 가입시 유저이름 파라미터를 보내지 않으므로 가입 성공 후 처리
 			firebase.auth().currentUser.updateProfile({
-				displayName: email,
+				displayName: newUserName,
 			}).then(function() {
 				console.log('userName 업데이트 성공')
 			}).catch(function(error) {
 				console.error('userName 업데이트 실패 : ', error );
 			});
-			/*
-			//인증 메일 발송
-			this.auth.useDeviceLanguage(); // 이메일 기기언어로 세팅
-			user.sendEmailVerification().then(function() {
-				console.log('인증메일 발송 성공')
-			}).catch(function(error) {
-				console.error('인증메일 발송 에러', error);
-			});*/
+		/*
+		//인증 메일 발송
+		this.auth.useDeviceLanguage(); // 이메일 기기언어로 세팅
+		user.sendEmailVerification().then(function() {
+			console.log('인증메일 발송 성공')
+		}).catch(function(error) {
+			console.error('인증메일 발송 에러', error);
+		});*/
 		}
+		document.getElementById('dvLogin').style.display = 'block';
+		document.getElementById('dvNewEmail').style.display = 'block';
 		var cbAfterPersistence = function(){
-			return this.auth.createUserWithEmailAndPassword(email, password)
-				.then(cbCreateUserWithEmail.bind(this))
-				.catch(function(error) {
-					console.error('이메일 가입시 에러 : ', error);
-					switch(error.code){
-						case "auth/email-already-in-use":
-							alert('이미 사용중인 이메일 입니다.');
-							break;
-						case "auth/invalid-email":
-							alert('유효하지 않은 메일입니다');
-							break;
-						case "auth/operation-not-allowed":
-							alert('이메일 가입이 중지되었습니다.');
-							break;
-						case "auth/weak-password":
-							alert("비밀번호를 6자리 이상 필요합니다");
-							break;
-					}
-				});
+		return this.auth.createUserWithEmailAndPassword(email, password)
+			.then(cbCreateUserWithEmail.bind(this))
+			.catch(function(error) {
+				console.error('이메일 가입시 에러 : ', error);
+				switch(error.code){
+					case "auth/email-already-in-use":
+						alert('이미 사용중인 이메일 입니다.');
+						break;
+					case "auth/invalid-email":
+						alert('유효하지 않은 메일입니다');
+						break;
+					case "auth/operation-not-allowed":
+						alert('이메일 가입이 중지되었습니다.');
+						break;
+					case "auth/weak-password":
+						alert("비밀번호를 6자리 이상 필요합니다");
+						break;
+				}
+			});
 		}
 		this.auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
 			.then(cbAfterPersistence.bind(this))
 			.catch(function(error) {
 				console.error('인증 상태 설정 중 에러 발생' , error);
-			});	
+			});
 	}
 }
 
@@ -259,22 +290,21 @@ document.addEventListener('DOMContentLoaded', function()
 				{
 					fbClient.onEmailBtnClick();
 				}
+				else if (fbClient.isGameStarted && e.keyCode === 27)
+				{
+					fbClient.logOut();
+				}
 			}
 		}
 	}
     console.log('done load');
 });
 
-document.onkeydown = function(e)
-{
-	if (fbClient.isGameStarted && e.keyCode === 27) fbClient.logOut();
-}
-
 class UserData
 {
     constructor()
     {
-        this.userName = prompt("유저의 이름을 입력해주세요.");
+        this.userName = fbClient.auth.currentUser.displayName;
         this.exp = 0;
         this.rank = -1;
         this.hopae = [];
