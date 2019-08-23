@@ -423,7 +423,7 @@ var shopScene = new Phaser.Class(
         this.sunbiItem = {
             price: 50,
             itemName: this.add.text(game.config.width - 500, 400, '선비').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
-            itemPrice: this.add.text(game.config.width - 200, 400, '100냥').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
+            itemPrice: this.add.text(game.config.width - 200, 400, '50냥').setOrigin(1, 0.5).setColor('#000000').setDepth(9.9).setPadding(5,5,5,5).setFont('40pt sejongFont'),
             buyBtn: UIObject.createButton(this, UIObject.createLabel(this, game.config.width - 800, 400, 5, 'buyBtn', 1, 'center'), -1, -1, -1, 
                 function()
                 {
