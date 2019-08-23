@@ -50,7 +50,7 @@ io.on('connection', function(socket)
         else
         {
             socket.playerData.nickname = msg.nickname;
-            socket.playerData.skiin = msg.skin;
+            socket.playerData.skin = msg.skin;
             console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] nickname set to ' + msg.nickname);
             GameServer.enterEmptyRoom(socket);
         }
