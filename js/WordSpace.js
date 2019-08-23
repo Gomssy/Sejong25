@@ -70,7 +70,7 @@ WordSpace.adjustVarByPhase = function()
 {
     if(WordSpace.CurrentPhase == WordSpace.Phase.START)
     {
-        WordSpace.delay.WordSpawn = 3000;
+        WordSpace.delay.WordSpawn = 2000;
         WordSpace.delay.NameSpawn = 15000;
         WordSpace.NameSpawnReduce = 1000;
         WordSpace.GradeProb[0] = 0.35;
@@ -79,7 +79,7 @@ WordSpace.adjustVarByPhase = function()
     }
     else if(WordSpace.CurrentPhase == WordSpace.Phase.MAIN)
     {
-        WordSpace.delay.WordSpawn = 3000 - WordSpace.playerTypingRate * 1000;
+        WordSpace.delay.WordSpawn = 2000 - WordSpace.playerTypingRate * 1000;
         WordSpace.delay.NameSpawn = 12000;
         WordSpace.NameSpawnReduce = 1000;
         WordSpace.GradeProb[0] = 0.5 - 0.5 * WordSpace.playerTypingRate;
@@ -88,7 +88,7 @@ WordSpace.adjustVarByPhase = function()
     }
     else if(WordSpace.CurrentPhase == WordSpace.Phase.MUSIC)
     {
-        WordSpace.delay.WordSpawn = 1500;
+        WordSpace.delay.WordSpawn = 1000;
         WordSpace.delay.NameSpawn = 8000;
         WordSpace.NameSpawnReduce = 400;
         WordSpace.GradeProb[0] = 0.2 - 0.2 * WordSpace.playerTypingRate;

@@ -269,7 +269,7 @@ class GameRoom
         setTimeout(function()
         {
             if (this.currentPhase === GameServer.Phase.START) this.checkPhase(Date.now());
-        }.bind(this), 60000);
+        }.bind(this), 61000);
     }
 
     checkPhase(checkTime)
