@@ -206,6 +206,7 @@ socket.on('defeat', function(msg) // object player
     let position = RoomData.findPlayer(msg.id).position;
     let nicknameText = RoomData.findPlayer(msg.id).nicknameText;
     let earnedStrongHopae = RoomData.findPlayer(msg.id).earnedStrongHopae;
+    let killCount = RoomData.findPlayer(msg.id).killCount;
 
     
     RoomData.players[msg.index] = msg;
@@ -213,6 +214,7 @@ socket.on('defeat', function(msg) // object player
     RoomData.players[msg.index].position = position;
     RoomData.players[msg.index].nicknameText = nicknameText;
     RoomData.players[msg.index].earnedStrongHopae = earnedStrongHopae;
+    RoomData.players[msg.index].killCount = killCount;
 
     let victim = RoomData.findPlayer(msg.id);
     RoomData.aliveCount--;
