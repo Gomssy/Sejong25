@@ -154,7 +154,7 @@ class GameRoom
             }
             else if (this.currentPhase === GameServer.Phase.COUNT)
             {
-                this.endTime = this.endTime - (Time.now() - this.countStartTime);
+                this.endTime = this.endTime - (Date.now() - this.countStartTime);
                 this.announceToRoom('setRoomCount', 
                 {
                     isEnable: true, endTime: this.endTime, playerCount: this.currentPlayer.length,
