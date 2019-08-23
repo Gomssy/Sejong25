@@ -56,7 +56,7 @@ io.on('connection', function(socket)
                 console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] nickname set to ' + msg.nickname);
                 GameServer.enterEmptyRoom(socket);
             }
-            catch
+            catch (e)
             {
                 socket.disconnect();
             }
