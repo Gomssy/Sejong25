@@ -49,10 +49,17 @@ io.on('connection', function(socket)
         if(msg.nickname.length < 1) socket.emit('alert' ,'errNicknameEmpty');
         else
         {
-            socket.playerData.nickname = msg.nickname;
-            socket.playerData.skin = msg.skin;
-            console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] nickname set to ' + msg.nickname);
-            GameServer.enterEmptyRoom(socket);
+            try
+            {
+                socket.playerData.nickname = msg.nickname;
+                socket.playerData.skin = msg.skin;
+                console.log(new Date().toLocaleTimeString('ko-KR') + ' ['+socket.playerData.id+'] nickname set to ' + msg.nickname);
+                GameServer.enterEmptyRoom(socket);
+            }
+            catch
+            {
+                socket.disconnect();
+            }
         }
     });
     
