@@ -255,7 +255,7 @@ var hopaeScene = new Phaser.Class(
         }
         this.inputBackground = UIObject.createLabel(this, game.config.width / 2, game.config.height / 2, 10, 'hopaeSceneInput', 2, 'center', '', 50, '#ffffff', 0.45, 0.5);
         Input.inputField.generate(this, function(){}, this.inputBackground);
-        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 2, 'dialog2', 1, 'center', 
+        UIObject.createLabel(this, game.config.width / 2, game.config.height / 2 - 200, 5, 'dialog2', 1, 'center', 
             '호패는 오직 한글만 입력이 가능합니다.\n띄어쓰기도 사용할 수 없습니다.', 50, '#000000').layout();
 
         this.checkDialog = this.rexUI.add.dialog({
